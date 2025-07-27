@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { SHEET_ID } from "../config";
 import { useNavigate } from "react-router-dom";
-import { BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber } from "./constants";
+import { arrayToBooking, BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber } from "./constants";
 
 import './css/searchBooking.css';
 
@@ -28,30 +28,9 @@ const SearchBooking = () => {
   const convertGoogleDataToBookings = (sheetData) => {
     // Skip header row
     // const rows = sheetData.slice(1);
-    console.log("Query From Google Data Sheet Returned ", sheetData.length);
+    console.log("Query From Google Data Sheet Returned ", sheetData);
     return sheetData.map((row) => {
-      return {
-        roomName: row[0] || '',
-        customerName: row[1] || '',
-        bookingDate: row[2] || '',
-        checkInDate: row[3] || '',
-        checkOutDate: row[4] || '',
-        contactNumber: row[5] || '',
-        numberOfPeople: Number(row[6] ? row[6].replace(/,/g, '') : 0) || 0,
-        numberOfNights: Number(row[7] ? row[7].replace(/,/g, '') : 0) || 0,
-        status: row[8] || '',
-        sourceOfBooking: row[9] || '',
-        roomAmount: Number(row[10] ? row[10].replace(/,/g, '') : 0) || 0,
-        advancePaid: Number(row[11] ? row[11].replace(/,/g, '') : 0) || 0,
-        advancePaidTo: row[12] || '',
-        food: Number(row[13] ? row[13].replace(/,/g, '') : 0) || 0,
-        campFire: Number(row[14] ? row[14].replace(/,/g, '') : 0) || 0,
-        commission: Number(row[15] ? row[15].replace(/,/g, '') : 0) || 0,
-        balanceToPay: Number(row[16] ? row[16].replace(/,/g, '') : 0) || 0,
-        twwRevenue: Number(row[17] ? row[17].replace(/,/g, '') : 0) || 0,
-        balancePaidTo: row[18] || '',
-        remarks: row[19] || ''
-      };
+      return arrayToBooking(row);
     });
   }
 
@@ -208,6 +187,7 @@ const SearchBooking = () => {
             <table className="booking-table">
               <thead>
                 <tr>
+                  <th>Booking ID</th>
                   <th>Room</th>
                   <th>Guest Name</th>
                   <th>Booking Date</th>
@@ -221,6 +201,7 @@ const SearchBooking = () => {
               <tbody>
                 {paginatedResults.map((booking, index) => (
                   <tr key={index} className={booking.status === 'Cancelled' ? 'cancelled-booking' : ''}>
+                    <td>{booking.bookingID}</td>
                     <td>{booking.roomName}</td>
                     <td>{booking.customerName}</td>
                     <td>{booking.bookingDate}</td>

@@ -6,7 +6,33 @@ export const BOOKING_DEFAULT = {
     STATUS: 'Confirmed'
 }
 
-export const RANGE = "Sheet1!A2:T"; // Adjust range
+export const DEFAULT_BOOKING = {
+    roomName: BOOKING_DEFAULT.ROOM_NAME,
+    customerName: '',
+    contactNumber: '',
+    numberOfPeople: 0,
+    checkInDate: '',
+    checkOutDate: '',
+    numberOfNights: 0,
+    status: BOOKING_DEFAULT.STATUS,
+    bookingDate: BOOKING_DEFAULT.BOOKING_DATE,
+    sourceOfBooking: '',
+    roomAmount: 0,
+    advancePaid: 0,
+    advancePaidTo: '',
+    food: 0,
+    campFire: 0,
+    otherServices: 0,
+    balanceToPay: 0,
+    totalAmount: 0,
+    commission: 0,
+    twwRevenue: 0,
+    balancePaidTo: '',
+    bookingID: '',
+    remarks: ''
+}
+
+export const RANGE = "Sheet1!A2:Z"; // Adjust range
 
 export { SHEET_ID };
 
@@ -37,5 +63,33 @@ export const parseNumber = (val) => {
     return typeof val === 'string' ? Number(val.replace(/,/g, '')) || 0 : val;
 };
 
-
-
+export const arrayToBooking = (row) => {
+    return {
+        roomName: row[0] || '',
+        customerName: row[1] || '',
+        contactNumber: row[2] || '',
+        numberOfPeople: Number(row[3] ? row[3].replace(/,/g, '') : 0) || 0,
+        checkInDate: row[4] || '',
+        checkOutDate: row[5] || '',
+        numberOfNights: Number(row[6] ? row[6].replace(/,/g, '') : 0) || 0,
+        status: row[7] || '',
+        bookingDate: row[8] || '',
+        sourceOfBooking: row[9] || '',
+        roomAmount: Number(row[10] ? row[10].replace(/,/g, '') : 0) || 0,
+        advancePaid: Number(row[11] ? row[11].replace(/,/g, '') : 0) || 0,
+        advancePaidTo: row[12] || '',
+        //
+        food: Number(row[14] ? row[14].replace(/,/g, '') : 0) || 0,
+        campFire: Number(row[15] ? row[15].replace(/,/g, '') : 0) || 0,
+        //
+        //
+        otherServices: Number(row[18] ? row[18].replace(/,/g, '') : 0) || 0,
+        balanceToPay: Number(row[19] ? row[19].replace(/,/g, '') : 0) || 0,
+        totalAmount: Number(row[20] ? row[20].replace(/,/g, '') : 0) || 0,
+        commission: Number(row[21] ? row[21].replace(/,/g, '') : 0) || 0,
+        twwRevenue: Number(row[22] ? row[22].replace(/,/g, '') : 0) || 0,
+        balancePaidTo: row[23] || '',
+        bookingID: row[24] || '',
+        remarks: row[25] || ''
+    };
+}

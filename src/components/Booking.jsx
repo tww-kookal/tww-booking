@@ -1,35 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import './css/Booking.css';
-import { BOOKING_DEFAULT, RANGE, SHEET_ID, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber } from "./constants";
+import { arrayToBooking, RANGE, SHEET_ID, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING } from "./constants";
 
 const Booking = () => {
     const { id } = useParams();
     const location = useLocation();
     const preloadedBooking = location.state?.preloadedBooking;
     const navigate = useNavigate();
-    const defaultBooking = {
-        roomName: BOOKING_DEFAULT.ROOM_NAME,
-        customerName: '',
-        bookingDate: BOOKING_DEFAULT.BOOKING_DATE,
-        checkInDate: '',
-        checkOutDate: '',
-        contactNumber: '',
-        numberOfPeople: 0,
-        numberOfNights: 0,
-        status: BOOKING_DEFAULT.STATUS,
-        sourceOfBooking: '',
-        roomAmount: 0,
-        advancePaid: 0,
-        advancePaidTo: '',
-        food: 0,
-        campFire: 0,
-        commission: 0,
-        balanceToPay: 0,
-        twwRevenue: 0,
-        balancePaidTo: '',
-        remarks: ''
-    };
+    const defaultBooking = DEFAULT_BOOKING;
     const [records, setRecords] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(-1);
     const [booking, setBooking] = useState({
@@ -50,35 +29,16 @@ const Booking = () => {
                         spreadsheetId: SHEET_ID,
                         range: RANGE,
                     });
-                    
+
                     if (response.result.values && response.result.values.length > 0) {
                         // Convert to bookings and find the one with matching ID (customer name)
-                        const allBookings = response.result.values.map((row) => ({
-                            roomName: row[0] || '',
-                            customerName: row[1] || '',
-                            bookingDate: row[2] || '',
-                            checkInDate: row[3] || '',
-                            checkOutDate: row[4] || '',
-                            contactNumber: row[5] || '',
-                            numberOfPeople: Number(row[6] ? row[6].replace(/,/g, '') : 0) || 0,
-                            numberOfNights: Number(row[7] ? row[7].replace(/,/g, '') : 0) || 0,
-                            status: row[8] || '',
-                            sourceOfBooking: row[9] || '',
-                            roomAmount: Number(row[10] ? row[10].replace(/,/g, '') : 0) || 0,
-                            advancePaid: Number(row[11] ? row[11].replace(/,/g, '') : 0) || 0,
-                            advancePaidTo: row[12] || '',
-                            food: Number(row[13] ? row[13].replace(/,/g, '') : 0) || 0,
-                            campFire: Number(row[14] ? row[14].replace(/,/g, '') : 0) || 0,
-                            commission: Number(row[15] ? row[15].replace(/,/g, '') : 0) || 0,
-                            balanceToPay: Number(row[16] ? row[16].replace(/,/g, '') : 0) || 0,
-                            twwRevenue: Number(row[17] ? row[17].replace(/,/g, '') : 0) || 0,
-                            balancePaidTo: row[18] || '',
-                            remarks: row[19] || ''
-                        }));
-                        
+                        const allBookings = response.result.values.map((row) => (
+                            arrayToBooking(row)
+                        ));
+
                         const decodedId = decodeURIComponent(id);
                         const foundBooking = allBookings.find(booking => booking.customerName === decodedId);
-                        
+
                         if (foundBooking) {
                             setBooking(foundBooking);
                         } else {
@@ -94,7 +54,7 @@ const Booking = () => {
                     setIsSubmitting(false);
                 }
             };
-            
+
             fetchBookingById();
         }
     }, [preloadedBooking, id]);
@@ -106,8 +66,8 @@ const Booking = () => {
         const numberOfNights = Math.max(0, (outDate - inDate) / (1000 * 60 * 60 * 24));
 
         const commission = calculateCommission(booking.sourceOfBooking, booking.roomAmount);
-        const balanceToPay = booking.roomAmount + booking.food + booking.campFire - booking.advancePaid;
-        const twwRevenue = booking.roomAmount + booking.food + booking.campFire - commission;
+        const balanceToPay = (booking.roomAmount + booking.food + booking.campFire + booking.otherServices) - booking.advancePaid;
+        const twwRevenue = (booking.roomAmount + booking.food + booking.campFire + booking.otherServices) - commission;
 
         setBooking(prev => ({
             ...prev,
@@ -178,7 +138,7 @@ const Booking = () => {
     const handleGenerateReceipt = () => {
         // Create a printable receipt
         const receiptWindow = window.open('', '_blank');
-        
+
         receiptWindow.document.write(`
             <html>
                 <head>
@@ -207,7 +167,7 @@ const Booking = () => {
                             <table>
                                 <tr>
                                     <th>Booking ID:</th>
-                                    <td>${new Date().getTime()}</td>
+                                    <td>${booking.bookingID}</td>
                                 </tr>
                                 <tr>
                                     <th>Customer Name:</th>
@@ -259,6 +219,10 @@ const Booking = () => {
                                     <th>Camp Fire:</th>
                                     <td>₹${booking.campFire}</td>
                                 </tr>` : ''}
+                                ${booking.otherServices > 0 ? `<tr>
+                                    <th>Other Services:</th>
+                                    <td>₹${booking.otherServices}</td>
+                                </tr>` : ''}
                                 <tr>
                                     <th>Advance Paid:</th>
                                     <td>₹${booking.advancePaid}</td>
@@ -282,7 +246,7 @@ const Booking = () => {
                 </body>
             </html>
         `);
-        
+
         receiptWindow.document.close();
     };
 
@@ -311,23 +275,26 @@ const Booking = () => {
             const bookingRow = [
                 booking.roomName,
                 booking.customerName,
-                booking.bookingDate,
-                booking.checkInDate,
-                booking.checkOutDate,
                 booking.contactNumber,
                 booking.numberOfPeople,
+                booking.checkInDate,
+                booking.checkOutDate,
                 booking.numberOfNights,
                 booking.status,
+                booking.bookingDate,
                 booking.sourceOfBooking,
                 booking.roomAmount,
                 booking.advancePaid,
                 booking.advancePaidTo,
                 booking.food,
                 booking.campFire,
-                booking.commission,
+                booking.otherServices,
                 booking.balanceToPay,
+                booking.totalAmount,
+                booking.commission,
                 booking.twwRevenue,
                 booking.balancePaidTo,
+                booking.bookingID,
                 booking.remarks
             ];
 
@@ -341,18 +308,18 @@ const Booking = () => {
                     spreadsheetId: SHEET_ID,
                     range: RANGE,
                 });
-                
+
                 if (response.result.values && response.result.values.length > 0) {
                     // Find the row index that matches our booking
                     const customerName = preloadedBooking?.customerName || decodeURIComponent(id);
                     let rowIndex = -1;
-                    
+
                     response.result.values.forEach((row, index) => {
                         if (row[1] === customerName) { // Customer name is in column B (index 1)
                             rowIndex = index;
                         }
                     });
-                    
+
                     if (rowIndex !== -1) {
                         // Update the specific row
                         await window.gapi.client.sheets.spreadsheets.values.update({
@@ -363,7 +330,7 @@ const Booking = () => {
                                 values: [bookingRow]
                             }
                         });
-                        
+
                         setSuccessMessage('Booking updated successfully!');
                     } else {
                         // If we couldn't find the row, append as a new booking
@@ -375,7 +342,7 @@ const Booking = () => {
                                 values: [bookingRow]
                             }
                         });
-                        
+
                         setSuccessMessage('Booking saved as new entry!');
                     }
                 }
@@ -389,10 +356,10 @@ const Booking = () => {
                         values: [bookingRow]
                     }
                 });
-                
+
                 setSuccessMessage('Booking saved successfully!');
             }
-            
+
             // Add to local state as well
             if (currentIndex >= 0) {
                 const updated = [...records];
@@ -430,20 +397,24 @@ const Booking = () => {
     return (
         <div className="booking-form-container">
             <h2>Room Booking Form</h2>
-            
+
             {successMessage && (
                 <div className="success-message">
                     {successMessage}
                 </div>
             )}
-            
+
             {errorMessage && (
                 <div className="error-message">
                     {errorMessage}
                 </div>
             )}
-            
+
             <form onSubmit={e => e.preventDefault()}>
+                <div className='form-group'>
+                    <label>Booking ID:</label>
+                    <input type="text" name="bookingID" value={booking.bookingID} readOnly />                
+                </div>
                 <div className='form-group'>
                     <label>Room Name:</label>
                     <select name="roomName" value={booking.roomName} onChange={handleChange}>
@@ -529,6 +500,11 @@ const Booking = () => {
                     </div>
 
                     <div className='form-group'>
+                        <label>Other Services:</label>
+                        <input type="number" name="campFire" value={booking.otherServices} onChange={handleChange} />
+                    </div>
+
+                    <div className='form-group'>
                         <label>Commission {getCommissionPercent(booking.sourceOfBooking)}% :</label>
                         <input type="number" name="commission" value={booking.commission} readOnly />
                     </div>
@@ -558,10 +534,10 @@ const Booking = () => {
                 <div className="form-buttons">
                     <button type="button" className="button-secondary" onClick={handleCancel}>Cancel</button>
                     <button type="button" className="button-secondary" onClick={handleAddNew}>Clear Form</button>
-                    <button 
-                        type="button" 
-                        className="button-primary" 
-                        onClick={handleUpdate} 
+                    <button
+                        type="button"
+                        className="button-primary"
+                        onClick={handleUpdate}
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update Booking' : 'Save Booking'}
