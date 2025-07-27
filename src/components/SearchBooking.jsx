@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { SHEET_ID } from "../config";
 import { useNavigate } from "react-router-dom";
-import { arrayToBooking, BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, sortBookings } from "./constants";
+import { convertGoogleDataToBookings, arrayToBooking, BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, sortBookings } from "./constants";
 
 import './css/searchBooking.css';
 
@@ -13,6 +13,7 @@ const SearchBooking = () => {
     guestName: "",
     checkInDate: "",
     contactNumber: "",
+    bookingID: "", // Added bookingID to search criteria
   });
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -25,15 +26,6 @@ const SearchBooking = () => {
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
   };
 
-  const convertGoogleDataToBookings = (sheetData) => {
-    // Skip header row
-    // const rows = sheetData.slice(1);
-    console.log("Query From Google Data Sheet Returned ", sheetData);
-    return sheetData.map((row) => {
-      return arrayToBooking(row);
-    });
-  }
-
   const fetchGoogleSheetRecords = async () => {
     setLoading(true);
     setError("");
@@ -42,34 +34,47 @@ const SearchBooking = () => {
         spreadsheetId: SHEET_ID,
         range: RANGE,
       });
-      
+
+      let allBookings = [];
+      let filteredResults = [];
+      const today = new Date().toISOString().split('T')[0];
+
       if (res.result.values && res.result.values.length > 0) {
-        // Convert to bookings and filter based on search criteria
-        const allBookings = convertGoogleDataToBookings(res.result.values);
-        
-        // Filter results based on search criteria
-        const filteredResults = allBookings.filter(booking => {
-          const matchesBookingDate = !searchCriteria.bookingDate || 
-            booking.bookingDate.includes(searchCriteria.bookingDate);
-          
-          const matchesGuestName = !searchCriteria.guestName || 
-            booking.customerName.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
-          
-          const matchesCheckInDate = !searchCriteria.checkInDate || 
-            booking.checkInDate.includes(searchCriteria.checkInDate);
-          
-          const matchesContactNumber = !searchCriteria.contactNumber || 
-            booking.contactNumber.includes(searchCriteria.contactNumber);
-          
-          return matchesBookingDate && matchesGuestName && matchesCheckInDate && matchesContactNumber;
-        });
-        
-        setResults(sortBookings(filteredResults));
-        setCurrentPage(1);
+        allBookings = convertGoogleDataToBookings(res.result.values);
       } else {
         setResults([]);
         setError("No bookings found");
       }
+
+      if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
+        filteredResults = allBookings.filter(booking => {
+          return booking.checkInDate >= today && booking.status !== 'Cancelled'; // Assuming index 8 is status
+        });
+      } else {
+        // Convert to bookings and filter based on search criteria
+        // Filter results based on search criteria
+        filteredResults = allBookings.filter(booking => {
+          const matchesBookingDate = !searchCriteria.bookingDate ||
+            booking.bookingDate.includes(searchCriteria.bookingDate);
+
+          const matchesGuestName = !searchCriteria.guestName ||
+            booking.customerName.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
+
+          const matchesCheckInDate = !searchCriteria.checkInDate ||
+            booking.checkInDate.includes(searchCriteria.checkInDate);
+
+          const matchesContactNumber = !searchCriteria.contactNumber ||
+            booking.contactNumber.includes(searchCriteria.contactNumber);
+
+          const matchesBookingID = !searchCriteria.bookingID ||
+            booking.bookingID.toLowerCase().includes(searchCriteria.bookingID.toLowerCase());
+
+          return matchesBookingDate && matchesGuestName && matchesCheckInDate &&
+            matchesContactNumber && matchesBookingID;
+        });
+      }
+      setResults(sortBookings(filteredResults));
+      setCurrentPage(1);
     } catch (err) {
       console.error("Error fetching data:", err);
       setError("Failed to fetch bookings. Please try again.");
@@ -87,16 +92,16 @@ const SearchBooking = () => {
   const handleSearch = () => {
     fetchGoogleSheetRecords();
   };
-  
+
   const handleViewBooking = (booking) => {
-    navigate(`/booking/${encodeURIComponent(booking.customerName)}`, { 
-      state: { 
+    navigate(`/booking/${encodeURIComponent(booking.customerName)}`, {
+      state: {
         preloadedBooking: booking,
         from: 'search'
-      } 
+      }
     });
   };
-  
+
   const handleCreateNew = () => {
     navigate('/booking', { state: { from: 'search' } });
   };
@@ -117,57 +122,73 @@ const SearchBooking = () => {
         <h2>Search Bookings</h2>
         <button className="create-new-button" onClick={handleCreateNew}>Create New Booking</button>
       </div>
-      
+
       <div className="search-form">
         <div className="search-row">
           <div className="search-field">
             <label>Booking Date:</label>
-            <input 
-              type="date" 
-              name="bookingDate" 
-              value={searchCriteria.bookingDate} 
-              onChange={handleInputChange} 
+            <input
+              type="date"
+              name="bookingDate"
+              value={searchCriteria.bookingDate}
+              onChange={handleInputChange}
             />
           </div>
-          
+
           <div className="search-field">
             <label>Guest Name:</label>
-            <input 
-              type="text" 
-              name="guestName" 
-              placeholder="Enter guest name" 
-              value={searchCriteria.guestName} 
-              onChange={handleInputChange} 
+            <input
+              type="text"
+              name="guestName"
+              placeholder="Enter guest name"
+              value={searchCriteria.guestName}
+              onChange={handleInputChange}
             />
           </div>
         </div>
-        
+
         <div className="search-row">
           <div className="search-field">
             <label>Check In Date:</label>
-            <input 
-              type="date" 
-              name="checkInDate" 
-              value={searchCriteria.checkInDate} 
-              onChange={handleInputChange} 
+            <input
+              type="date"
+              name="checkInDate"
+              value={searchCriteria.checkInDate}
+              onChange={handleInputChange}
             />
           </div>
-          
+
           <div className="search-field">
             <label>Contact Number:</label>
-            <input 
-              type="text" 
-              name="contactNumber" 
-              placeholder="Enter contact number" 
-              value={searchCriteria.contactNumber} 
-              onChange={handleInputChange} 
+            <input
+              type="text"
+              name="contactNumber"
+              placeholder="Enter contact number"
+              value={searchCriteria.contactNumber}
+              onChange={handleInputChange}
             />
           </div>
         </div>
-        
+
+        <div className="search-row">
+          <div className="search-field">
+            <label>Booking ID:</label>
+            <input
+              type="text"
+              name="bookingID"
+              placeholder="Enter booking ID"
+              value={searchCriteria.bookingID}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="search-field">
+            {/* Empty div to maintain grid layout */}
+          </div>
+        </div>
+
         <div className="search-actions">
-          <button 
-            className="search-button" 
+          <button
+            className="search-button"
             onClick={handleSearch}
             disabled={loading}
           >
@@ -177,7 +198,7 @@ const SearchBooking = () => {
       </div>
 
       {error && <div className="error-message">{error}</div>}
-      
+
       <div className="results-section">
         {loading ? (
           <div className="loading-indicator">Loading bookings...</div>
@@ -192,7 +213,7 @@ const SearchBooking = () => {
                   <th>Guest Name</th>
                   <th>Booking Date</th>
                   <th>Check In</th>
-                  <th>Check Out</th>                  
+                  <th>Check Out</th>
                   <th>Contact</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -214,8 +235,8 @@ const SearchBooking = () => {
                       </span>
                     </td>
                     <td>
-                      <button 
-                        className="view-button" 
+                      <button
+                        className="view-button"
                         onClick={() => handleViewBooking(booking)}
                       >
                         View Details
@@ -225,20 +246,20 @@ const SearchBooking = () => {
                 ))}
               </tbody>
             </table>
-            
+
             {results.length > itemsPerPage && (
               <div className="pagination">
-                <button 
-                  className="pagination-button" 
-                  onClick={() => handlePageChange("prev")} 
+                <button
+                  className="pagination-button"
+                  onClick={() => handlePageChange("prev")}
                   disabled={currentPage === 1}
                 >
                   Previous
                 </button>
                 <span className="page-info">Page {currentPage} of {Math.ceil(results.length / itemsPerPage)}</span>
-                <button 
-                  className="pagination-button" 
-                  onClick={() => handlePageChange("next")} 
+                <button
+                  className="pagination-button"
+                  onClick={() => handlePageChange("next")}
                   disabled={currentPage * itemsPerPage >= results.length}
                 >
                   Next

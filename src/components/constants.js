@@ -53,6 +53,15 @@ export const getCommissionPercent = (source) => {
     return 0;
 };
 
+export const convertGoogleDataToBookings = (sheetData) => {
+    // Skip header row
+    // const rows = sheetData.slice(1);
+    console.log("Query From Google Data Sheet Returned ", sheetData.length);
+    return sheetData.map((row) => {
+        return arrayToBooking(row);
+    });
+}
+
 export const calculateCommission = (source, amount) => {
     return (amount * getCommissionPercent(source)) / 100;
 };
@@ -100,7 +109,7 @@ export const sortBookings = (bookings) => {
         // Convert YYYY-MM-DD strings to Date objects for proper date comparison
         const dateA = a.checkInDate ? new Date(a.checkInDate) : new Date(0);
         const dateB = b.checkInDate ? new Date(b.checkInDate) : new Date(0);
-        
+
         // If check-in dates are the same, sort by customer name
         if (dateA.getTime() === dateB.getTime()) {
             return a.customerName.localeCompare(b.customerName);

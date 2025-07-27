@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { SHEET_ID, RANGE } from './constants';
+import { SHEET_ID, RANGE, convertGoogleDataToBookings } from './constants';
 import './css/Dashboard.css';
 
 const Dashboard = () => {
@@ -25,25 +25,24 @@ const Dashboard = () => {
         range: RANGE,
       });
 
-      if (res.result.values) {
-        const bookings = res.result.values;
+      const bookings = convertGoogleDataToBookings(res.result.values);
+
+      if (bookings) {
         const today = new Date().toISOString().split('T')[0];
-        
         // Calculate stats
         const totalBookings = bookings.length;
         const upcomingBookings = bookings.filter(booking => {
-          const checkInDate = booking[3]; // Assuming index 3 is check-in date
-          return checkInDate >= today && booking[8] !== 'Cancelled'; // Assuming index 8 is status
+          return booking.checkInDate >= today && booking.status !== 'Cancelled'; // Assuming index 8 is status
         }).length;
-        
+
         const todayCheckIns = bookings.filter(booking => {
-          return booking[3] === today && booking[8] !== 'Cancelled';
+          return booking.checkInDate === today && booking.status !== 'Cancelled';
         }).length;
-        
+
         const todayCheckOuts = bookings.filter(booking => {
-          return booking[4] === today && booking[8] !== 'Cancelled'; // Assuming index 4 is check-out date
+          return booking.checkOutDate === today && booking.status !== 'Cancelled'; // Assuming index 4 is check-out date
         }).length;
-        
+
         setStats({
           totalBookings,
           upcomingBookings,
@@ -62,9 +61,9 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <h2>Dashboard</h2>
-      
+
       {error && <div className="error-message">{error}</div>}
-      
+
       {loading ? (
         <div className="loading">Loading statistics...</div>
       ) : (
@@ -74,10 +73,12 @@ const Dashboard = () => {
               <h3>Total Bookings</h3>
               <p className="stat-value">{stats.totalBookings}</p>
             </div>
-            <div className="stat-card">
+            <Link to="/search" className="action-button search">
+            <div className="stat-card">              
               <h3>Upcoming Bookings</h3>
               <p className="stat-value">{stats.upcomingBookings}</p>
             </div>
+            </Link>
             <div className="stat-card">
               <h3>Today's Check-ins</h3>
               <p className="stat-value">{stats.todayCheckIns}</p>
@@ -87,7 +88,7 @@ const Dashboard = () => {
               <p className="stat-value">{stats.todayCheckOuts}</p>
             </div>
           </div>
-          
+
           <div className="quick-actions">
             <h3>Quick Actions</h3>
             <div className="action-buttons">
