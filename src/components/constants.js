@@ -93,3 +93,19 @@ export const arrayToBooking = (row) => {
         remarks: row[25] || ''
     };
 }
+
+export const sortBookings = (bookings) => {
+    // Sort the filtered results by check-in date
+    return bookings.sort((a, b) => {
+        // Convert YYYY-MM-DD strings to Date objects for proper date comparison
+        const dateA = a.checkInDate ? new Date(a.checkInDate) : new Date(0);
+        const dateB = b.checkInDate ? new Date(b.checkInDate) : new Date(0);
+        
+        // If check-in dates are the same, sort by customer name
+        if (dateA.getTime() === dateB.getTime()) {
+            return a.customerName.localeCompare(b.customerName);
+        }
+        // Otherwise sort by check-in date (ascending order)
+        return dateA - dateB;
+    });
+}

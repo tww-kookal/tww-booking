@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { SHEET_ID } from "../config";
 import { useNavigate } from "react-router-dom";
-import { arrayToBooking, BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber } from "./constants";
+import { arrayToBooking, BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, sortBookings } from "./constants";
 
 import './css/searchBooking.css';
 
@@ -64,7 +64,7 @@ const SearchBooking = () => {
           return matchesBookingDate && matchesGuestName && matchesCheckInDate && matchesContactNumber;
         });
         
-        setResults(filteredResults);
+        setResults(sortBookings(filteredResults));
         setCurrentPage(1);
       } else {
         setResults([]);
