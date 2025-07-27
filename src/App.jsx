@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { gapi } from "gapi-script";
 import { CLIENT_ID, API_KEY, SCOPES } from "./config";
 import SearchBooking from "./components/SearchBooking.jsx";
 import Booking from "./components/Booking.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import Navbar from "./components/Navbar.jsx";
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 
 let tokenClient;
@@ -15,43 +14,62 @@ const App = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Load gapi client
-    gapi.load("client", async () => {
+    const loadGoogleAPI = async () => {
       try {
-        await gapi.client.init({
-          apiKey: API_KEY,
-          discoveryDocs: [
-            "https://sheets.googleapis.com/$discovery/rest?version=v4",
-            "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
-          ],
-        });
+        // Load the Google API script dynamically
+        const script = document.createElement("script");
+        script.src = "https://apis.google.com/js/api.js";
+        script.onload = async () => {
+          // Initialize the gapi client
+          await window.gapi.load("client", async () => {
+            try {
+              await window.gapi.client.init({
+                apiKey: API_KEY,
+                discoveryDocs: [
+                  "https://sheets.googleapis.com/$discovery/rest?version=v4",
+                  "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest",
+                ],
+              });
 
-        // Setup GIS token client
-        tokenClient = window.google.accounts.oauth2.initTokenClient({
-          client_id: CLIENT_ID,
-          scope: SCOPES,
-          callback: (tokenResponse) => {
-            if (tokenResponse && tokenResponse.access_token) {
-              gapi.client.setToken(tokenResponse);
-              setSignedIn(true);
-            } else {
-              console.error("❌ Failed to get access token: ", e);
-              setError("Failed to get access token.");
+              // Initialize the Google Identity Services (GIS) token client
+              tokenClient = window.google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: (tokenResponse) => {
+                  if (tokenResponse && tokenResponse.access_token) {
+                    window.gapi.client.setToken(tokenResponse);
+                    setSignedIn(true);
+                  } else {
+                    console.error("❌ Failed to get access token.");
+                    setError("Failed to get access token.");
+                  }
+                },
+              });
+            } catch (e) {
+              console.error("❌ gapi client initialization error:", e);
+              setError("Google API client initialization failed.");
             }
-          },
-        });
+          });
+        };
+        script.onerror = () => {
+          console.error("❌ Failed to load Google API script.");
+          setError("Failed to load Google API script.");
+        };
+        document.body.appendChild(script);
       } catch (e) {
-        console.error("❌ gapi init error:", e);
-        setError("Google API client initialization failed.");
+        console.error("❌ Error loading Google API:", e);
+        setError("Error loading Google API.");
       }
-    });
+    };
+
+    loadGoogleAPI();
   }, []);
 
   const handleSignIn = () => {
     if (tokenClient) {
       tokenClient.requestAccessToken();
     } else {
-      console.error("❌ Token client not initialized:", e);
+      console.error("❌ Token client not initialized.");
       setError("Token client not initialized.");
     }
   };
@@ -64,7 +82,9 @@ const App = () => {
 
       {!signedIn && (
         <div className="login-container">
-          <button className="login-button" onClick={handleSignIn}>Sign in with Google</button>
+          <button className="login-button" onClick={handleSignIn}>
+            Sign in with Google
+          </button>
         </div>
       )}
 
