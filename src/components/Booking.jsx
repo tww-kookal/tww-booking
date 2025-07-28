@@ -254,6 +254,9 @@ const Booking = () => {
     const handleAddNew = () => {
         setBooking({ ...defaultBooking });
         setCurrentIndex(-1);
+        // Clear file input on form clear
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) fileInput.value = '';
     };
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -413,6 +416,9 @@ const Booking = () => {
             // Otherwise go to dashboard
             navigate('/');
         }
+        // Clear file input on cancel
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) fileInput.value = '';
     };
 
     return (
