@@ -1,107 +1,233 @@
+import {
+    ResponsiveContainer,
+    ScatterChart,
+    Scatter,
+    XAxis,
+    YAxis,
+    Tooltip,
+    Legend,
+    CartesianGrid,
+} from "recharts";
 import React, { useEffect, useState, useMemo } from 'react';
-import { ResponsiveContainer, ScatterChart, XAxis, YAxis, Scatter, Tooltip } from 'recharts';
 import dayjs from 'dayjs';
-import { loadFromSheetToBookings, roomAvailabilityStatusColors, roomOptions } from './constants'; // Assuming roomOptions is defined in constants.js
+import { DEFAULT_BOOKING, loadFromSheetToBookings, roomAvailabilityStatusColors, roomOptions } from './constants'; // Assuming roomOptions is defined in constants.js
 import './css/RoomAvailabilityDotChart.css'; // Add your CSS file for styling
 
-const RoomAvailabilityDotChart = ({ defaultStartDate = dayjs().format('YYYY-MM-DD') }) => {
+const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [startDate, setStartDate] = useState(defaultStartDate);
     const [data, setData] = useState([]);
 
-    const filterBookings = async (startDate) => {
-        setLoading(true);
-        try {
-            const allBookings = await loadFromSheetToBookings();
-            const today = startDate || new Date().toISOString().split('T')[0];
-            return allBookings.filter(booking =>
-                booking.checkInDate >= today && booking.checkInDate <= dayjs(today).add(15, 'day').format('YYYY-MM-DD')
-            ).map(booking => ({
-                x: booking.checkInDate,
-                y: booking.roomName,
-                status: booking.status,
-            }));
-        } catch (err) {
-            console.error("Error fetching data:", err);
-            setError("Failed to fetch bookings. Please try again.");
-            return [];
-        } finally {
-            setLoading(false);
-        }
+    const DEFAULT_NUMBER_OF_DAYS = 28; // Default number of days to show in the chart
+
+    const [startDate, setStartDate] = useState(
+        propStartDate ? dayjs(propStartDate) : dayjs()
+    );
+
+    const dates = useMemo(() =>
+        Array.from({ length: DEFAULT_NUMBER_OF_DAYS }, (_, i) =>
+            dayjs(startDate).add(i, "day").format("YYYY-MM-DD")
+        ), [startDate]
+    );
+    const memoizedDates = useMemo(() => dates, [dates]);
+
+    const useWindowSize = () => {
+        const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
+
+        useEffect(() => {
+            const handleResize = () => setSize([window.innerWidth, window.innerHeight]);
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+        }, []);
+
+        return size;
+    };
+
+    useEffect(() => {
+        const filterBookings = async () => {
+            setLoading(true);
+            try {
+                const dateSet = new Set(
+                    Array.from({ length: DEFAULT_NUMBER_OF_DAYS }, (_, i) => startDate.add(i, "day").format("YYYY-MM-DD"))
+                );
+
+                const bookings = await loadFromSheetToBookings();
+                const chartData = bookings
+                    .filter((booking) => dateSet.has(booking.checkInDate))
+                    .map((booking) => ({
+                        ...booking,
+                        chartStatus: dayjs(booking.checkInDate, "YYYY-MM-DD").isBefore(dayjs()) ? 'Closed' : booking.status,
+                    }));
+
+                const allData = [];
+                for (const date of memoizedDates) {
+                    for (const room of roomOptions) {
+                        const booking = chartData.find((b) =>
+                            dayjs(b.checkInDate, "YYYY-MM-DD").isSame(date) && b.roomName === room
+                        );
+                        if (!booking && dayjs(date, "YYYY-MM-DD").isBefore(dayjs())) {
+                            // If no booking exists for this room on this date and its a past date, add a default booking with Closed status
+                            allData.push({
+                                ...DEFAULT_BOOKING,
+                                roomName: room,
+                                checkInDate: date,
+                                checkOutDate: date,
+                                chartStatus: 'Closed',
+                                status: 'Available',
+                                chartData: 'INJECTED',
+                                pastDate: true
+                            });
+                        } else if (!booking) {
+                            // If no booking exists for this room for today and future
+                            allData.push({
+                                ...DEFAULT_BOOKING,
+                                roomName: room,
+                                checkInDate: date,
+                                checkOutDate: date,
+                                chartStatus: 'Available',
+                                status: 'Available',
+                                chartData: 'INJECTED',
+                                pastDate: false
+                            });
+                        } else if (booking && dayjs(booking.checkInDate, "YYYY-MM-DD").isBefore(dayjs())) {
+                            // If booking exists for this room on this date and its a past date, add a default booking with Closed status
+                            // This is to ensure that past bookings are shown as closed
+                            allData.push({
+                                ...booking,
+                                chartStatus: 'Closed',
+                                chartData: 'ACTUAL',
+                                pastDate: true
+                            });
+                        } else if (booking) {
+                            // If booking exists for this room on this date and future, add it to the data
+                            allData.push({
+                                ...booking,
+                                chartStatus: booking.status,
+                                chartData: 'ACTUAL',
+                                pastDate: false
+                            })
+                        }
+                    }
+                }
+                setError(null);
+                setData(allData);
+                return allData;
+            } catch (err) {
+                console.error("Error fetching data:", err);
+                setError("Failed to fetch bookings. Please try again.");
+                return [];
+            } finally {
+                setLoading(false);
+            }
+        };
+        filterBookings();
+    }, [startDate, propStartDate]);
+
+    const chartXAxisData = memoizedDates.map(date => (dayjs(date, "YYYY-MM-DD").format("MMM D, YYYY")));
+    const handleDateChange = (e) => {
+        setStartDate(dayjs(e.target.value));
+    };
+
+    const onBookingClick = (booking) => {
     }
 
-    const CustomDot = ({ cx, cy, payload }) => {
-        return (
-            <circle
-                cx={cx}
-                cy={cy}
-                r={6}
-                stroke="#000"
-                strokeWidth={1}
-                fill={roomAvailabilityStatusColors[payload.status]}
-            />
-        );
+
+    const getStatusColor = (booking) => {
+        if (booking.pastDate) {
+            if (booking.status === 'Available') return 'dark-green'
+            else if (booking.status === 'Confirmed') return 'dark-blue'
+            else if (booking.status === 'Cancelled') return 'dark-orange';
+            else if (booking.status === 'Closed') return 'gray'; // gray
+        } else {
+            if (booking.chartStatus === 'Available') return 'green'
+            else if (booking.chartStatus === 'Confirmed') return 'blue'
+            else if (booking.chartStatus === 'Cancelled') return 'orange';
+            else if (booking.chartStatus === 'Closed') return 'gray'; // gray
+        }
+    };
+
+    const getInitials = (name) => {
+        return name
+            .split(' ')
+            .map(part => part[0])
+            .join('')
+            .toUpperCase();
     };
 
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const fetchData = await filterBookings(startDate);
-            setData(fetchData);
-        };
-        fetchData();
-    }, [startDate]);
+    const renderCell = (roomName, date) => {
+        const parameterDate = dayjs(date, "YYYY-MM-DD");
+        const bookingActual = data.find(
+            b =>
+                b.chartData === 'ACTUAL' &&
+                b.roomName === roomName &&
+                new dayjs(b.checkInDate, "YYYY-MM-DD").isSame(parameterDate)
+        );
+        const bookingInjected = data.find(
+            b =>
+                b.chartData === 'INJECTED' &&
+                b.roomName === roomName &&
+                new dayjs(b.checkInDate, "YYYY-MM-DD").isSame(parameterDate)
+        );
 
-    const memoizedData = useMemo(() => data, [data]);
+        let bgColor = '#5d595cff'; // Default color for injected bookings
+        if (bookingActual) {
+            bgColor = getStatusColor(bookingActual);
+        } else if (bookingInjected) {
+            bgColor = getStatusColor(bookingInjected);
+        }
+        return (
+            <td
+                key={date}
+                style={{ backgroundColor: `${bgColor}`, cursor: 'pointer', color: 'white', textAlign: 'center' }}
+                onClick={bookingActual && bookingActual.status !== 'Available' ? () => onBookingClick(bookingActual) : onBookingClick(bookingInjected)}
+                title={bookingActual ?
+                    bookingActual.customerName +
+                    "\r\nCheck Out : " + dayjs(bookingActual.checkOutDate, "YYYY-MM-DD").format("MMM D") +
+                    "\r\nGuests : " + bookingActual.numberOfPeople
+                    : ''}
+            >
+                {bookingActual ? getInitials(bookingActual.customerName) : ''}
+            </td>
+        )
 
-    console.log("Filtered Data:", memoizedData);
-
-    const filteredData = memoizedData.filter((entry) => {
-        const date = dayjs(entry.x);
-        const today = dayjs(startDate);
-        return date.isAfter(today.subtract(1, 'day')) && date.isBefore(today.add(15, 'day'));
-    });
+    };
 
     return (
-        <div className="w-full overflow-x-auto p-4">
+        <div className="room-chart-container">
             {error && <div className="error-message">{error}</div>}
             {loading ? 'Fetching from data store...' : ''}
-            <div className="mb-4">
-                <label className="font-semibold mr-2">Start Date:</label>
+            <div className="chart-header">
+                <h3>Room Availability Chart</h3>
+            </div>
+            <div style={{ marginBottom: 10 }}>
+                <label className="date-label">
+                    Start Date: &nbsp;</label>
                 <input
                     type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="border rounded px-2 py-1"
+                    value={startDate.format("YYYY-MM-DD")}
+                    onChange={handleDateChange}
                 />
+
             </div>
-            <div style={{ width: '1000px', maxWidth: '2000px', height: '400px' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                    <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                        <XAxis
-                            type="category"
-                            dataKey="x"
-                            name="Date"
-                            tickFormatter={(tick) => dayjs(tick).format('MM/DD')}
-                            interval={0}
-                        />
-                        <YAxis
-                            type="category"
-                            dataKey="y"
-                            name="Room"
-                            ticks={roomOptions}
-                        />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                        <Scatter
-                            name="Room Bookings"
-                            data={filteredData}
-                            fill="#8884d8"
-                            shape={<CustomDot />}
-                        />
-                    </ScatterChart>
-                </ResponsiveContainer>
-            </div>
+            <table className="room-chart-table">
+                <thead className="room-chart-table-header">
+                    <tr>
+                        <th>Room</th>
+                        {memoizedDates.map(date => (
+                            <th key={date}>{new dayjs(date, "YYYY-MM-DD").format("MMM DD")}</th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {roomOptions.map(roomName => (
+                        <tr key={roomName}>
+                            <td className="room-chart-first-column"><strong>{roomName}</strong></td>
+                            {memoizedDates.map(date => renderCell(roomName, date))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 };

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import './css/Booking.css';
+import './css/booking.css';
 import { arrayToBooking, RANGE, SHEET_ID, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING, loadFromSheetToBookings } from "./constants";
 import { uploadToDrive } from './googleDriveService';
+import RoomAvailabilityDotChart from './RoomAvailabilityDotChart';
 
 const Booking = () => {
     const { id } = useParams();
@@ -416,6 +417,7 @@ const Booking = () => {
 
     return (
         <div className="booking-form-container">
+            <RoomAvailabilityDotChart />
             <h2>Room Booking Form</h2>
             <div className='form-group'>
                 <label>Upload Document:</label>

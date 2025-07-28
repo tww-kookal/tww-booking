@@ -42,8 +42,8 @@ export const roomAvailabilityStatusColors = {
     Confirmed: '#007bff', // blue
     Cancelled: '#fd7e14', // orange
     Available: '#28a745', // green
+    Closed: '#6c757d', // gray
 };
-
 
 export const statusOptions = ['Confirmed', 'Tentative', 'Cancelled'];
 
