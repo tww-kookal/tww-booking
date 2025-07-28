@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { SHEET_ID } from "../config";
 import { useNavigate } from "react-router-dom";
-import { convertGoogleDataToBookings, arrayToBooking, BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, sortBookings } from "./constants";
+import { convertGoogleDataToBookings, arrayToBooking, BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, sortBookings, loadFromSheetToBookings } from "./constants";
 
 import './css/searchBooking.css';
 
@@ -30,18 +30,11 @@ const SearchBooking = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await window.gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: SHEET_ID,
-        range: RANGE,
-      });
-
-      let allBookings = [];
+      const allBookings = await loadFromSheetToBookings();
       let filteredResults = [];
       const today = new Date().toISOString().split('T')[0];
-
-      if (res.result.values && res.result.values.length > 0) {
-        allBookings = convertGoogleDataToBookings(res.result.values);
-      } else {
+      // If no bookings found, set results to empty and show error
+      if (!allBookings || allBookings.length <= 0) {
         setResults([]);
         setError("No bookings found");
       }

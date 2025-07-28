@@ -38,6 +38,13 @@ export { SHEET_ID };
 
 export const roomOptions = ['Cedar', 'Pine', 'Teak', 'Maple', 'Tent'];
 
+export const roomAvailabilityStatusColors = {
+    Confirmed: '#007bff', // blue
+    Cancelled: '#fd7e14', // orange
+    Available: '#28a745', // green
+};
+
+
 export const statusOptions = ['Confirmed', 'Tentative', 'Cancelled'];
 
 export const sourceOptions = [
@@ -60,6 +67,25 @@ export const convertGoogleDataToBookings = (sheetData) => {
     return sheetData.map((row) => {
         return arrayToBooking(row);
     });
+}
+
+export const loadFromSheetToBookings = async () => {
+    try {
+        const res = await window.gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: SHEET_ID,
+            range: RANGE,
+        });
+
+        if (res.result.values && res.result.values.length > 0) {
+            return convertGoogleDataToBookings(res.result.values);
+        } else {
+            console.error("❌ No bookings found in the sheet.");
+            return [];
+        }
+    } catch (error) {
+        console.error("❌ Error fetching data from Google Sheets:", error);
+        return [];
+    }
 }
 
 export const calculateCommission = (source, amount) => {

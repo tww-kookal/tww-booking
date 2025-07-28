@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { SHEET_ID, RANGE, convertGoogleDataToBookings } from './constants';
+import { loadFromSheetToBookings } from './constants';
 import './css/Dashboard.css';
 
 const Dashboard = () => {
@@ -20,12 +20,8 @@ const Dashboard = () => {
   const fetchBookingStats = async () => {
     try {
       setLoading(true);
-      const res = await window.gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: SHEET_ID,
-        range: RANGE,
-      });
 
-      const bookings = convertGoogleDataToBookings(res.result.values);
+      const bookings =  await loadFromSheetToBookings();
 
       if (bookings) {
         const today = new Date().toISOString().split('T')[0];
@@ -50,6 +46,7 @@ const Dashboard = () => {
           todayCheckOuts
         });
       }
+      setError(null);
     } catch (err) {
       console.error("Error fetching booking stats:", err);
       setError("Failed to load booking statistics");

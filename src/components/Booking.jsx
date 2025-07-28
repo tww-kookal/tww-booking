@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import './css/Booking.css';
-import { arrayToBooking, RANGE, SHEET_ID, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING } from "./constants";
+import { arrayToBooking, RANGE, SHEET_ID, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING, loadFromSheetToBookings } from "./constants";
 import { uploadToDrive } from './googleDriveService';
 
 const Booking = () => {
@@ -26,16 +26,9 @@ const Booking = () => {
             const fetchBookingById = async () => {
                 setIsSubmitting(true);
                 try {
-                    const response = await window.gapi.client.sheets.spreadsheets.values.get({
-                        spreadsheetId: SHEET_ID,
-                        range: RANGE,
-                    });
-
-                    if (response.result.values && response.result.values.length > 0) {
+                    const allBookings = await loadFromSheetToBookings();
+                    if (allBookings && allBookings.length > 0) {
                         // Convert to bookings and find the one with matching ID (customer name)
-                        const allBookings = response.result.values.map((row) => (
-                            arrayToBooking(row)
-                        ));
 
                         const decodedId = decodeURIComponent(id);
                         const foundBooking = allBookings.find(booking => booking.customerName === decodedId);
@@ -325,19 +318,19 @@ const Booking = () => {
             if (isUpdate) {
                 // For updating, we need to find the row in the sheet that matches this booking
                 // First, get all current values
-                const response = await window.gapi.client.sheets.spreadsheets.values.get({
-                    spreadsheetId: SHEET_ID,
-                    range: RANGE,
-                });
+                const allBookings = await loadFromSheetToBookings();
 
-                if (response.result.values && response.result.values.length > 0) {
+                if (allBookings && allBookings.length > 0) {
                     // Find the row index that matches our booking
                     const customerName = preloadedBooking?.customerName || decodeURIComponent(id);
                     let rowIndex = -1;
 
                     //Find the booking row by booking ID and room name and checkin date
-                    response.result.values.forEach((row, index) => {
-                        if (row[24] == booking.bookingID && row[0] === booking.roomName && row[4] === booking.checkInDate && row[5] === booking.checkOutDate) { // Customer name is in column B (index 1)
+                    allBookings.forEach((iBooking, index) => {
+                        if (iBooking.bookingID == booking.bookingID && 
+                            iBooking.roomName === booking.roomName && 
+                            iBooking.checkInDate === booking.checkInDate && 
+                            iBooking.checkOutDate === booking.checkOutDate) { // Customer name is in column B (index 1)
                             rowIndex = index;
                             console.log(`Found booking at row index: ${rowIndex + 1}`); // +1 because sheets are 1-indexed
                         }
@@ -426,9 +419,9 @@ const Booking = () => {
             <h2>Room Booking Form</h2>
             <div className='form-group'>
                 <label>Upload Document:</label>
-                <input 
-                    type="file" 
-                    onChange={(e) => setUploadedFile(e.target.files[0])} 
+                <input
+                    type="file"
+                    onChange={(e) => setUploadedFile(e.target.files[0])}
                     accept=".pdf,.jpg,.jpeg,.png"
                 />
             </div>
@@ -448,7 +441,7 @@ const Booking = () => {
             <form onSubmit={e => e.preventDefault()}>
                 <div className='form-group'>
                     <label>Booking ID:</label>
-                    <input type="text" name="bookingID" value={booking.bookingID} readOnly />                
+                    <input type="text" name="bookingID" value={booking.bookingID} readOnly />
                 </div>
                 <div className='form-group'>
                     <label>Room Name:</label>

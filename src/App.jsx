@@ -6,6 +6,7 @@ import Dashboard from "./components/Dashboard.jsx";
 import Navbar from "./components/Navbar.jsx";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
+import RoomAvailabilityDotChart from "./components/RoomAvailabilityDotChart.jsx";
 
 let tokenClient;
 
@@ -56,6 +57,7 @@ const App = () => {
           setError("Failed to load Google API script.");
         };
         document.body.appendChild(script);
+        setError(null);
       } catch (e) {
         console.error("❌ Error loading Google API:", e);
         setError("Error loading Google API.");
@@ -68,6 +70,7 @@ const App = () => {
   const handleSignIn = () => {
     if (tokenClient) {
       tokenClient.requestAccessToken();
+      setError(null);
     } else {
       console.error("❌ Token client not initialized.");
       setError("Token client not initialized.");
@@ -94,6 +97,7 @@ const App = () => {
           <div className="content-container">
             <Routes>
               <Route path="/" element={<Dashboard />} />
+              <Route path="/availability" element={<RoomAvailabilityDotChart />} />
               <Route path="/search" element={<SearchBooking />} />
               <Route path="/booking" element={<Booking />} />
               <Route path="/booking/:id" element={<Booking />} />
