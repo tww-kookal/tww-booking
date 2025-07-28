@@ -269,7 +269,7 @@ const Booking = () => {
         setIsSubmitting(true);
         setErrorMessage('');
         setSuccessMessage('');
-
+        booking.bookingID = booking.roomName + '-' + booking.checkInDate + '-' + booking.checkOutDate;
         try {
             // Convert booking object to array format for Google Sheets
             const bookingRow = [
@@ -286,8 +286,11 @@ const Booking = () => {
                 booking.roomAmount,
                 booking.advancePaid,
                 booking.advancePaidTo,
+                0, // Placeholder for room balance
                 booking.food,
                 booking.campFire,
+                0, // Placeholder for heater
+                0, // Placeholder for safari
                 booking.otherServices,
                 booking.balanceToPay,
                 booking.totalAmount,
@@ -314,10 +317,13 @@ const Booking = () => {
                     const customerName = preloadedBooking?.customerName || decodeURIComponent(id);
                     let rowIndex = -1;
 
+                    //Find the booking row by booking ID and room name and checkin date
                     response.result.values.forEach((row, index) => {
-                        if (row[1] === customerName) { // Customer name is in column B (index 1)
+                        if (row[24] == booking.bookingID && row[0] === booking.roomName && row[4] === booking.checkInDate && row[5] === booking.checkOutDate) { // Customer name is in column B (index 1)
                             rowIndex = index;
+                            console.log(`Found booking at row index: ${rowIndex + 1}`); // +1 because sheets are 1-indexed
                         }
+
                     });
 
                     if (rowIndex !== -1) {
