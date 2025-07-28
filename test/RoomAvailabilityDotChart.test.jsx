@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import RoomAvailabilityDotChart from './RoomAvailabilityDotChart';
+import RoomAvailabilityDotChart from '../src/components/RoomAvailabilityDotChart';
 
 describe('RoomAvailabilityDotChart', () => {
   test('renders chart header and date input', () => {

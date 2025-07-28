@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import BookingList from './BookingList';
+import BookingList from '../src/components/BookingList';
 
 const mockResults = [
   { bookingID: 'BID123', roomName: 'Cedar', customerName: 'John Doe', bookingDate: '2025-07-28', checkInDate: '2025-07-28', checkOutDate: '2025-07-29', contactNumber: '1234567890', status: 'Confirmed' },

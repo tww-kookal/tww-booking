@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import GoogleLoginButton from './GoogleLoginButton';
+import GoogleLoginButton from '../src/components/GoogleLoginButton';
 
 describe('GoogleLoginButton', () => {
   test('renders login button container', () => {

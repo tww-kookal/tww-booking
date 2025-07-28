@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Booking from './Booking';
+import Booking from '../src/components/Booking';
 
 describe('Booking', () => {
   test('renders without crashing', () => {
