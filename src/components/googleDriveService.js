@@ -1,6 +1,5 @@
-import { gapi } from 'gapi-script';
+// Use window.gapi instead of importing from gapi-script
 import { FOLDER_ID } from '../config'
-
 
 export const uploadToDrive = async (file, bookingID) => {
     const metadata = {
@@ -16,7 +15,7 @@ export const uploadToDrive = async (file, bookingID) => {
         reader.readAsDataURL(file);
     });
 
-    const accessToken = gapi.auth.getToken().access_token;
+    const accessToken = window.gapi.auth.getToken().access_token;
     const form = new FormData(); 
     form.append(
         "metadata",
