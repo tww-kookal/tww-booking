@@ -67,7 +67,6 @@ export const calculateCommission = (source, amount) => {
 };
 
 export const parseNumber = (val) => {
-    console.log("Val Received ", val);
     if (!val) return 0;
     return typeof val === 'string' ? Number(val.replace(/,/g, '')) || 0 : val;
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import './css/Booking.css';
 import { arrayToBooking, RANGE, SHEET_ID, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING } from "./constants";
+import { uploadToDrive } from './googleDriveService';
 
 const Booking = () => {
     const { id } = useParams();
@@ -258,6 +259,7 @@ const Booking = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [uploadedFile, setUploadedFile] = useState(null);
 
     const handleUpdate = async () => {
         // Validate required fields
@@ -266,10 +268,23 @@ const Booking = () => {
             return;
         }
 
+        booking.bookingID = booking.roomName + '-' + booking.checkInDate + '-' + booking.checkOutDate;
+
+        // Upload file if one was selected
+        if (uploadedFile) {
+            try {
+                await uploadToDrive(uploadedFile, booking.bookingID);
+                setSuccessMessage('File uploaded successfully!');
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                setErrorMessage('Failed to upload file. Please try again.');
+                return;
+            }
+        }
+
         setIsSubmitting(true);
         setErrorMessage('');
         setSuccessMessage('');
-        booking.bookingID = booking.roomName + '-' + booking.checkInDate + '-' + booking.checkOutDate;
         try {
             // Convert booking object to array format for Google Sheets
             const bookingRow = [
@@ -403,6 +418,14 @@ const Booking = () => {
     return (
         <div className="booking-form-container">
             <h2>Room Booking Form</h2>
+            <div className='form-group'>
+                <label>Upload Document:</label>
+                <input 
+                    type="file" 
+                    onChange={(e) => setUploadedFile(e.target.files[0])} 
+                    accept=".pdf,.jpg,.jpeg,.png"
+                />
+            </div>
 
             {successMessage && (
                 <div className="success-message">
@@ -471,15 +494,16 @@ const Booking = () => {
                 </div>
 
                 <div className='form-group'>
+                    <label>Room Amount:</label>
+                    <input type="number" name="roomAmount" value={booking.roomAmount} onChange={handleChange} />
+                </div>
+
+                <div className='form-group'>
                     <label>Source of Booking:</label>
                     <select name="sourceOfBooking" value={booking.sourceOfBooking} onChange={handleChange}>
                         <option value="">Select</option>
                         {sourceOptions.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
-                </div>
-                <div className='form-group'>
-                    <label>Room Amount:</label>
-                    <input type="number" name="roomAmount" value={booking.roomAmount} onChange={handleChange} />
                 </div>
 
                 {/* Optional Fields */}
