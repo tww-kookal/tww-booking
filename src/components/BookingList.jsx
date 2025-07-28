@@ -1,4 +1,3 @@
-// ResultsSection extracted from SearchBooking
 import './css/bookingList.css';
 
 const BookingList = ({ loading, results, paginatedResults, itemsPerPage, currentPage, handlePageChange, handleViewBooking, error }) => (

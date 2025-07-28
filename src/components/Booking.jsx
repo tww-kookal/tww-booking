@@ -420,7 +420,7 @@ const Booking = () => {
             <RoomAvailabilityDotChart />
             <h2>Room Booking Form</h2>
             <div className='form-group'>
-                <label>Upload Document:</label>
+                <label>Identity Document:</label>
                 <input
                     type="file"
                     onChange={(e) => setUploadedFile(e.target.files[0])}

@@ -1,16 +1,6 @@
-import {
-    ResponsiveContainer,
-    ScatterChart,
-    Scatter,
-    XAxis,
-    YAxis,
-    Tooltip,
-    Legend,
-    CartesianGrid,
-} from "recharts";
 import React, { useEffect, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { DEFAULT_BOOKING, loadFromSheetToBookings, roomAvailabilityStatusColors, roomOptions } from './constants'; // Assuming roomOptions is defined in constants.js
+import {loadFromSheetToBookings, prepareChartData, roomAvailabilityStatusColors, roomOptions } from './constants'; // Assuming roomOptions is defined in constants.js
 import './css/RoomAvailabilityDotChart.css'; // Add your CSS file for styling
 
 const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
@@ -52,63 +42,7 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
                 );
 
                 const bookings = await loadFromSheetToBookings();
-                const chartData = bookings
-                    .filter((booking) => dateSet.has(booking.checkInDate))
-                    .map((booking) => ({
-                        ...booking,
-                        chartStatus: dayjs(booking.checkInDate, "YYYY-MM-DD").isBefore(dayjs()) ? 'Closed' : booking.status,
-                    }));
-
-                const allData = [];
-                for (const date of memoizedDates) {
-                    for (const room of roomOptions) {
-                        const booking = chartData.find((b) =>
-                            dayjs(b.checkInDate, "YYYY-MM-DD").isSame(date) && b.roomName === room
-                        );
-                        if (!booking && dayjs(date, "YYYY-MM-DD").isBefore(dayjs())) {
-                            // If no booking exists for this room on this date and its a past date, add a default booking with Closed status
-                            allData.push({
-                                ...DEFAULT_BOOKING,
-                                roomName: room,
-                                checkInDate: date,
-                                checkOutDate: date,
-                                chartStatus: 'Closed',
-                                status: 'Available',
-                                chartData: 'INJECTED',
-                                pastDate: true
-                            });
-                        } else if (!booking) {
-                            // If no booking exists for this room for today and future
-                            allData.push({
-                                ...DEFAULT_BOOKING,
-                                roomName: room,
-                                checkInDate: date,
-                                checkOutDate: date,
-                                chartStatus: 'Available',
-                                status: 'Available',
-                                chartData: 'INJECTED',
-                                pastDate: false
-                            });
-                        } else if (booking && dayjs(booking.checkInDate, "YYYY-MM-DD").isBefore(dayjs())) {
-                            // If booking exists for this room on this date and its a past date, add a default booking with Closed status
-                            // This is to ensure that past bookings are shown as closed
-                            allData.push({
-                                ...booking,
-                                chartStatus: 'Closed',
-                                chartData: 'ACTUAL',
-                                pastDate: true
-                            });
-                        } else if (booking) {
-                            // If booking exists for this room on this date and future, add it to the data
-                            allData.push({
-                                ...booking,
-                                chartStatus: booking.status,
-                                chartData: 'ACTUAL',
-                                pastDate: false
-                            })
-                        }
-                    }
-                }
+                const allData = prepareChartData(bookings, dateSet, memoizedDates);
                 setError(null);
                 setData(allData);
                 return allData;
@@ -123,14 +57,12 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
         filterBookings();
     }, [startDate, propStartDate]);
 
-    const chartXAxisData = memoizedDates.map(date => (dayjs(date, "YYYY-MM-DD").format("MMM D, YYYY")));
     const handleDateChange = (e) => {
         setStartDate(dayjs(e.target.value));
     };
 
     const onBookingClick = (booking) => {
     }
-
 
     const getStatusColor = (booking) => {
         if (booking.pastDate) {
