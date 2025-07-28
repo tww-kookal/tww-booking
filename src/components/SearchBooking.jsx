@@ -1,10 +1,12 @@
 // SearchBooking.jsx
 import React, { useState, useEffect } from "react";
+// ResultsSection extracted below
 import { SHEET_ID } from "../config";
 import { useNavigate } from "react-router-dom";
 import { convertGoogleDataToBookings, arrayToBooking, BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, sortBookings, loadFromSheetToBookings } from "./constants";
 
 import './css/searchBooking.css';
+import BookingList from "./BookingList";
 
 const SearchBooking = () => {
   const navigate = useNavigate();
@@ -192,81 +194,17 @@ const SearchBooking = () => {
 
       {error && <div className="error-message">{error}</div>}
 
-      <div className="results-section">
-        {loading ? (
-          <div className="loading-indicator">Loading bookings...</div>
-        ) : results.length > 0 ? (
-          <div className="table-container">
-            <h3>Bookings Found ({results.length})</h3>
-            <table className="booking-table">
-              <thead>
-                <tr>
-                  <th>Booking ID</th>
-                  <th>Room</th>
-                  <th>Guest Name</th>
-                  <th>Booking Date</th>
-                  <th>Check In</th>
-                  <th>Check Out</th>
-                  <th>Contact</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedResults.map((booking, index) => (
-                  <tr key={index} className={booking.status === 'Cancelled' ? 'cancelled-booking' : ''}>
-                    <td>{booking.bookingID}</td>
-                    <td>{booking.roomName}</td>
-                    <td>{booking.customerName}</td>
-                    <td>{booking.bookingDate}</td>
-                    <td>{booking.checkInDate}</td>
-                    <td>{booking.checkOutDate}</td>
-                    <td>{booking.contactNumber}</td>
-                    <td>
-                      <span className={`status-badge status-${booking.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                        {booking.status}
-                      </span>
-                    </td>
-                    <td>
-                      <button
-                        className="view-button"
-                        onClick={() => handleViewBooking(booking)}
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            {results.length > itemsPerPage && (
-              <div className="pagination">
-                <button
-                  className="pagination-button"
-                  onClick={() => handlePageChange("prev")}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </button>
-                <span className="page-info">Page {currentPage} of {Math.ceil(results.length / itemsPerPage)}</span>
-                <button
-                  className="pagination-button"
-                  onClick={() => handlePageChange("next")}
-                  disabled={currentPage * itemsPerPage >= results.length}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </div>
-        ) : !error && (
-          <div className="no-results">No bookings found. Try adjusting your search criteria.</div>
-        )}
-      </div>
-
-
-    </div >
+      <BookingList
+        loading={loading}
+        results={results}
+        paginatedResults={paginatedResults}
+        itemsPerPage={itemsPerPage}
+        currentPage={currentPage}
+        handlePageChange={handlePageChange}
+        handleViewBooking={handleViewBooking}
+        error={error}
+      />
+    </div>
   );
 };
 
