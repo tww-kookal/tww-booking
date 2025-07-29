@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import './css/booking.css';
-import { arrayToBooking, RANGE, SHEET_ID, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING, loadFromSheetToBookings } from "./constants";
+import { arrayToBooking, RANGE, SHEET_ID, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING, loadFromSheetToBookings } from "../modules/constants";
 import { uploadToDrive } from './googleDriveService';
 import RoomAvailabilityDotChart from './RoomAvailabilityDotChart';
+import { validateBooking } from '../modules/booking.module';
 
 const Booking = () => {
     const { id } = useParams();
@@ -260,11 +261,12 @@ const Booking = () => {
 
     const handleUpdate = async () => {
         // Validate required fields
-        if (!booking.customerName || !booking.checkInDate || !booking.checkOutDate || !booking.contactNumber) {
-            setErrorMessage('Please fill in all required fields: Customer Name, Check-in Date, Check-out Date, and Contact Number');
+        errors = validateBooking(booking);
+        if(errors && errors.length > 0 ) {
+            setErrorMessage(errors.join(', '));
             return;
         }
-
+        
         booking.bookingID = booking.roomName + '-' + booking.checkInDate + '-' + booking.checkOutDate;
 
         // Upload file if one was selected

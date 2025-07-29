@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 // ResultsSection extracted below
 import { useNavigate } from "react-router-dom";
-import { sortBookings, loadFromSheetToBookings } from "./constants";
+import { sortBookings, loadFromSheetToBookings } from "../modules/constants";
 
 import './css/searchBooking.css';
 import BookingList from "./BookingList";

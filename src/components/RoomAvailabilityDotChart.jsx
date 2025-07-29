@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
-import {loadFromSheetToBookings, prepareChartData, roomAvailabilityStatusColors, roomOptions } from './constants'; // Assuming roomOptions is defined in constants.js
+import {loadFromSheetToBookings, prepareChartData, roomAvailabilityStatusColors, roomOptions } from '../modules/constants'; // Assuming roomOptions is defined in constants.js
 import './css/RoomAvailabilityDotChart.css'; // Add your CSS file for styling
 
 const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
