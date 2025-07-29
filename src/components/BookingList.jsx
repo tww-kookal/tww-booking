@@ -1,3 +1,4 @@
+import React from 'react';
 import './css/bookingList.css';
 
 const BookingList = ({ loading, results, paginatedResults, itemsPerPage, currentPage, handlePageChange, handleViewBooking, error }) => (

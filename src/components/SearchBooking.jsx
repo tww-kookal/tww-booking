@@ -1,9 +1,8 @@
 // SearchBooking.jsx
 import React, { useState, useEffect } from "react";
 // ResultsSection extracted below
-import { SHEET_ID } from "../config";
 import { useNavigate } from "react-router-dom";
-import { convertGoogleDataToBookings, arrayToBooking, BOOKING_DEFAULT, RANGE, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, sortBookings, loadFromSheetToBookings } from "./constants";
+import { sortBookings, loadFromSheetToBookings } from "./constants";
 
 import './css/searchBooking.css';
 import BookingList from "./BookingList";

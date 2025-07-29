@@ -1,11 +1,18 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SearchBooking from '../src/components/SearchBooking';
+import jsday from 'dayjs';
 
-jest.mock('./constants', () => ({
-  loadFromSheetToBookings: jest.fn().mockResolvedValue([
-    { bookingID: 'BID123', roomName: 'Cedar', customerName: 'John Doe', bookingDate: '2025-07-28', checkInDate: '2025-07-28', checkOutDate: '2025-07-29', contactNumber: '1234567890', status: 'Confirmed' }
-  ]),
+const mockBookings = [
+  { bookingID: 'BID123', roomName: 'Cedar', customerName: 'John Doe', bookingDate: '2025-07-28', checkInDate: jsday().format("YYYY-MM-DD"), checkOutDate: '2025-07-29', contactNumber: '1234567890', status: 'Confirmed' }
+];
+
+jest.mock('../src/components/constants', () => ({
+
+  loadFromSheetToBookings: jest.fn(() => {
+    console.log('🧪 loadFromSheetToBookings called');
+    return Promise.resolve(mockBookings);
+  }),
   sortBookings: jest.fn(bookings => bookings)
 }));
 

@@ -1,4 +1,5 @@
 // src/components/GoogleLoginButton.jsx
+import React from 'react';
 import { useEffect, useRef } from 'react';
 import { jwtDecode } from "jwt-decode";
 import { CLIENT_ID, API_KEY, SCOPES, SHEET_ID } from "../config"; // Make sure these are correctly defined
