@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { sortBookings, loadFromSheetToBookings } from "../modules/constants";
 
-import './css/searchBooking.css';
+import '../css/searchBooking.css';
 import BookingList from "./BookingList";
 
 const SearchBooking = () => {
