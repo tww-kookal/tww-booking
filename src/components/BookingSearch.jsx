@@ -97,10 +97,6 @@ const BookingSearch = () => {
     });
   };
 
-  const handleCreateNew = () => {
-    navigate('/booking', { state: { from: 'search' } });
-  };
-
   const paginatedResults = results.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -112,10 +108,9 @@ const BookingSearch = () => {
   };
 
   return (
-    <div className="search-booking-container-mobile" style={{ width: '100%', fontSize:'1.2rem' }}> {/* Renamed class for mobile */}
-      <div className="search-header-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
-        <h2>Search Bookings</h2>
-        <button className="create-new-button-mobile" onClick={handleCreateNew}>New Booking</button> {/* Renamed class for mobile */}
+    <div className="search-booking-container-mobile" style={{ width: '100%', fontSize: '3rem' }}> {/* Renamed class for mobile */}
+      <div className="search-header-mobile" style={{ width: '100%', fontSize: '3.5rem' }}> {/* Renamed class for mobile */}
+        Search
       </div>
 
       <div className="search-form-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}

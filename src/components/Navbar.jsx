@@ -29,10 +29,10 @@ const Navbar = () => {
           Availability
         </Link>
         <Link to="/search" className={location.pathname === '/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
-          Search Bookings
+          Search
         </Link>
         <Link to="/booking" className={location.pathname.includes('/booking') ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
-          New Booking
+          New
         </Link>
       </div>
     </nav>

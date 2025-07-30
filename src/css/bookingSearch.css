@@ -268,41 +268,6 @@
     background-color: #5a6268;
 }
 
-/* Pagination Styles */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-    padding: 10px 0;
-}
-
-.pagination-button {
-    background-color: #f0f0f0;
-    border: 1px solid #ddd;
-    color: #333;
-    padding: 8px 12px;
-    margin: 0 5px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.pagination-button:hover:not(:disabled) {
-    background-color: #e0e0e0;
-}
-
-.pagination-button:disabled {
-    background-color: #f9f9f9;
-    color: #ccc;
-    cursor: not-allowed;
-}
-
-.page-info {
-    margin: 0 10px;
-    color: #666;
-}
-
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .search-row {

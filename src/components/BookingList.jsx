@@ -1,5 +1,6 @@
 import React from 'react';
-import '../css/bookingList.css';
+import '../css/bookingList.large.css';
+import '../css/bookingList.handheld.css';
 import dayjs from 'dayjs';
 
 const BookingList = ({
@@ -17,7 +18,7 @@ const BookingList = ({
             <div className="loading-indicator">Loading bookings...</div>
         ) : results.length > 0 ? (
             <div className="table-container">
-                <h3 style={{ fontSize: 'clamp(1.1rem, 2vw, 1.7rem)' }}>
+                <h3>
                     Bookings Found ({results.length})
                 </h3>
                 <div className="card-list">
@@ -35,12 +36,6 @@ const BookingList = ({
                                             : booking.status === 'Available'
                                                 ? '#c8e6c9' // Light green
                                                 : '#eeeeee', // Light grey
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.07)',
-                                marginBottom: '1rem',
-                                padding: '1rem',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                transition: 'box-shadow 0.2s',
                                 border: `2px solid ${booking.status === 'Confirmed'
                                     ? '#1976d2'
                                     : booking.status === 'Cancelled'
@@ -51,34 +46,32 @@ const BookingList = ({
                                     }`
                             }}
                         >
-                            <div className="card-row" style={{ marginBottom: '0.5rem' }}>
-                                <span className="card-label" style={{ fontWeight: 600, color: '#555' }}>
-                                    <span role="img" aria-label="room" style={{ marginRight: '4px' }}>🛏️</span>
-                                    {booking.roomName}
+                            <div className="card-row">
+                                <span className="card-label">
+                                    🛏️{booking.roomName}&nbsp;
                                 </span>
-                                <span className="card-value" style={{ color: '#222' }}>
-                                    <span style={{ fontWeight: 700 }}> {booking.status} &nbsp; 🧑‍💼{booking.numberOfPeople || '- '}</span>
+                                <span className="card-value">
+                                    <span className="card-value-status">{booking.status}&nbsp;🧑‍💼{booking.numberOfPeople || '- '}</span>
                                 </span>
                             </div>
-                            <div className="card-row" style={{ marginBottom: '0.5rem' }}>
-                                <span className="card-label" style={{ fontWeight: 600, color: '#555' }}>Booking ID :</span>
-                                <span className="card-value" style={{ color: '#222' }}>{booking.bookingID}</span>
+                            <div className="card-row">
+                                <span className="card-label">Booking ID:&nbsp;</span>
+                                <span className="card-value">{booking.bookingID}</span>
                             </div>
-                            <div className="card-row" style={{ marginBottom: '0.5rem' }}>
-                                <span className="card-label" style={{ fontWeight: 600, color: '#555' }}>Guest :</span>
-                                <span className="card-value" style={{ color: '#222' }}>{booking.customerName}</span>
+                            <div className="card-row" >
+                                <span className="card-label" >Guest:&nbsp;</span>
+                                <span className="card-value" >{booking.customerName}</span>
                             </div>
-                            <div className="card-row" style={{ marginBottom: '0.5rem' }}>
-                                <span className="card-label" style={{ fontWeight: 600, color: '#555' }}>Dates :</span>
-                                <span className="card-value" style={{ color: '#222' }}>
+                            <div className="card-row">
+                                <span className="card-value">
                                     {dayjs(booking.checkInDate, "YYYY-MM-DD").format("MMM DD 'YY")} <span style={{ color: '#888' }}>to</span> {dayjs(booking.checkOutDate, "YYYY-MM-DD").format("MMM DD 'YY")}
                                     &nbsp;({booking.numberOfNights} nights)
                                 </span>
                             </div>
-                            <div className="card-row" style={{ marginBottom: '0.5rem' }}>
+                            <div className="card-row">
                                 {booking.contactNumber && (
-                                    // <div className="card-row" style={{ marginBottom: '0.5rem' }}>
-                                    <span className="card-value" style={{ color: '#222' }}><a
+                                    // <div className="card-row">
+                                    <span className="card-value"><a
                                         href={`tel:${booking.contactNumber}`}
                                         style={{ color: '#1976d2', textDecoration: 'none', fontWeight: 600 }}
                                         onClick={e => e.stopPropagation()}
@@ -88,18 +81,18 @@ const BookingList = ({
                                     // </div>
                                 )}
                             </div>
-                            <div className="card-row" style={{ marginBottom: '0.5rem' }}>
-                                <span className="card-label" style={{ fontWeight: 600, color: '#555' }}>Source: </span> 
-                                <span className="card-value" style={{ color: '#222' }}>{booking.sourceOfBooking || '-'}</span>
+                            <div className="card-row">
+                                <span className="card-label">Source:&nbsp;</span> 
+                                <span className="card-value">{booking.sourceOfBooking || '-'}</span>
                             </div>
-                            <div className="card-row" style={{ marginBottom: '0.5rem' }}>
-                                <span className="card-label" style={{ fontWeight: 600, color: '#555' }}>Amount: </span> 
-                                <span className="card-value" style={{ color: '#222' }}>₹{booking.roomAmount || 0} </span>
+                            <div className="card-row">
+                                <span className="card-label">Amount:&nbsp;</span> 
+                                <span className="card-value">₹{booking.roomAmount || 0}</span>
                             </div>
-                            <div className="card-row" style={{ marginBottom: '0.5rem' }}>
-                                <span className="card-value" style={{ color: '#222' }}>{'✔️'} Breakfast.</span>
-                                <span className="card-value" style={{ color: '#222' }}>&nbsp;{booking.campFire ? '✔️' : '❌'} Campfire.</span>
-                                <span className="card-value" style={{ color: '#222' }}>&nbsp;{booking.remarks ? '📒' : ''}</span>
+                            <div className="card-row">
+                                <span className="card-value">{'✔️'} Breakfast</span>
+                                <span className="card-value">&nbsp;{booking.campFire ? '✔️' : '❌'} Campfire</span>
+                                <span className="card-value">&nbsp;{booking.remarks ? '📒' : ''}</span>
                             </div>
                         </div>
                     ))}
@@ -107,7 +100,7 @@ const BookingList = ({
                 {results.length > itemsPerPage && (
                     <div className="pagination">
                         <button
-                            className="pagination-button"
+                            className="pagination-button"                        
                             onClick={() => handlePageChange('prev')}
                             disabled={currentPage === 1}
                         >
