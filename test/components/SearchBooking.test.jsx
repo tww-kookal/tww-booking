@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SearchBooking from '../../src/components/SearchBooking';
+import BookingSearch from '../../src/components/BookingSearch';
 import jsday from 'dayjs';
 
 const mockBookings = [
@@ -20,9 +20,9 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => jest.fn()
 }));
 
-describe('SearchBooking', () => {
+describe('BookingSearch', () => {
   test('renders search form and results', async () => {
-    render(<SearchBooking />);
+    render(<BookingSearch />);
     expect(screen.getByText(/Search Bookings/i)).toBeInTheDocument();
     await waitFor(() => {
       expect(screen.getByText('Bookings Found (1)')).toBeInTheDocument();
@@ -31,7 +31,7 @@ describe('SearchBooking', () => {
   });
 
   test('shows loading indicator', () => {
-    render(<SearchBooking />);
+    render(<BookingSearch />);
     expect(screen.getByText(/Searching/i)).toBeInTheDocument();
   });
 });

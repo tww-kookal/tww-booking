@@ -1,14 +1,12 @@
-// SearchBooking.jsx
 import React, { useState, useEffect } from "react";
-// ResultsSection extracted below
 import { useNavigate } from "react-router-dom";
 import { sortBookings, loadFromSheetToBookings } from "../modules/constants";
 import { useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
-import '../css/searchBooking.css';
+import '../css/bookingSearch.css';
 import BookingList from "./BookingList";
 
-const SearchBooking = () => {
+const BookingSearch = () => {
   const navigate = useNavigate();
   const today = new Date().toISOString().split('T')[0];
   const initialCheckInDate = useLocation().state?.defaultCheckInDate || today;
@@ -219,4 +217,4 @@ const SearchBooking = () => {
   );
 };
 
-export default SearchBooking;
+export default BookingSearch;

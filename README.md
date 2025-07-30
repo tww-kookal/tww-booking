@@ -21,9 +21,9 @@ A React-based booking management system for The Westwood, allowing staff to crea
 │   ├── components/
 │   │   ├── Booking.jsx      # Booking form component
 │   │   ├── Booking.css      # Booking form styles
+│   │   ├── BookingSearch.jsx # Booking search component
 │   │   ├── Dashboard.jsx    # Dashboard component
 │   │   ├── Navbar.jsx       # Navigation bar component
-│   │   ├── SearchBooking.jsx # Booking search component
 │   │   ├── constants.js     # Application constants
 │   │   └── css/             # Component-specific styles
 ├── index.html              # HTML entry point

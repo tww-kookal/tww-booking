@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import App from '../src/App';
 
 // Mock dependencies
-jest.mock('../src/components/SearchBooking.jsx', () => () => <div>SearchBooking</div>);
+jest.mock('../src/components/BookingSearch.jsx', () => () => <div>BookingSearch</div>);
 jest.mock('../src/components/Booking.jsx', () => () => <div>Booking</div>);
 jest.mock('../src/components/Dashboard.jsx', () => () => <div>Dashboard</div>);
 jest.mock('../src/components/Navbar.jsx', () => () => <div>Navbar</div>);

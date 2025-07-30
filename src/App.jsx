@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { CLIENT_ID, API_KEY, SCOPES } from "./config";
-import SearchBooking from "./components/SearchBooking.jsx";
+import BookingSearch from "./components/BookingSearch.jsx";
 import Booking from "./components/Booking.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import Navbar from "./components/Navbar.jsx";
@@ -98,7 +98,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/availability" element={<RoomAvailabilityDotChart />} />
-              <Route path="/search" element={<SearchBooking />} />
+              <Route path="/search" element={<BookingSearch />} />
               <Route path="/booking" element={<Booking />} />
               <Route path="/booking/:id" element={<Booking />} />
               <Route path="*" element={<Navigate to="/" />} /> {/* Redirect any unknown route to Dashboard */}
