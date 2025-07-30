@@ -1,4 +1,4 @@
-import { RANGE, RANGE, SHEET_ID, DEFAULT_BOOKING, roomOptions } from "./constants";
+import { RANGE, SHEET_ID, DEFAULT_BOOKING, roomOptions } from "./constants";
 import dayjs from 'dayjs';
 
 /**
