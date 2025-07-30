@@ -3,16 +3,21 @@ import React, { useState, useEffect } from "react";
 // ResultsSection extracted below
 import { useNavigate } from "react-router-dom";
 import { sortBookings, loadFromSheetToBookings } from "../modules/constants";
-
+import { useLocation } from 'react-router-dom';
+import dayjs from 'dayjs';
 import '../css/searchBooking.css';
 import BookingList from "./BookingList";
 
 const SearchBooking = () => {
   const navigate = useNavigate();
+  const today = new Date().toISOString().split('T')[0];
+  const initialCheckInDate = useLocation().state?.defaultCheckInDate || today;
+  const exactStartDate = useLocation().state?.exactStartDate || false;
+  console.log("Initial Check-in Date:", initialCheckInDate, ", Exact Start Date:", exactStartDate);
   const [searchCriteria, setSearchCriteria] = useState({
     bookingDate: "",
     guestName: "",
-    checkInDate: "",
+    checkInDate: initialCheckInDate,
     contactNumber: "",
     bookingID: "", // Added bookingID to search criteria
   });
@@ -33,7 +38,7 @@ const SearchBooking = () => {
     try {
       const allBookings = await loadFromSheetToBookings();
       let filteredResults = [];
-      const today = new Date().toISOString().split('T')[0];
+      const initialDate = dayjs(initialCheckInDate, "YYYY-MM-DD");
       // If no bookings found, set results to empty and show error
       if (!allBookings || allBookings.length <= 0) {
         setResults([]);
@@ -42,7 +47,7 @@ const SearchBooking = () => {
 
       if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
         filteredResults = allBookings.filter(booking => {
-          return booking.checkInDate >= today && booking.status !== 'Cancelled'; // Assuming index 8 is status
+          return dayjs(booking.checkInDate, "YYYY-MM-DD").isAfter(initialDate) && booking.status !== 'Cancelled';
         });
       } else {
         // Convert to bookings and filter based on search criteria
@@ -55,7 +60,7 @@ const SearchBooking = () => {
             booking.customerName.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
 
           const matchesCheckInDate = !searchCriteria.checkInDate ||
-            booking.checkInDate.includes(searchCriteria.checkInDate);
+            exactStartDate ? booking.checkInDate.includes(searchCriteria.checkInDate) : dayjs(booking.checkInDate, 'YYYY-MM-DD').add(-1, "day").isAfter(dayjs(searchCriteria.checkInDate, 'YYYY-MM-DD'));
 
           const matchesContactNumber = !searchCriteria.contactNumber ||
             booking.contactNumber.includes(searchCriteria.contactNumber);
@@ -188,7 +193,7 @@ const SearchBooking = () => {
           >
             {loading ? (
               <span className="searching-animation">
-                Searching 
+                Searching
                 <span className="dot"></span>
                 <span className="dot"></span>
                 <span className="dot"></span>

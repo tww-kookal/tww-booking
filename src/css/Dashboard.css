@@ -89,7 +89,11 @@
 }
 
 .action-button.search {
-  background-color: #3498db;
+  background-color: #ffffff;
+}
+
+.action-button.find {
+  background-color: #4545eb;
 }
 
 .action-button.refresh {

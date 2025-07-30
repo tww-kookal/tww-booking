@@ -93,10 +93,14 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
         );
 
         let bgColor = '#5d595cff';
+        let displayText = '';
         if (bookingActual) {
             bgColor = getStatusColor(bookingActual);
+            displayText = `${getStartingCharacters(bookingActual.customerName)} 
+                            ${bookingActual.numberOfPeople ? `(🧑‍💼${bookingActual.numberOfPeople})` : ''} `;
         } else if (bookingInjected) {
             bgColor = getStatusColor(bookingInjected);
+            displayText = bookingInjected.status || 'NONE';
         }
         return (
             <td
@@ -121,9 +125,7 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
                     "\r\nGuests : " + bookingActual.numberOfPeople
                     : ''}
             >
-                {/* {bookingActual ? getInitials(bookingActual.customerName) : ''} */}
-                {bookingActual ? bookingActual.customerName : ''} &nbsp;
-                ({bookingActual ? bookingActual.numberOfPeople : ''})
+                {displayText}
             </td>
         );
     };

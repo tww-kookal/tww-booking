@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { loadFromSheetToBookings } from '../modules/constants';
 import '../css/Dashboard.css';
-import RoomAvailabilityDotChart from './RoomAvailabilityDotChart';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalBookings: 0,
     upcomingBookings: 0,
     todayCheckIns: 0,
-    todayCheckOuts: 0
+    todayCheckOuts: 0,
+    todayCheckInDetails: [],
+    todayCheckOutDetails: []
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,11 +41,29 @@ const Dashboard = () => {
           return booking.checkOutDate === today && booking.status !== 'Cancelled'; // Assuming index 4 is check-out date
         }).length;
 
+        const todayCheckInDetails = bookings.filter(booking => {
+          return booking.checkInDate === today && booking.status !== 'Cancelled'
+        }).map(booking => ({
+          customerName: booking.customerName,
+          numberOfPeople: booking.numberOfPeople,
+          roomName: booking.roomName
+        }));
+
+        const todayCheckOutDetails = bookings.filter(booking => {
+          return booking.checkOutDate === today && booking.status !== 'Cancelled'
+        }).map(booking => ({
+          customerName: booking.customerName,
+          numberOfPeople: booking.numberOfPeople,
+          roomName: booking.roomName
+        }));
+
         setStats({
           totalBookings,
           upcomingBookings,
           todayCheckIns,
-          todayCheckOuts
+          todayCheckOuts,
+          todayCheckInDetails,
+          todayCheckOutDetails
         });
       }
       setError(null);
@@ -59,9 +78,8 @@ const Dashboard = () => {
   return (
     <div className="">
       <div>
-        <h2 style={{textAlign: "center"}}>Dashboard</h2>
+        <h2 style={{ textAlign: "center" }}>Dashboard</h2>
         {error && <div className="error-message">{error}</div>}
-        <RoomAvailabilityDotChart />
       </div>
       <div className="dashboard-container">
         {loading ? (
@@ -70,22 +88,43 @@ const Dashboard = () => {
           <>
             <div className="stats-grid">
               <div className="stat-card">
-                <h3>Total Bookings</h3>
-                <p className="stat-value">{stats.totalBookings}</p>
-              </div>
-              <Link to="/search" className="action-button search">
-                <div className="stat-card">
-                  <h3>Upcoming Bookings</h3>
-                  <p className="stat-value">{stats.upcomingBookings}</p>
-                </div>
-              </Link>
-              <div className="stat-card">
-                <h3>Today's Check-ins</h3>
+                <Link to="/search" state={{ exactStartDate: true }} className="action-button search">
+                  <h3>Today's Check-ins</h3>
+                </Link>
                 <p className="stat-value">{stats.todayCheckIns}</p>
+                {stats.todayCheckInDetails.map((detail, index) => (
+                  <div key={index}>
+                    <span>{detail.roomName}: {detail.customerName} (🧑‍💼{detail.numberOfPeople})</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="stat-card">
+                <Link to="/search" state={{ exactStartDate: true }} className="action-button search">
+                  <h3>Today's Check-outs</h3>
+                </Link>
+                <p className="stat-value">{stats.todayCheckOuts}</p>
+                {stats.todayCheckOutDetails.map((detail, index) => (
+                  <div key={index}>
+                    <span>{detail.roomName}: {detail.customerName} (🧑‍💼{detail.numberOfPeople})</span>
+                  </div>
+                ))}
               </div>
               <div className="stat-card">
-                <h3>Today's Check-outs</h3>
-                <p className="stat-value">{stats.todayCheckOuts}</p>
+                <Link to="/search" className="action-button search">
+                  <h3>Upcoming Bookings</h3>
+                </Link>
+                <p className="stat-value">{stats.upcomingBookings}</p>
+              </div>
+              <div className="stat-card">
+                <Link
+                  to="/search"
+                  state={{ defaultCheckInDate: "2020-01-01" }}
+                  className="action-button search"
+                >
+                  <h3>Total Bookings</h3>
+                </Link>
+                <p className="stat-value">{stats.totalBookings}</p>
               </div>
             </div>
 
@@ -96,7 +135,7 @@ const Dashboard = () => {
                   <span className="icon">+</span>
                   <span>New Booking</span>
                 </Link>
-                <Link to="/search" className="action-button search">
+                <Link to="/search" className="action-button find">
                   <span className="icon">🔍</span>
                   <span>Search Bookings</span>
                 </Link>
