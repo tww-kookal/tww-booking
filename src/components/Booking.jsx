@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import '../css/booking.css';
+import '../css/booking.large.css';
+import '../css/booking.handheld.css';
 import { roomOptions, statusOptions, sourceOptions, DEFAULT_BOOKING } from "../modules/constants";
 import {getCommissionPercent, calculateCommission, parseNumber, loadFromSheetToBookings} from "../modules/common.module";
 import { uploadToDrive } from '../modules/googleDriveService';
@@ -237,7 +238,7 @@ const Booking = () => {
     };
 
     return (
-        <div className="booking-form-container" style={{ width: '100%', fontSize: '1.2rem' }}>
+        <div className="booking-form-container">
             <h2>Room Booking Form</h2>
             <div className='form-group'>
                 <label>Identity Document:</label>
@@ -384,14 +385,14 @@ const Booking = () => {
                 {/* Buttons */}
                 <div className="form-buttons">
                     <button type="button" className="button-secondary" onClick={handleCancel}>Cancel</button>
-                    <button type="button" className="button-secondary" onClick={handleAddNew}>Clear Form</button>
+                    <button type="button" className="button-secondary" onClick={handleAddNew}>Clear</button>
                     <button
                         type="button"
                         className="button-primary"
                         onClick={handleUpdate}
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update Booking' : 'Save Booking'}
+                        {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update' : 'Save'}
                     </button>
                     <button type="button" className="button-secondary" onClick={() => handleGenerateReceipt(booking)}>Generate Receipt</button>
                 </div>
