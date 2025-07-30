@@ -3,8 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import Dashboard from '../../src/components/Dashboard';
 import '../../src/modules/constants';
 
-// Mock RoomAvailabilityDotChart and Link
-jest.mock('../../src/components/RoomAvailabilityDotChart', () => () => <div>RoomAvailabilityDotChart</div>);
+// Mock AvailabilityChart and Link
+jest.mock('../../src/components/AvailabilityChart', () => () => <div>AvailabilityChart</div>);
 jest.mock('react-router-dom', () => ({
   Link: ({ children, ...props }) => <a {...props}>{children}</a>
 }));
@@ -45,10 +45,10 @@ jest.mock('../../src/modules/constants', () => ({
 }));
 
 describe('Dashboard Component', () => {
-  test('renders dashboard title and RoomAvailabilityDotChart', async () => {
+  test('renders dashboard title and AvailabilityChart', async () => {
     render(<Dashboard />);
     expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
-    expect(screen.getByText('RoomAvailabilityDotChart')).toBeInTheDocument();
+    expect(screen.getByText('AvailabilityChart')).toBeInTheDocument();
   });
 
   test('shows loading indicator initially', async () => {

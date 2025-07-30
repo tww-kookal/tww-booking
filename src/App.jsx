@@ -6,7 +6,7 @@ import Dashboard from "./components/Dashboard.jsx";
 import Navbar from "./components/Navbar.jsx";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
-import RoomAvailabilityDotChart from "./components/RoomAvailabilityDotChart.jsx";
+import AvailabilityChart from "./components/AvailabilityChart.jsx";
 
 let tokenClient;
 
@@ -97,7 +97,7 @@ const App = () => {
           <div className="content-container">
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/availability" element={<RoomAvailabilityDotChart />} />
+              <Route path="/availability" element={<AvailabilityChart />} />
               <Route path="/search" element={<BookingSearch />} />
               <Route path="/booking" element={<Booking />} />
               <Route path="/booking/:id" element={<Booking />} />

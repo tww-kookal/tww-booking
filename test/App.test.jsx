@@ -7,7 +7,7 @@ jest.mock('../src/components/BookingSearch.jsx', () => () => <div>BookingSearch<
 jest.mock('../src/components/Booking.jsx', () => () => <div>Booking</div>);
 jest.mock('../src/components/Dashboard.jsx', () => () => <div>Dashboard</div>);
 jest.mock('../src/components/Navbar.jsx', () => () => <div>Navbar</div>);
-jest.mock('../src/components/RoomAvailabilityDotChart.jsx', () => () => <div>RoomAvailabilityDotChart</div>);
+jest.mock('../src/components/AvailabilityChart.jsx', () => () => <div>AvailabilityChart</div>);
 jest.mock('../src/config', () => ({ CLIENT_ID: 'test-client-id', API_KEY: 'test-api-key', SCOPES: 'test-scope' }));
 
 // Mock window.gapi and window.google

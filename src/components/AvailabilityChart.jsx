@@ -5,7 +5,7 @@ import { loadFromSheetToBookings, prepareChartData, getStartingCharacters } from
 import '../css/availabilityChart.handheld.css';
 import '../css/availabilityChart.large.css';
 
-const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
+const AvailabilityChart = ({ startDate: propStartDate }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [data, setData] = useState([]);
@@ -70,23 +70,30 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
     };
 
     // Mobile-friendly card layout: horizontal alignment for rooms per date
-    const renderMobileCards = () => (
-        <div className="room-chart-list">
+    const renderCards = () => (
+        <div className="room-chartlist">
             {/* Header Card */}
-            <div className="room-chart-rooms-horizontal" >
-                <div className="room-chart-date" >
+            <div className="room-chart-rooms-horizontal">
+                <div className="room-chart-date">
                     Date
                 </div>
                 {roomOptions.map(roomName => (
-                    <div key={roomName} className="room-chart-room">
+                    <div
+                        key={roomName}
+                        className="room-chart-room"
+                        style={{
+                            background: '#e3eafc',
+                            color: '#1976d2',
+                        }}
+                    >
                         {roomName}
                     </div>
                 ))}
             </div>
             {/* Data Cards */}
             {memoizedDates.map(date => (
-                <div className="room-chart-rooms-horizontal" key={date} >
-                    <div className="room-chart-date" >
+                <div className="room-chart-rooms-horizontal" key={date} style={{ padding: '4px 0', background: '#fff' }}>
+                    <div className="room-chart-date" style={{ color: '#1976d2' }}>
                         {dayjs(date, "YYYY-MM-DD").format("MMM DD 'YY")}
                     </div>
                     {roomOptions.map(roomName => {
@@ -122,7 +129,9 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
                                     ? () => onBookingClick(bookingActual)
                                     : bookingInjected ? () => onBookingClick(bookingInjected) : undefined}
                             >
-                                <span > {displayText}</span>
+                                <span style={{ fontSize: '1.15em' }}> {/* Increased font size by 2 */}
+                                    {displayText}
+                                </span>
                             </div>
                         );
                     })}
@@ -136,17 +145,18 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
             {error && <div className="error-message">{error}</div>}
             {loading ? 'Fetching from data store...' : ''}
             <div className='form-search'>
-                <label className="date-label">
-                    Start Date: &nbsp;</label>
+                <label>Start Date: &nbsp;</label>
                 <input
                     type="date"
                     value={startDate.format("YYYY-MM-DD")}
                     onChange={handleDateChange}
                 />
             </div>
-            <div>{renderMobileCards()}</div>
+            <div className="room-chart" style={{ width: '100%' }} >
+                {renderCards()}
+            </div>
         </div>
     );
 };
 
-export default RoomAvailabilityDotChart;
+export default AvailabilityChart;

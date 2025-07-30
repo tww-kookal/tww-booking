@@ -1,4 +1,4 @@
-import { getStartingCharacters } from '../../src/modules/roomAvailabilityDotChart.module';
+import { getStartingCharacters } from '../../src/modules/common.module';
 
 describe('getStartingCharacters', () => {
   it('returns the full name if length is less than numberOfCharacters', () => {
