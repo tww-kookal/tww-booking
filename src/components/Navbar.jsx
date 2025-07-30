@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import '../css/Navbar.css';
+import '../css/navbar.large.css';
+import '../css/navbar.handheld.css';
 
 const Navbar = () => {
   const location = useLocation();
@@ -12,7 +13,7 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <div className="navbar-brand" style ={{ display: 'flex', alignItems: 'center', fontSize: '2rem', fontWeight: 'bold' }}>
+      <div className="navbar-brand">
         The Westwood
       </div>
 
@@ -21,7 +22,7 @@ const Navbar = () => {
         ☰
       </div>
 
-      <div className={`navbar-links ${isMenuOpen ? 'active' : ''}`} style ={{ display: 'flex', alignItems: 'center', fontSize: '1.5rem', fontWeight: 'bold' }}>
+      <div className={`navbar-links ${isMenuOpen ? 'active' : ''}`} >
         <Link to="/" className={location.pathname === '/' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
           Dashboard
         </Link>

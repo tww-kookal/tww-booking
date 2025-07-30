@@ -1,0 +1,48 @@
+/* Mobile view */
+@media (max-width: 999px) {
+  /* Adjusted for screens less than 1000 pixels */
+
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2d0000;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+  }
+
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+
+  .menu-icon {
+    display: block;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .navbar-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    font-size: 1.7rem;
+    font-weight: bold;
+  }
+
+  .navbar-links a {
+    color: white;
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+  }
+
+  .navbar-links a.active,
+  .navbar-links a:hover {
+    background-color: #99000098;
+  }
+
+}
