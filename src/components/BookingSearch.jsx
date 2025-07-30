@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { sortBookings, loadFromSheetToBookings } from "../modules/constants";
+import { sortBookings, loadFromSheetToBookings } from "../modules/common.module";
 import dayjs from 'dayjs';
 import '../css/bookingSearch.css';
 import BookingList from "./BookingList";

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import '../css/booking.css';
-import { roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING, loadFromSheetToBookings } from "../modules/constants";
+import { roomOptions, statusOptions, sourceOptions, DEFAULT_BOOKING } from "../modules/constants";
+import {getCommissionPercent, calculateCommission, parseNumber, loadFromSheetToBookings} from "../modules/common.module";
 import { uploadToDrive } from '../modules/googleDriveService';
 import { validateBooking, convertBookingToSheetsRecord, findSheetRowToUpdate } from '../modules/booking.module';
 import { updateBookingRow, appendBookingRow } from '../modules/googleSheetsService';

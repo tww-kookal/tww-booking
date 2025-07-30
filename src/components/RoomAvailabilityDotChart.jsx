@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
-import { loadFromSheetToBookings, prepareChartData, roomAvailabilityStatusColors, roomOptions } from '../modules/constants';
+import { roomOptions } from '../modules/constants';
+import { loadFromSheetToBookings, prepareChartData, getStartingCharacters } from '../modules/common.module';
 import '../css/RoomAvailabilityDotChart.css';
-import { getStartingCharacters } from '../modules/common.module';
 
 const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
     const [loading, setLoading] = useState(true);

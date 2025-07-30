@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { loadFromSheetToBookings } from '../modules/constants';
 import '../css/Dashboard.css';
-import { getStartingCharacters } from '../modules/common.module';
+import { getStartingCharacters, loadFromSheetToBookings } from '../modules/common.module';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
