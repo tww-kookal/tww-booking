@@ -14,7 +14,7 @@ import {
   arrayToBooking,
   sortBookings,
   prepareChartData
-} from '../src/components/constants';
+} from '../../src/modules/constants';
 
 // Mock window.gapi for loadFromSheetToBookings
 beforeAll(() => {

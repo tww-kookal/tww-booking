@@ -1,4 +1,4 @@
-import { uploadToDrive } from '../src/components/googleDriveService';
+import { uploadToDrive } from '../../src/modules/googleDriveService';
 
 // Mocks
 const mockFile = new Blob(['test content'], { type: 'application/pdf' });

@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import Dashboard from '../src/components/Dashboard';
-import '../src/components/constants';
+import Dashboard from '../../src/components/Dashboard';
+import '../../src/modules/constants';
 
 // Mock RoomAvailabilityDotChart and Link
-jest.mock('../src/components/RoomAvailabilityDotChart', () => () => <div>RoomAvailabilityDotChart</div>);
+jest.mock('../../src/components/RoomAvailabilityDotChart', () => () => <div>RoomAvailabilityDotChart</div>);
 jest.mock('react-router-dom', () => ({
   Link: ({ children, ...props }) => <a {...props}>{children}</a>
 }));
@@ -39,7 +39,7 @@ const mockBookings = [
   }
 ];
 
-jest.mock('../src/components/constants', () => ({
+jest.mock('../../src/modules/constants', () => ({
   loadFromSheetToBookings: jest.fn().mockResolvedValue(mockBookings),
   roomOptions: ['Cedar', 'Pine', 'Teak', 'Maple', 'Tent'],
 }));
@@ -69,7 +69,7 @@ describe('Dashboard Component', () => {
   });
 
   test('shows error message if data fetch fails', async () => {
-    const { loadFromSheetToBookings, roomOptions } = require('../src/components/constants');
+    const { loadFromSheetToBookings, roomOptions } = require('../../src/modules/constants');
     loadFromSheetToBookings.mockRejectedValueOnce(new Error('Failed'));
     render(<Dashboard />);
     await waitFor(() => {

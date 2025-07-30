@@ -1,13 +1,13 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SearchBooking from '../src/components/SearchBooking';
+import SearchBooking from '../../src/components/SearchBooking';
 import jsday from 'dayjs';
 
 const mockBookings = [
   { bookingID: 'BID123', roomName: 'Cedar', customerName: 'John Doe', bookingDate: '2025-07-28', checkInDate: jsday().format("YYYY-MM-DD"), checkOutDate: '2025-07-29', contactNumber: '1234567890', status: 'Confirmed' }
 ];
 
-jest.mock('../src/components/constants', () => ({
+jest.mock('../../src/modules/constants', () => ({
 
   loadFromSheetToBookings: jest.fn(() => {
     console.log('🧪 loadFromSheetToBookings called');
