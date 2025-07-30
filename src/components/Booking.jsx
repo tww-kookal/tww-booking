@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import '../css/booking.css';
-import { RANGE, SHEET_ID, roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING, loadFromSheetToBookings } from "../modules/constants";
+import { roomOptions, statusOptions, sourceOptions, getCommissionPercent, calculateCommission, parseNumber, DEFAULT_BOOKING, loadFromSheetToBookings } from "../modules/constants";
 import { uploadToDrive } from '../modules/googleDriveService';
-import RoomAvailabilityDotChart from './RoomAvailabilityDotChart';
 import { validateBooking, convertBookingToSheetsRecord, findSheetRowToUpdate } from '../modules/booking.module';
 import { updateBookingRow, appendBookingRow } from '../modules/googleSheetsService';
 
@@ -238,7 +237,6 @@ const Booking = () => {
 
     return (
         <div className="booking-form-container">
-            <RoomAvailabilityDotChart />
             <h2>Room Booking Form</h2>
             <div className='form-group'>
                 <label>Identity Document:</label>
