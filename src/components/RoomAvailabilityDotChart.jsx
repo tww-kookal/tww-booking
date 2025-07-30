@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { loadFromSheetToBookings, prepareChartData, roomAvailabilityStatusColors, roomOptions } from '../modules/constants';
 import '../css/RoomAvailabilityDotChart.css';
-import { getStartingCharacters } from '../modules/roomAvailabilityDotChart.module';
+import { getStartingCharacters } from '../modules/common.module';
 
 const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
     const [loading, setLoading] = useState(true);
@@ -269,29 +269,7 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
                     onChange={handleDateChange}
                 />
             </div>
-            <div className="room-chart-desktop">
-                <table className="room-chart-table">
-                    <thead className="room-chart-table-header">
-                        <tr>
-                            <th>Date</th>
-                            {roomOptions.map(roomName => (
-                                <th key={roomName}>{roomName}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {memoizedDates.map(date => (
-                            <tr key={date}>
-                                <td className="room-chart-first-column">
-                                    <strong>{dayjs(date, "YYYY-MM-DD").format("MMM DD")}</strong>
-                                </td>
-                                {roomOptions.map(roomName => renderCell(date, roomName))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="room-chart-mobile">
+            <div className="room-chart-mobile" >
                 {renderMobileCards()}
             </div>
         </div>

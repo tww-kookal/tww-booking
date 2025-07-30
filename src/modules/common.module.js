@@ -1,4 +1,4 @@
-export const getStartingCharacters = (name, numberOfCharacters = 5) => {
+export const getStartingCharacters = (name, numberOfCharacters = 6) => {
     if (!name) return '';
     if (name.length <= numberOfCharacters) {
         return name;

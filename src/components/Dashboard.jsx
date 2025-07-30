@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { loadFromSheetToBookings } from '../modules/constants';
 import '../css/Dashboard.css';
+import { getStartingCharacters } from '../modules/common.module';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -44,7 +45,7 @@ const Dashboard = () => {
         const todayCheckInDetails = bookings.filter(booking => {
           return booking.checkInDate === today && booking.status !== 'Cancelled'
         }).map(booking => ({
-          customerName: booking.customerName,
+          customerName: getStartingCharacters(booking.customerName),
           numberOfPeople: booking.numberOfPeople,
           roomName: booking.roomName
         }));
@@ -52,7 +53,7 @@ const Dashboard = () => {
         const todayCheckOutDetails = bookings.filter(booking => {
           return booking.checkOutDate === today && booking.status !== 'Cancelled'
         }).map(booking => ({
-          customerName: booking.customerName,
+          customerName: getStartingCharacters(booking.customerName),
           numberOfPeople: booking.numberOfPeople,
           roomName: booking.roomName
         }));
