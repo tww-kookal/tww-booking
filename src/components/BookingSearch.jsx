@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { sortBookings, loadFromSheetToBookings } from "../modules/common.module";
 import dayjs from 'dayjs';
-import '../css/bookingSearch.css';
+import '../css/bookingSearch.large.css';
+import '../css/bookingSearch.handheld.css';
 import BookingList from "./BookingList";
 
 const BookingSearch = () => {
@@ -108,13 +109,13 @@ const BookingSearch = () => {
   };
 
   return (
-    <div className="search-booking-container-mobile" style={{ width: '100%', fontSize: '3rem' }}> {/* Renamed class for mobile */}
-      <div className="search-header-mobile" style={{ width: '100%', fontSize: '3.5rem' }}> {/* Renamed class for mobile */}
+    <div className="search-booking-container" >
+      <div className="search-header" >
         Search
       </div>
 
-      <div className="search-form-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
-        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+      <div className="search-form" >
+        <div className="search-field" >
           <label>Booking Date:</label>
           <input
             type="date"
@@ -125,7 +126,7 @@ const BookingSearch = () => {
           />
         </div>
 
-        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+        <div className="search-field" >
           <label>Guest Name:</label>
           <input
             type="text"
@@ -137,7 +138,7 @@ const BookingSearch = () => {
           />
         </div>
 
-        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+        <div className="search-field" >
           <label>Check In Date:</label>
           <input
             type="date"
@@ -148,7 +149,7 @@ const BookingSearch = () => {
           />
         </div>
 
-        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+        <div className="search-field" >
           <label>Contact Number:</label>
           <input
             type="text"
@@ -160,7 +161,7 @@ const BookingSearch = () => {
           />
         </div>
 
-        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+        <div className="search-field" >
           <label>Booking ID:</label>
           <input
             type="text"
@@ -173,7 +174,7 @@ const BookingSearch = () => {
         </div>
 
         <button
-          className="search-button-mobile"
+          className="search-button"
           onClick={handleSearch}
           disabled={loading}
           style={{ width: '100%' }}
