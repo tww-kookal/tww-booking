@@ -1,12 +1,44 @@
 import { SHEET_ID } from '../config';
 import dayjs from 'dayjs';
 
+/**
+ * @constant {object} BOOKING_DEFAULT - Default values for a booking.
+ * @property {string} BOOKING_DATE - The default booking date, set to today's date in ISO format.
+ * @property {string} ROOM_NAME - The default room name, set to 'Cedar'.
+ * @property {string} STATUS - The default booking status, set to 'Confirmed'.
+ */
 export const BOOKING_DEFAULT = {
     BOOKING_DATE: new Date().toISOString().split('T')[0],
     ROOM_NAME: 'Cedar',
     STATUS: 'Confirmed'
 }
 
+/**
+ * @constant {object} DEFAULT_BOOKING - Default booking object with initial values for all properties.
+ * @property {string} roomName - The name of the room, default is BOOKING_DEFAULT.ROOM_NAME.
+ * @property {string} customerName - The name of the customer, default is an empty string.
+ * @property {string} contactNumber - The contact number of the customer, default is an empty string.
+ * @property {number} numberOfPeople - The number of people in the booking, default is 0.
+ * @property {string} checkInDate - The check-in date, default is an empty string.
+ * @property {string} checkOutDate - The check-out date, default is an empty string.
+ * @property {number} numberOfNights - The number of nights booked, default is 0.
+ * @property {string} status - The status of the booking, default is BOOKING_DEFAULT.STATUS.
+ * @property {string} bookingDate - The date the booking was made, default is BOOKING_DEFAULT.BOOKING_DATE.
+ * @property {string} sourceOfBooking - The source of the booking, default is an empty string.
+ * @property {number} roomAmount - The amount charged for the room, default is 0.
+ * @property {number} advancePaid - The amount of advance paid, default is 0.
+ * @property {string} advancePaidTo - The recipient of the advance payment, default is an empty string.
+ * @property {number} food - The amount charged for food, default is 0.
+ * @property {number} campFire - The amount charged for campfire, default is 0.
+ * @property {number} otherServices - The amount charged for other services, default is 0.
+ * @property {number} balanceToPay - The remaining balance to pay, default is 0.
+ * @property {number} totalAmount - The total amount for the booking, default is 0.
+ * @property {number} commission - The commission earned on the booking, default is 0.
+ * @property {number} twwRevenue - The revenue for The Westwood on the booking, default is 0.
+ * @property {string} balancePaidTo - The recipient of the balance payment, default is an empty string.
+ * @property {string} bookingID - The unique identifier for the booking, default is an empty string.
+ * @property {string} remarks - Any remarks or notes about the booking, default is an empty string.
+ */
 export const DEFAULT_BOOKING = {
     roomName: BOOKING_DEFAULT.ROOM_NAME,
     customerName: '',
@@ -33,12 +65,28 @@ export const DEFAULT_BOOKING = {
     remarks: ''
 }
 
+/**
+ * @constant {string} RANGE - The range of cells in the Google Sheet to read data from.
+ */
 export const RANGE = "Sheet1!A2:Z"; // Adjust range
 
+/**
+ * @constant {string} SHEET_ID - The ID of the Google Sheet.
+ */
 export { SHEET_ID };
 
+/**
+ * @constant {Array<string>} roomOptions - An array of available room options.
+ */
 export const roomOptions = ['Cedar', 'Pine', 'Teak', 'Maple', 'Tent'];
 
+/**
+ * @constant {object} roomAvailabilityStatusColors - An object mapping booking statuses to their corresponding colors.
+ * @property {string} Confirmed - Hex color code for 'Confirmed' status.
+ * @property {string} Cancelled - Hex color code for 'Cancelled' status.
+ * @property {string} Available - Hex color code for 'Available' status.
+ * @property {string} Closed - Hex color code for 'Closed' status.
+ */
 export const roomAvailabilityStatusColors = {
     Confirmed: '#007bff', // blue
     Cancelled: '#fd7e14', // orange
@@ -46,161 +94,16 @@ export const roomAvailabilityStatusColors = {
     Closed: '#6c757d', // gray
 };
 
-export const statusOptions = ['Confirmed', 'Tentative', 'Cancelled'];
+/**
+ * @constant {Array<string>} statusOptions - An array of available status options.
+ */
+export const statusOptions = ['Confirmed', 'Cancelled'];
 
+/**
+ * @constant {Array<string>} sourceOptions - An array of available source options.
+ */
 export const sourceOptions = [
     'Sangeetha', 'Pranav', 'RK', 'Balan', 'Walkin',
     'MMT', 'Agoda', 'Booking.com', 'Ganesh Agent', 'Kodai Guest'
 ];
-
-export const getCommissionPercent = (source) => {
-    if (source === "Sangeetha") return 8;
-    else if (["Ganesh Agent", "Kodai Guest", "Kodai Homes"].includes(source)) return 10;
-    else if (source === "MMT") return 30;
-    else if (["Pranav", "RK", "Balan"].includes(source)) return 0;
-    return 0;
-};
-
-export const convertGoogleDataToBookings = (sheetData) => {
-    // Skip header row
-    // const rows = sheetData.slice(1);
-    console.log("Query From Google Data Sheet Returned ", sheetData.length);
-    return sheetData.map((row) => {
-        return arrayToBooking(row);
-    });
-}
-
-export const loadFromSheetToBookings = async () => {
-    try {
-        const res = await window.gapi.client.sheets.spreadsheets.values.get({
-            spreadsheetId: SHEET_ID,
-            range: RANGE,
-        });
-
-        if (res.result.values && res.result.values.length > 0) {
-            return convertGoogleDataToBookings(res.result.values);
-        } else {
-            console.error("❌ No bookings found in the sheet.");
-            return [];
-        }
-    } catch (error) {
-        console.error("❌ Error fetching data from Google Sheets:", error);
-        return [];
-    }
-}
-
-export const calculateCommission = (source, amount) => {
-    return (amount * getCommissionPercent(source)) / 100;
-};
-
-export const parseNumber = (val) => {
-    if (!val) return 0;
-    return typeof val === 'string' ? Number(val.replace(/,/g, '')) || 0 : val;
-};
-
-export const arrayToBooking = (row) => {
-    return {
-        roomName: row[0] || '',
-        customerName: row[1] || '',
-        contactNumber: row[2] || '',
-        numberOfPeople: Number(row[3] ? row[3].replace(/,/g, '') : 0) || 0,
-        checkInDate: row[4] || '',
-        checkOutDate: row[5] || '',
-        numberOfNights: Number(row[6] ? row[6].replace(/,/g, '') : 0) || 0,
-        status: row[7] || '',
-        bookingDate: row[8] || '',
-        sourceOfBooking: row[9] || '',
-        roomAmount: Number(row[10] ? row[10].replace(/,/g, '') : 0) || 0,
-        advancePaid: Number(row[11] ? row[11].replace(/,/g, '') : 0) || 0,
-        advancePaidTo: row[12] || '',
-        //
-        food: Number(row[14] ? row[14].replace(/,/g, '') : 0) || 0,
-        campFire: Number(row[15] ? row[15].replace(/,/g, '') : 0) || 0,
-        //
-        //
-        otherServices: Number(row[18] ? row[18].replace(/,/g, '') : 0) || 0,
-        balanceToPay: Number(row[19] ? row[19].replace(/,/g, '') : 0) || 0,
-        totalAmount: Number(row[20] ? row[20].replace(/,/g, '') : 0) || 0,
-        commission: Number(row[21] ? row[21].replace(/,/g, '') : 0) || 0,
-        twwRevenue: Number(row[22] ? row[22].replace(/,/g, '') : 0) || 0,
-        balancePaidTo: row[23] || '',
-        bookingID: row[24] || '',
-        remarks: row[25] || ''
-    };
-}
-
-export const sortBookings = (bookings) => {
-    // Sort the filtered results by check-in date
-    return bookings.sort((a, b) => {
-        // Convert YYYY-MM-DD strings to Date objects for proper date comparison
-        const dateA = a.checkInDate ? new Date(a.checkInDate) : new Date(0);
-        const dateB = b.checkInDate ? new Date(b.checkInDate) : new Date(0);
-
-        // If check-in dates are the same, sort by customer name
-        if (dateA.getTime() === dateB.getTime()) {
-            return a.customerName.localeCompare(b.customerName);
-        }
-        // Otherwise sort by check-in date (ascending order)
-        return dateA - dateB;
-    });
-}
-
-export const prepareChartData = (bookings, dateSet, memoizedDates) =>{
-    const chartData = bookings
-        .filter((booking) => dateSet.has(booking.checkInDate))
-        .map((booking) => ({
-            ...booking,
-            chartStatus: dayjs(booking.checkInDate, "YYYY-MM-DD").isBefore(dayjs()) ? 'Closed' : booking.status,
-        }));
-
-    const allData = [];
-    for (const date of memoizedDates) {
-        for (const room of roomOptions) {
-            const booking = chartData.find((b) => dayjs(b.checkInDate, "YYYY-MM-DD").isSame(date) && b.roomName === room);
-            if (!booking && dayjs(date, "YYYY-MM-DD").isBefore(dayjs())) {
-                // If no booking exists for this room on this date and its a past date, add a default booking with Closed status
-                allData.push({
-                    ...DEFAULT_BOOKING,
-                    roomName: room,
-                    checkInDate: date,
-                    checkOutDate: date,
-                    chartStatus: 'Closed',
-                    status: 'Available',
-                    chartData: 'INJECTED',
-                    pastDate: true
-                });
-            } else if (!booking) {
-                // If no booking exists for this room for today and future
-                allData.push({
-                    ...DEFAULT_BOOKING,
-                    roomName: room,
-                    checkInDate: date,
-                    checkOutDate: date,
-                    chartStatus: 'Available',
-                    status: 'Available',
-                    chartData: 'INJECTED',
-                    pastDate: false
-                });
-            } else if (booking && dayjs(booking.checkInDate, "YYYY-MM-DD").isBefore(dayjs())) {
-                // If booking exists for this room on this date and its a past date, add a default booking with Closed status
-                // This is to ensure that past bookings are shown as closed
-                allData.push({
-                    ...booking,
-                    chartStatus: 'Closed',
-                    chartData: 'ACTUAL',
-                    pastDate: true
-                });
-            } else if (booking) {
-                // If booking exists for this room on this date and future, add it to the data
-                allData.push({
-                    ...booking,
-                    chartStatus: booking.status,
-                    chartData: 'ACTUAL',
-                    pastDate: false
-                });
-            }
-        }
-    }
-    return allData;
-}
 

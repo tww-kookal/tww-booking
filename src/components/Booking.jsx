@@ -236,7 +236,7 @@ const Booking = () => {
     };
 
     return (
-        <div className="booking-form-container">
+        <div className="booking-form-container" style={{ width: '100%', fontSize: '1.2rem' }}>
             <h2>Room Booking Form</h2>
             <div className='form-group'>
                 <label>Identity Document:</label>

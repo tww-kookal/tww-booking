@@ -1,6 +1,13 @@
 // Use window.gapi instead of importing from gapi-script
 import { FOLDER_ID } from '../config'
 
+/**
+ * Uploads a file to Google Drive.
+ * @async
+ * @param {File} file - The file to upload.
+ * @param {string} bookingID - The booking ID associated with the file.
+ * @returns {Promise<void>}
+ */
 export const uploadToDrive = async (file, bookingID) => {
     const metadata = {
         name: `${bookingID}_${file.name}`,
