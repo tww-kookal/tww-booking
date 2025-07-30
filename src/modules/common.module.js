@@ -6,3 +6,12 @@ export const getStartingCharacters = (name, numberOfCharacters = 6) => {
         return name.substring(0, numberOfCharacters);
     }
 }
+
+export const getInitials = (name) => {
+    return name
+        .split(' ')
+        .map(part => part[0])
+        .join('')
+        .toUpperCase();
+};
+
