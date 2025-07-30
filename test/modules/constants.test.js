@@ -16,6 +16,8 @@ import {
   prepareChartData
 } from '../../src/modules/constants';
 
+import dayjs from 'dayjs';
+
 // Mock window.gapi for loadFromSheetToBookings
 beforeAll(() => {
   global.window = {};
@@ -130,4 +132,23 @@ describe('constants.js', () => {
     expect(chartData.some(d => d.roomName === 'Cedar')).toBe(true);
     expect(chartData.some(d => d.roomName === 'Pine')).toBe(true);
   });
+
+  test ('prepareChartData handles past checkindate', () => {
+    const bookings = [
+      { roomName: 'Cedar', checkInDate: dayjs("3025-07-28").format("YYYY-MM-DD"), status: 'Confirmed' },
+      { roomName: 'Pine', checkInDate: dayjs("3025-07-28").format("YYYY-MM-DD"), status: 'Cancelled' }
+    ];
+    const dateSet = new Set(['3025-07-27', '3025-07-28', '3025-07-29','3025-07-30']);
+    const memoizedDates = ['3025-07-27', '3025-07-28', '3025-07-29','3025-07-30'];
+    const chartData = prepareChartData(bookings, dateSet, memoizedDates);
+    expect(chartData.length).toBe(roomOptions.length * memoizedDates.length);
+    expect(chartData.every(d => d.status === 'Available')).toBe(false);
+  });
+
+  test('When there is no bookings in googlesheet, loadFromSheetToBookings returns empty array', async () => {
+    window.gapi.client.sheets.spreadsheets.values.get.mockResolvedValue({ result: { values: [] } });
+    const bookings = await loadFromSheetToBookings();
+    expect(bookings).toEqual([]);
+  });
+
 });
