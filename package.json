@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist -r https://github.com/tww-kookal/tww-booking.git",
+    "deploy": "gh-pages -d dist --repo https://github.com/tww-kookal/tww-booking.git",
     "test": "jest --env=jsdom",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
