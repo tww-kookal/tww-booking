@@ -86,8 +86,8 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
             }}>
                 <div className="room-chart-mobile-date" style={{
                     minWidth: 70,
-                    color: '#1976d2',
-                    fontSize: '1.05rem',
+                    color: '#ffffffff',
+                    fontSize: '1.2rem',
                     textAlign: 'center'
                 }}>
                     Date
@@ -105,7 +105,7 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
                             color: '#1976d2',
                             textAlign: 'center',
                             fontWeight: 'bold',
-                            fontSize: '1.1rem' // Increased font size by 2
+                            fontSize: '1.2rem' // Increased font size by 2
                         }}
                     >
                         {roomName}
@@ -129,10 +129,10 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
                         minWidth: 70,
                         fontWeight: 'bold',
                         color: '#1976d2',
-                        fontSize: '1.05rem',
+                        fontSize: '1.2rem',
                         textAlign: 'center'
                     }}>
-                        {dayjs(date, "YYYY-MM-DD").format("MMM DD")}
+                        {dayjs(date, "YYYY-MM-DD").format("MMM DD 'YY")}
                     </div>
                     {roomOptions.map(roomName => {
                         const parameterDate = dayjs(date, "YYYY-MM-DD");
@@ -197,9 +197,6 @@ const RoomAvailabilityDotChart = ({ startDate: propStartDate }) => {
         <div className="room-chart-container">
             {error && <div className="error-message">{error}</div>}
             {loading ? 'Fetching from data store...' : ''}
-            <div className="chart-header">
-                <h3>Room Availability Chart</h3>
-            </div>
             <div style={{ marginBottom: 10 }}>
                 <label className="date-label">
                     Start Date: &nbsp;</label>

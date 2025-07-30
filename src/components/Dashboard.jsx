@@ -79,7 +79,6 @@ const Dashboard = () => {
   return (
     <div className="">
       <div>
-        <h2 style={{ textAlign: "center" }}>Dashboard</h2>
         {error && <div className="error-message">{error}</div>}
       </div>
       <div className="dashboard-container">
@@ -130,7 +129,6 @@ const Dashboard = () => {
             </div>
 
             <div className="quick-actions">
-              <h3>Quick Actions</h3>
               <div className="action-buttons">
                 <Link to="/booking" state={{ from: 'dashboard' }} className="action-button create">
                   <span className="icon">+</span>

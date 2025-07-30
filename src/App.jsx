@@ -4,7 +4,7 @@ import SearchBooking from "./components/SearchBooking.jsx";
 import Booking from "./components/Booking.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import Navbar from "./components/Navbar.jsx";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import RoomAvailabilityDotChart from "./components/RoomAvailabilityDotChart.jsx";
 
@@ -13,6 +13,7 @@ let tokenClient;
 const App = () => {
   const [signedIn, setSignedIn] = useState(false);
   const [error, setError] = useState(null);
+  const [appLoaded, setAppLoaded] = useState(false); // New state to track app loading
 
   useEffect(() => {
     const loadGoogleAPI = async () => {
@@ -46,6 +47,7 @@ const App = () => {
                   }
                 },
               });
+              setAppLoaded(true); // Set appLoaded to true after successful initialization
             } catch (e) {
               console.error("❌ gapi client initialization error:", e);
               setError("Google API client initialization failed.");
@@ -79,8 +81,6 @@ const App = () => {
 
   return (
     <div className="app-container">
-      <h1 className="app-title">The Westwood Booking</h1>
-
       {error && <p className="error-message">Error: {error}</p>}
 
       {!signedIn && (
@@ -91,7 +91,7 @@ const App = () => {
         </div>
       )}
 
-      {signedIn && (
+      {signedIn && appLoaded && ( // Conditionally render the Router only when appLoaded is true
         <Router>
           <Navbar />
           <div className="content-container">
@@ -101,6 +101,7 @@ const App = () => {
               <Route path="/search" element={<SearchBooking />} />
               <Route path="/booking" element={<Booking />} />
               <Route path="/booking/:id" element={<Booking />} />
+              <Route path="*" element={<Navigate to="/" />} /> {/* Redirect any unknown route to Dashboard */}
             </Routes>
           </div>
         </Router>
