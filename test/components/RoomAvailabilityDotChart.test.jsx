@@ -7,7 +7,7 @@ describe('RoomAvailabilityDotChart', () => {
     render(<RoomAvailabilityDotChart />);
     expect(screen.getByText(/Room Availability Chart/i)).toBeInTheDocument();    
     ['Cedar', 'Pine', 'Teak', 'Maple', 'Tent'].forEach(room => {
-      expect(screen.getByText(room)).toBeInTheDocument();
+        expect(screen.getByRole('columnheader', { name: room })).toBeInTheDocument();
     });
   });
 });

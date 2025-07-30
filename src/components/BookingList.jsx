@@ -60,7 +60,7 @@ const BookingList = ({
                                     {booking.roomName}
                                 </span>
                                 <span className="card-value" style={{ color: '#222' }}>
-                                    <span style={{ fontWeight: 700 }}> {booking.status}</span>
+                                    <span style={{ fontWeight: 700 }}> {booking.status} &nbsp; 🧑‍💼{booking.numberOfPeople || '- '}</span>
                                 </span>
                             </div>
                             <div className="card-row" style={{ marginBottom: '0.5rem' }}>
@@ -74,14 +74,11 @@ const BookingList = ({
                             <div className="card-row" style={{ marginBottom: '0.5rem' }}>
                                 <span className="card-label" style={{ fontWeight: 600, color: '#555' }}>Dates :</span>
                                 <span className="card-value" style={{ color: '#222' }}>
-                                    {dayjs(booking.checkInDate, "YYYY-MM-DD").format("MMM DD")} <span style={{ color: '#888' }}>to</span> {dayjs(booking.checkOutDate, "YYYY-MM-DD").format('MMM DD')}
-                                    ( {booking.numberOfNights} nights)
+                                    {dayjs(booking.checkInDate, "YYYY-MM-DD").format("MMM DD 'YY")} <span style={{ color: '#888' }}>to</span> {dayjs(booking.checkOutDate, "YYYY-MM-DD").format("MMM DD 'YY")}
+                                    &nbsp;({booking.numberOfNights} nights)
                                 </span>
                             </div>
                             <div className="card-row" style={{ marginBottom: '0.5rem' }}>
-                                <span className="card-label" style={{ fontWeight: 600, color: '#555' }}>People:</span>
-                                <span className="card-value" style={{ color: '#222' }}> {booking.numberOfPeople || '- '}</span>
-
                                 {booking.contactNumber && (
                                     // <div className="card-row" style={{ marginBottom: '0.5rem' }}>
                                     <span className="card-value" style={{ color: '#222' }}><a
@@ -89,7 +86,7 @@ const BookingList = ({
                                         style={{ color: '#1976d2', textDecoration: 'none', fontWeight: 600 }}
                                         onClick={e => e.stopPropagation()}
                                     >
-                                        <span role="img" aria-label="phone" style={{ marginRight: '4px' }}> &nbsp;&nbsp;&nbsp;&nbsp;📞</span> {booking.contactNumber}
+                                        <span role="img" aria-label="phone" style={{ marginRight: '4px' }}>📞</span> {booking.contactNumber}
                                     </a></span>
                                     // </div>
                                 )}
