@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import '../css/Dashboard.css';
+import '../css/dashboard.handheld.css';
+import '../css/dashboard.large.css';
 import { getStartingCharacters, loadFromSheetToBookings } from '../modules/common.module';
 
 const Dashboard = () => {
@@ -76,76 +77,73 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="">
+    <div className="dashboard-container">
       <div>
         {error && <div className="error-message">{error}</div>}
       </div>
-      <div className="dashboard-container">
-        {loading ? (
-          <div className="loading">Loading statistics...</div>
-        ) : (
-          <>
-            <div className="stats-grid">
-              <div className="stat-card">
-                <Link to="/search" state={{ exactStartDate: true }} className="action-button search">
-                  <h3>Today's Check-ins</h3>
-                </Link>
-                <p className="stat-value">{stats.todayCheckIns}</p>
-                {stats.todayCheckInDetails.map((detail, index) => (
-                  <div key={index}>
-                    <span>{detail.roomName}: {detail.customerName} (🧑‍💼{detail.numberOfPeople})</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="stat-card">
-                <Link to="/search" state={{ exactStartDate: true }} className="action-button search">
-                  <h3>Today's Check-outs</h3>
-                </Link>
-                <p className="stat-value">{stats.todayCheckOuts}</p>
-                {stats.todayCheckOutDetails.map((detail, index) => (
-                  <div key={index}>
-                    <span>{detail.roomName}: {detail.customerName} (🧑‍💼{detail.numberOfPeople})</span>
-                  </div>
-                ))}
-              </div>
-              <div className="stat-card">
-                <Link to="/search" className="action-button search">
-                  <h3>Upcoming Bookings</h3>
-                </Link>
-                <p className="stat-value">{stats.upcomingBookings}</p>
-              </div>
-              <div className="stat-card">
-                <Link
-                  to="/search"
-                  state={{ defaultCheckInDate: "2020-01-01" }}
-                  className="action-button search"
-                >
-                  <h3>Total Bookings</h3>
-                </Link>
-                <p className="stat-value">{stats.totalBookings}</p>
-              </div>
+      {loading ? (
+        <div className="loading">Loading statistics...</div>
+      ) : (
+        <>
+          <div className="stats-grid">
+            <div className="stat-card">
+              <Link to="/search" state={{ exactStartDate: true }} className="action-button search">
+                <h3>Today's Check-ins</h3>
+              </Link>
+              <p className="stat-value">{stats.todayCheckIns}</p>
+              {stats.todayCheckInDetails.map((detail, index) => (
+                <div key={index}>
+                  <span>{detail.roomName}: {detail.customerName} (🧑‍💼{detail.numberOfPeople})</span>
+                </div>
+              ))}
             </div>
 
-            <div className="quick-actions">
-              <div className="action-buttons">
-                <Link to="/booking" state={{ from: 'dashboard' }} className="action-button create">
-                  <span className="icon">+</span>
-                  <span>New Booking</span>
-                </Link>
-                <Link to="/search" className="action-button find">
-                  <span className="icon">🔍</span>
-                  <span>Search Bookings</span>
-                </Link>
-                <button onClick={fetchBookingStats} className="action-button refresh">
-                  <span className="icon">↻</span>
-                  <span>Refresh Data</span>
-                </button>
-              </div>
+            <div className="stat-card">
+              <Link to="/search" state={{ exactStartDate: true }} className="action-button search">
+                <h3>Today's Check-outs</h3>
+              </Link>
+              <p className="stat-value">{stats.todayCheckOuts}</p>
+              {stats.todayCheckOutDetails.map((detail, index) => (
+                <div key={index}>
+                  <span>{detail.roomName}: {detail.customerName} (🧑‍💼{detail.numberOfPeople})</span>
+                </div>
+              ))}
             </div>
-          </>
-        )}
-      </div>
+            <div className="stat-card">
+              <Link to="/search" className="action-button search">
+                <h3>Upcoming Bookings</h3>
+              </Link>
+              <p className="stat-value">{stats.upcomingBookings}</p>
+            </div>
+            <div className="stat-card">
+              <Link
+                to="/search"
+                state={{ defaultCheckInDate: "2020-01-01" }}
+                className="action-button search"
+              >
+                <h3>Total Bookings</h3>
+              </Link>
+              <p className="stat-value">{stats.totalBookings}</p>
+            </div>
+          </div>
+          <div className="quick-actions">
+            <div className="action-buttons">
+              <Link to="/booking" state={{ from: 'dashboard' }} className="action-button create">
+                <span className="icon">+</span>
+                <span>New</span>
+              </Link>
+              <Link to="/search" className="action-button find">
+                <span className="icon">🔍</span>
+                <span>Search</span>
+              </Link>
+              <button onClick={fetchBookingStats} className="action-button refresh">
+                <span className="icon">↻</span>
+                <span>Refresh</span>
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
