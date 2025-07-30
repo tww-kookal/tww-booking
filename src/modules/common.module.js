@@ -1,3 +1,6 @@
+import { RANGE, RANGE, SHEET_ID, DEFAULT_BOOKING, roomOptions } from "./constants";
+import dayjs from 'dayjs';
+
 /**
  * Returns the first specified number of characters from a given string.
  *
@@ -35,11 +38,11 @@ export const getInitials = (name) => {
  * @returns {number} The commission percentage.
  */
 export const getCommissionPercent = (source) => {
-    if (source === "Sangeetha") return 8;
-    else if (["Ganesh Agent", "Kodai Guest", "Kodai Homes"].includes(source)) return 10;
-    else if (source === "MMT") return 30;
-    else if (["Pranav", "RK", "Balan"].includes(source)) return 0;
-    return 0;
+    if (source === "sangeetha") return 8;
+    else if (['walkin', 'direct', 'walk in'].includes(source)) return 0;
+    else if (['mmt', 'agoda']) return 30;
+    else if (['owners', 'owner', "pranav", "rk", "balan", ''].includes(source.trim().toLocaleLowerCase())) return 0;
+    else return 10; // Who are supposed to be agents
 };
 
 /**

@@ -1,5 +1,4 @@
 import { SHEET_ID } from '../config';
-import dayjs from 'dayjs';
 
 /**
  * @constant {object} BOOKING_DEFAULT - Default values for a booking.
