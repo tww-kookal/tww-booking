@@ -78,7 +78,7 @@
 .desktop-table { display: none; }
 .mobile-card-list { display: block; }
 
-@media (max-width: '100%') {
+@media (max-width: 1000px) {
   .desktop-table { display: none; }
   .mobile-card-list { display: block; }
   .booking-card {
@@ -112,4 +112,30 @@
   .status-confirmed { background: #e0f2ff; color: #1976d2; }
   .status-cancelled { background: #ffe0b2; color: #e65100; }
   .status-available { background: #e0ffe0; color: #388e3c; }
+}
+
+.card-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: flex-start; /* Distribute items evenly */
+}
+
+.booking-card {
+    width: 100%; /* Default to full width for mobile */
+    box-sizing: border-box;
+}
+
+/* Desktop view */
+@media (min-width: 768px) {
+    .booking-card {
+        width: calc(50% - 0.5rem); /* Two cards per row */
+    }
+}
+
+/* Large desktop view */
+@media (min-width: 1200px) {
+    .booking-card {
+        width: calc(33.333% - 0.666rem); /* Three cards per row */
+    }
 }

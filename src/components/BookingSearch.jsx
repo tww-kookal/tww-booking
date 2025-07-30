@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { sortBookings, loadFromSheetToBookings } from "../modules/constants";
-import { useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import '../css/bookingSearch.css';
 import BookingList from "./BookingList";
 
 const BookingSearch = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const today = new Date().toISOString().split('T')[0];
-  const initialCheckInDate = useLocation().state?.defaultCheckInDate || today;
-  const exactStartDate = useLocation().state?.exactStartDate || false;
-  console.log("Initial Check-in Date:", initialCheckInDate, ", Exact Start Date:", exactStartDate);
+  const initialCheckInDate = location.state?.defaultCheckInDate || today;
+  const exactStartDate = location.state?.exactStartDate || false;
+
   const [searchCriteria, setSearchCriteria] = useState({
     bookingDate: "",
     guestName: "",
     checkInDate: initialCheckInDate,
     contactNumber: "",
-    bookingID: "", // Added bookingID to search criteria
+    bookingID: "",
   });
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5; // Reduced items per page for better mobile view
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -37,10 +37,11 @@ const BookingSearch = () => {
       const allBookings = await loadFromSheetToBookings();
       let filteredResults = [];
       const initialDate = dayjs(initialCheckInDate, "YYYY-MM-DD");
-      // If no bookings found, set results to empty and show error
+
       if (!allBookings || allBookings.length <= 0) {
         setResults([]);
         setError("No bookings found");
+        return;
       }
 
       if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
@@ -48,8 +49,6 @@ const BookingSearch = () => {
           return dayjs(booking.checkInDate, "YYYY-MM-DD").isAfter(initialDate) && booking.status !== 'Cancelled';
         });
       } else {
-        // Convert to bookings and filter based on search criteria
-        // Filter results based on search criteria
         filteredResults = allBookings.filter(booking => {
           const matchesBookingDate = !searchCriteria.bookingDate ||
             booking.bookingDate.includes(searchCriteria.bookingDate);
@@ -81,7 +80,6 @@ const BookingSearch = () => {
     }
   };
 
-  // Load all bookings on component mount
   useEffect(() => {
     fetchGoogleSheetRecords();
   }, []);
@@ -114,91 +112,86 @@ const BookingSearch = () => {
   };
 
   return (
-    <div className="search-booking-container">
-      <div className="search-header">
+    <div className="search-booking-container-mobile" style={{ width: '100%', fontSize:'1.2rem' }}> {/* Renamed class for mobile */}
+      <div className="search-header-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
         <h2>Search Bookings</h2>
-        <button className="create-new-button" onClick={handleCreateNew}>Create New Booking</button>
+        <button className="create-new-button-mobile" onClick={handleCreateNew}>New Booking</button> {/* Renamed class for mobile */}
       </div>
 
-      <div className="search-form">
-        <div className="search-row">
-          <div className="search-field">
-            <label>Booking Date:</label>
-            <input
-              type="date"
-              name="bookingDate"
-              value={searchCriteria.bookingDate}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="search-field">
-            <label>Guest Name:</label>
-            <input
-              type="text"
-              name="guestName"
-              placeholder="Enter guest name"
-              value={searchCriteria.guestName}
-              onChange={handleInputChange}
-            />
-          </div>
+      <div className="search-form-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+          <label>Booking Date:</label>
+          <input
+            type="date"
+            name="bookingDate"
+            value={searchCriteria.bookingDate}
+            onChange={handleInputChange}
+            style={{ width: '100%' }}
+          />
         </div>
 
-        <div className="search-row">
-          <div className="search-field">
-            <label>Check In Date:</label>
-            <input
-              type="date"
-              name="checkInDate"
-              value={searchCriteria.checkInDate}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="search-field">
-            <label>Contact Number:</label>
-            <input
-              type="text"
-              name="contactNumber"
-              placeholder="Enter contact number"
-              value={searchCriteria.contactNumber}
-              onChange={handleInputChange}
-            />
-          </div>
+        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+          <label>Guest Name:</label>
+          <input
+            type="text"
+            name="guestName"
+            placeholder="Enter guest name"
+            value={searchCriteria.guestName}
+            onChange={handleInputChange}
+            style={{ width: '100%' }}
+          />
         </div>
 
-        <div className="search-row">
-          <div className="search-field">
-            <label>Booking ID:</label>
-            <input
-              type="text"
-              name="bookingID"
-              placeholder="Enter booking ID"
-              value={searchCriteria.bookingID}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="search-field">
-            {/* Empty div to maintain grid layout */}
-          </div>
+        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+          <label>Check In Date:</label>
+          <input
+            type="date"
+            name="checkInDate"
+            value={searchCriteria.checkInDate}
+            onChange={handleInputChange}
+            style={{ width: '100%' }}
+          />
         </div>
 
-        <div className="search-actions">
-          <button
-            className="search-button"
-            onClick={handleSearch}
-            disabled={loading}
-          >
-            {loading ? (
-              <span className="searching-animation">
-                Searching
-                <span className="dot"></span>
-                <span className="dot"></span>
-                <span className="dot"></span>
-              </span>
-            ) : 'Search'}
-          </button>
+        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+          <label>Contact Number:</label>
+          <input
+            type="text"
+            name="contactNumber"
+            placeholder="Enter contact number"
+            value={searchCriteria.contactNumber}
+            onChange={handleInputChange}
+            style={{ width: '100%' }}
+          />
         </div>
+
+        <div className="search-field-mobile" style={{ width: '100%' }}> {/* Renamed class for mobile */}
+          <label>Booking ID:</label>
+          <input
+            type="text"
+            name="bookingID"
+            placeholder="Enter booking ID"
+            value={searchCriteria.bookingID}
+            onChange={handleInputChange}
+            style={{ width: '100%' }}
+          />
+        </div>
+
+        <button
+          className="search-button-mobile"
+          onClick={handleSearch}
+          disabled={loading}
+          style={{ width: '100%' }}
+        >
+          {loading ? (
+            <span className="searching-animation">
+              Searching
+              <span className="dot"></span>
+              <span className="dot"></span>
+              <span className="dot"></span>
+            </span>
+          ) : 'Search'}
+        </button>
       </div>
 
       {error && <div className="error-message">{error}</div>}
