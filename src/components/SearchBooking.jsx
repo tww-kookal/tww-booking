@@ -186,7 +186,14 @@ const SearchBooking = () => {
             onClick={handleSearch}
             disabled={loading}
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? (
+              <span className="searching-animation">
+                Searching 
+                <span className="dot"></span>
+                <span className="dot"></span>
+                <span className="dot"></span>
+              </span>
+            ) : 'Search'}
           </button>
         </div>
       </div>
