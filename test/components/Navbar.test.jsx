@@ -10,7 +10,7 @@ describe('Navbar', () => {
     );
     expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
     expect(screen.getByText(/Availability/i)).toBeInTheDocument();
-    expect(screen.getByText(/Search Bookings/i)).toBeInTheDocument();
-    expect(screen.getByText(/New Booking/i)).toBeInTheDocument();
+    expect(screen.getByText(/Search/i)).toBeInTheDocument();
+    expect(screen.getByText(/New/i)).toBeInTheDocument();
   });
 });

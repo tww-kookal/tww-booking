@@ -41,7 +41,7 @@ export const getCommissionPercent = (source) => {
     if (source.trim().toLocaleLowerCase() === "sangeetha") return 8;
     else if (['walkin', 'direct', 'walk-in'].includes(source.trim().toLocaleLowerCase())) return 0;
     else if (['mmt', 'agoda'].includes(source.trim().toLocaleLowerCase())) return 30;
-    else if (['owners', 'owner', "pranav", "rk", "balan", ''].includes(source.trim().toLocaleLowerCase())) return 0;
+    else if (['owners', 'owner', "pranav", "rk", "balan", 'unknown', 'undefined', ''].includes(source.trim().toLocaleLowerCase())) return 0;
     else return 10; // Who are supposed to be agents
 };
 

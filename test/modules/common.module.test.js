@@ -1,5 +1,10 @@
+import dayjs from 'dayjs';
 import {
     roomOptions,
+} from '../../src/modules/constants';
+
+import { 
+    getStartingCharacters,
     getCommissionPercent,
     convertGoogleDataToBookings,
     loadFromSheetToBookings,
@@ -46,7 +51,7 @@ describe('common.module.test.js', () => {
     test('calculateCommission returns correct value', () => {
         expect(calculateCommission('Sangeetha', 1000)).toBe(80);
         expect(calculateCommission('MMT', 2000)).toBe(600);
-        expect(calculateCommission('Unknown', 1000)).toBe(0);
+        expect(calculateCommission('Unknown', 1000)).toBe(0); 
     });
 
     test('parseNumber parses numbers and strings', () => {
@@ -108,8 +113,8 @@ describe('common.module.test.js', () => {
 
     test('prepareChartData handles past checkindate', () => {
         const bookings = [
-            { roomName: 'Cedar', checkInDate: dayjs("3025-07-28").format("YYYY-MM-DD"), status: 'Confirmed' },
-            { roomName: 'Pine', checkInDate: dayjs("3025-07-28").format("YYYY-MM-DD"), status: 'Cancelled' }
+            { roomName: 'Cedar', checkInDate: dayjs("3025-07-28", "YYYY-MM-DD").format("YYYY-MM-DD"), status: 'Confirmed' },
+            { roomName: 'Pine', checkInDate: dayjs("3025-07-28", "YYYY-MM-DD").format("YYYY-MM-DD"), status: 'Cancelled' }
         ];
         const dateSet = new Set(['3025-07-27', '3025-07-28', '3025-07-29', '3025-07-30']);
         const memoizedDates = ['3025-07-27', '3025-07-28', '3025-07-29', '3025-07-30'];
