@@ -40,8 +40,11 @@ const mockBookings = [
 ];
 
 jest.mock('../../src/modules/constants', () => ({
-  loadFromSheetToBookings: jest.fn().mockResolvedValue(mockBookings),
   roomOptions: ['Cedar', 'Pine', 'Teak', 'Maple', 'Tent'],
+}));
+
+jest.mock('../../src/modules/common.module', () => ({
+  loadFromSheetToBookings: jest.fn().mockResolvedValue(mockBookings),
 }));
 
 describe('Dashboard Component', () => {

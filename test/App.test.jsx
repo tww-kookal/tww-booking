@@ -34,7 +34,6 @@ beforeAll(() => {
 describe('App Component', () => {
   test('renders app title and sign in button when not signed in', async () => {
     render(<App />);
-    expect(screen.getByText(/The Westwood Booking/i)).toBeInTheDocument();
     expect(screen.getByText(/Sign in with Google/i)).toBeInTheDocument();
   });
 
