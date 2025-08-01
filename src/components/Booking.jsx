@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import '../css/booking.large.css';
-import '../css/booking.handheld.css';
+import dayjs from 'dayjs';
+
 import { roomOptions, statusOptions, sourceOptions, DEFAULT_BOOKING } from "../modules/constants";
 import { getCommissionPercent, calculateCommission, parseNumber, loadFromSheetToBookings } from "../modules/common.module";
 import { uploadToDrive } from '../modules/googleDriveService';
 import { validateBooking, convertBookingToSheetsRecord, findSheetRowToUpdate } from '../modules/booking.module';
-import { updateBookingRow, appendBookingRow } from '../modules/googleSheetsService';
+import { updateBookingRow, appendBookingRow, handleGenerateReceipt } from '../modules/googleSheetsService';
+
+import '../css/booking.large.css';
+import '../css/booking.handheld.css';
 
 const Booking = () => {
     const { id } = useParams();
@@ -90,23 +93,21 @@ const Booking = () => {
                 [name]: value,
             };
 
-            const checkIn = new Date(updated.checkInDate);
-            const checkOut = new Date(updated.checkOutDate);
+            const checkInDate = dayjs(updated.checkInDate, "YYYY-MM-DD");
+            const checkOutDate = dayjs(updated.checkOutDate, "YYYY-MM-DD");
 
-            // Calculate number of nights if dates are valid
-            if (!isNaN(checkIn) && !isNaN(checkOut) && checkOut > checkIn) {
-                const diffTime = checkOut - checkIn;
-                updated.numberOfNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (checkInDate.isValid() && checkOutDate.isValid() && checkOutDate.isAfter(checkInDate)) {
+                updated.numberOfNights = checkOutDate.diff(checkInDate, 'day');
             } else {
                 updated.numberOfNights = '';
             }
 
             // Calculate commission based on source of booking
             const source = updated.sourceOfBooking || '';
-            const roomAmount = parseNumber(updated.roomAmount);
-            const food = parseNumber(updated.food);
-            const campFire = parseNumber(updated.campFire);
-            const advance = parseNumber(updated.advancePaid);
+            const roomAmount = parseNumber(updated.roomAmount || 0);
+            const food = parseNumber(updated.food || 0);
+            const campFire = parseNumber(updated.campFire || 0);
+            const advance = parseNumber(updated.advancePaid || 0);
             updated.commission = calculateCommission(source, roomAmount);
 
             // Balance To Pay = Room + Food + Camp - Advance
@@ -117,20 +118,6 @@ const Booking = () => {
 
             return updated;
         });
-    };
-
-    const handleNext = () => {
-        if (currentIndex < records.length - 1) {
-            setCurrentIndex(i => i + 1);
-            setBooking({ ...records[currentIndex + 1] });
-        }
-    };
-
-    const handlePrevious = () => {
-        if (currentIndex > 0) {
-            setCurrentIndex(i => i - 1);
-            setBooking({ ...records[currentIndex - 1] });
-        }
     };
 
     const handleAddNew = () => {
@@ -145,12 +132,16 @@ const Booking = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [uploadedFile, setUploadedFile] = useState(null);
+    const [isFormDisabled, setIsFormDisabled] = useState(false);
 
     const handleUpdate = async () => {
+        setIsFormDisabled(true); // Disable the form
+        setIsSubmitting(true);
         // Validate required fields
         let errors = validateBooking(booking);
         if (errors && errors.length > 0) {
             setErrorMessage(errors.join(', '));
+            setIsFormDisabled(false); // Re-enable on error
             return;
         }
 
@@ -160,22 +151,24 @@ const Booking = () => {
         if (uploadedFile) {
             try {
                 await uploadToDrive(uploadedFile, booking.bookingID);
-                setSuccessMessage('File uploaded successfully!');
+                console.log('Identity Document uploaded successfully');
             } catch (error) {
                 console.error('Error uploading file:', error);
-                setErrorMessage('Failed to upload file. Please try again.');
+                setErrorMessage('Failed to upload Identity Document. Please try again.');
                 return;
+            } finally {
+                setIsSubmitting(false);
+                setIsFormDisabled(false); // Re-enable on error
             }
         }
 
-        setIsSubmitting(true);
-        setErrorMessage('');
-        setSuccessMessage('');
         try {
             // Convert booking object to array format for Google Sheets
             const bookingRow = convertBookingToSheetsRecord(booking);
             // Determine if this is an update or a new booking
             const isUpdate = id || preloadedBooking;
+
+            console.log('Existing Booking to Update ? ', isUpdate);
 
             if (isUpdate) {
                 // For updating, we need to find the row in the sheet that matches this booking
@@ -188,16 +181,19 @@ const Booking = () => {
                         // Update the specific row
                         await updateBookingRow(rowIndex, bookingRow);
                         setSuccessMessage('Booking updated successfully!');
+                        console.log('Booking updated successfully');
                     } else {
                         // If we couldn't find the row, append as a new booking
                         await appendBookingRow(bookingRow);
                         setSuccessMessage('Booking saved as new entry!');
+                        console.log('Booking not found, saved as new booking');
                     }
                 }
             } else {
                 // For new bookings, simply append
                 await appendBookingRow(bookingRow);
                 setSuccessMessage('Booking saved successfully!');
+                console.log('Booking created successfully');
             }
 
             // Add to local state as well
@@ -214,12 +210,14 @@ const Booking = () => {
                 if (!isUpdate) {
                     handleAddNew();
                 }
+                handleGenerateReceipt(booking);
                 setSuccessMessage('');
             }, 2000);
         } catch (error) {
             console.error('Error saving booking:', error);
             setErrorMessage('Failed to save booking. Please try again.');
         } finally {
+            setIsFormDisabled(false); // Re-enable after operation
             setIsSubmitting(false);
         }
     };
@@ -375,17 +373,17 @@ const Booking = () => {
 
                 {/* Buttons */}
                 <div className="form-buttons">
-                    <button type="button" className="button-secondary" onClick={handleCancel}>Cancel</button>
-                    <button type="button" className="button-secondary" onClick={handleAddNew}>Clear</button>
+                    <button type="button" className="button-secondary" onClick={handleCancel} disabled={isFormDisabled}>Cancel</button>
+                    <button type="button" className="button-secondary" onClick={handleAddNew} disabled={isFormDisabled}>Clear</button>
                     <button
                         type="button"
                         className="button-primary"
                         onClick={handleUpdate}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isFormDisabled}
                     >
                         {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update' : 'Save'}
                     </button>
-                    <button type="button" className="button-secondary" onClick={() => handleGenerateReceipt(booking)}>Generate Receipt</button>
+                    <button type="button" className="button-secondary" onClick={() => handleGenerateReceipt(booking)} disabled={isFormDisabled}>Generate Receipt</button>
                 </div>
             </form>
         </div>

@@ -38,9 +38,9 @@ export const getInitials = (name) => {
  * @returns {number} The commission percentage.
  */
 export const getCommissionPercent = (source) => {
-    if (source === "sangeetha") return 8;
-    else if (['walkin', 'direct', 'walk in'].includes(source)) return 0;
-    else if (['mmt', 'agoda']) return 30;
+    if (source.trim().toLocaleLowerCase() === "sangeetha") return 8;
+    else if (['walkin', 'direct', 'walk-in'].includes(source.trim().toLocaleLowerCase())) return 0;
+    else if (['mmt', 'agoda'].includes(source.trim().toLocaleLowerCase())) return 30;
     else if (['owners', 'owner', "pranav", "rk", "balan", ''].includes(source.trim().toLocaleLowerCase())) return 0;
     else return 10; // Who are supposed to be agents
 };
@@ -93,7 +93,7 @@ export const loadFromSheetToBookings = async () => {
  * @returns {number} The calculated commission amount.
  */
 export const calculateCommission = (source, amount) => {
-    return (amount * getCommissionPercent(source)) / 100;
+    return (parseNumber(amount) * getCommissionPercent(source)) / 100;
 };
 
 /**
@@ -103,8 +103,13 @@ export const calculateCommission = (source, amount) => {
  * @returns {number} The parsed number.
  */
 export const parseNumber = (val) => {
-    if (!val) return 0;
-    return typeof val === 'string' ? Number(val.replace(/,/g, '')) || 0 : val;
+    try {
+        if (!val) return 0;
+        return typeof val === 'string' ? Number(val.replace(/,/g, '')) || 0 : val;
+    } catch (error) {
+        console.log("Error parsing number: ", val, ", ", error);
+        return 0;
+    }
 };
 
 /**
