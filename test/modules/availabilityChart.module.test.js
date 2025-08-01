@@ -24,8 +24,8 @@ describe('getStartingCharacters', () => {
     expect(getStartingCharacters('', 5)).toBe('');
   });
 
-  it('defaults to 5 characters if numberOfCharacters is not provided', () => {
-    expect(getStartingCharacters('MapleTree')).toBe('Maple');
+  it('defaults to 6 characters if numberOfCharacters is not provided', () => {
+    expect(getStartingCharacters('MapleTree')).toBe('MapleT');
   });
 
   it('handles numberOfCharacters as 0', () => {

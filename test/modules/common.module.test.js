@@ -3,7 +3,7 @@ import {
     roomOptions,
 } from '../../src/modules/constants';
 
-import { 
+import {
     getStartingCharacters,
     getCommissionPercent,
     convertGoogleDataToBookings,
@@ -12,7 +12,9 @@ import {
     parseNumber,
     arrayToBooking,
     sortBookings,
-    prepareChartData
+    prepareChartData,
+    getStatusColor,
+    getDisplayText
 } from '../../src/modules/common.module';
 
 // Mock window.gapi for loadFromSheetToBookings
@@ -51,7 +53,7 @@ describe('common.module.test.js', () => {
     test('calculateCommission returns correct value', () => {
         expect(calculateCommission('Sangeetha', 1000)).toBe(80);
         expect(calculateCommission('MMT', 2000)).toBe(600);
-        expect(calculateCommission('Unknown', 1000)).toBe(0); 
+        expect(calculateCommission('Unknown', 1000)).toBe(0);
     });
 
     test('parseNumber parses numbers and strings', () => {
@@ -127,5 +129,30 @@ describe('common.module.test.js', () => {
         window.gapi.client.sheets.spreadsheets.values.get.mockResolvedValue({ result: { values: [] } });
         const bookings = await loadFromSheetToBookings();
         expect(bookings).toEqual([]);
+    });
+
+    test('for correct Status color', () => {
+        expect(getStatusColor({ pastDate: true, status: 'Available' })).toBe('#1c461eff');
+        expect(getStatusColor({ pastDate: true, status: 'Confirmed' })).toBe('#0d447cff');
+        expect(getStatusColor({ pastDate: true, status: 'Cancelled' })).toBe('#762900ff');
+        expect(getStatusColor({ pastDate: true, status: 'Closed' })).toBe('#6c686bff');
+        expect(getStatusColor({ pastDate: false, chartStatus: 'Available' })).toBe('#388e3c');
+        expect(getStatusColor({ pastDate: false, chartStatus: 'Confirmed' })).toBe('#1976d2');
+        expect(getStatusColor({ pastDate: false, chartStatus: 'Cancelled' })).toBe('#e65100');
+        expect(getStatusColor({ pastDate: false, chartStatus: 'Closed' })).toBe('#a6a0a4ff');
+        expect(getStatusColor({ pastDate: true, status: 'Unknown' })).toBe('#5d595cff');
+        expect(getStatusColor({ pastDate: false, chartStatus: 'Unknown' })).toBe('#5d595cff');
+        expect(getStatusColor({})).toBe('#5d595cff');
+    });
+
+    test('for correct displayText ', () => {
+        expect(getDisplayText({ pastDate: true })).toBe('Blocked');
+        expect(getDisplayText({ pastDate: false, chartStatus: 'Available' })).toBe('Available');
+        expect(getDisplayText({ chartStatus: 'Confirmed' })).toBe('Confirmed');
+        expect(getDisplayText({ chartStatus: 'Cancelled' })).toBe('Cancelled');
+        expect(getDisplayText({ chartStatus: 'Closed' })).toBe('Closed');
+        expect(getDisplayText({})).toBe('NONE');
+        expect(getDisplayText({ pastDate: false })).toBe('NONE');
+        expect(getDisplayText({ pastDate: false, chartStatus: 'Confirmed' })).toBe('Confirmed');
     });
 });
