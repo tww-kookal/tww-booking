@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { roomOptions } from '../modules/constants';
-import { loadFromSheetToBookings, prepareChartData, getStartingCharacters } from '../modules/common.module';
+import { loadFromSheetToBookings, prepareChartData, getStartingCharacters, getDisplayText, getStatusColor } from '../modules/common.module';
 import '../css/availabilityChart.handheld.css';
 import '../css/availabilityChart.large.css';
 
@@ -54,21 +54,6 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
         // Implement your booking click logic here
     };
 
-    const getStatusColor = (booking) => {
-        if (booking.pastDate) {
-            if (booking.status === 'Available') return '#388e3c'
-            else if (booking.status === 'Confirmed') return '#1976d2'
-            else if (booking.status === 'Cancelled') return '#e65100';
-            else if (booking.status === 'Closed') return '#a6a0a4ff';
-        } else {
-            if (booking.chartStatus === 'Available') return '#388e3c'
-            else if (booking.chartStatus === 'Confirmed') return '#1976d2'
-            else if (booking.chartStatus === 'Cancelled') return '#e65100';
-            else if (booking.chartStatus === 'Closed') return '#a6a0a4ff';
-        }
-        return '#5d595cff';
-    };
-
     // Mobile-friendly card layout: horizontal alignment for rooms per date
     const renderCards = () => (
         <div className="room-chartlist">
@@ -118,7 +103,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                             ${bookingActual.numberOfPeople ? `(🧑‍💼${bookingActual.numberOfPeople})` : ''} `;
                         } else if (bookingInjected) {
                             bgColor = getStatusColor(bookingInjected);
-                            displayText = bookingInjected.status || 'NONE';
+                            displayText = getDisplayText(bookingInjected);
                         }
                         return (
                             <div

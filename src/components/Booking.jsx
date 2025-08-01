@@ -3,7 +3,7 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import '../css/booking.large.css';
 import '../css/booking.handheld.css';
 import { roomOptions, statusOptions, sourceOptions, DEFAULT_BOOKING } from "../modules/constants";
-import {getCommissionPercent, calculateCommission, parseNumber, loadFromSheetToBookings} from "../modules/common.module";
+import { getCommissionPercent, calculateCommission, parseNumber, loadFromSheetToBookings } from "../modules/common.module";
 import { uploadToDrive } from '../modules/googleDriveService';
 import { validateBooking, convertBookingToSheetsRecord, findSheetRowToUpdate } from '../modules/booking.module';
 import { updateBookingRow, appendBookingRow } from '../modules/googleSheetsService';
@@ -148,12 +148,12 @@ const Booking = () => {
 
     const handleUpdate = async () => {
         // Validate required fields
-        errors = validateBooking(booking);
-        if(errors && errors.length > 0 ) {
+        let errors = validateBooking(booking);
+        if (errors && errors.length > 0) {
             setErrorMessage(errors.join(', '));
             return;
         }
-        
+
         booking.bookingID = booking.roomName + '-' + booking.checkInDate + '-' + booking.checkOutDate;
 
         // Upload file if one was selected
@@ -249,17 +249,8 @@ const Booking = () => {
                 />
             </div>
 
-            {successMessage && (
-                <div className="success-message">
-                    {successMessage}
-                </div>
-            )}
-
-            {errorMessage && (
-                <div className="error-message">
-                    {errorMessage}
-                </div>
-            )}
+            {successMessage && (<div className="success-message">{successMessage}</div>)}
+            {errorMessage && (<div className="error-message">{errorMessage}</div>)}
 
             <form onSubmit={e => e.preventDefault()}>
                 <div className='form-group'>

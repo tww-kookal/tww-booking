@@ -174,7 +174,7 @@ export const sortBookings = (bookings) => {
  * @param {Array<string>} memoizedDates - An array of memoized dates.
  * @returns {Array<ChartData>} An array of chart data objects.
  */
-export const prepareChartData = (bookings, dateSet, memoizedDates) =>{
+export const prepareChartData = (bookings, dateSet, memoizedDates) => {
     const chartData = bookings
         .filter((booking) => dateSet.has(booking.checkInDate))
         .map((booking) => ({
@@ -231,4 +231,26 @@ export const prepareChartData = (bookings, dateSet, memoizedDates) =>{
         }
     }
     return allData;
+}
+
+export const getStatusColor = (booking) => {
+    if (booking.pastDate) {
+        if (booking.status === 'Available') return '#1c461eff'
+        else if (booking.status === 'Confirmed') return '#0d447cff'
+        else if (booking.status === 'Cancelled') return '#762900ff';
+        else if (booking.status === 'Closed') return '#6c686bff';
+    } else {
+        if (booking.chartStatus === 'Available') return '#388e3c'
+        else if (booking.chartStatus === 'Confirmed') return '#1976d2'
+        else if (booking.chartStatus === 'Cancelled') return '#e65100';
+        else if (booking.chartStatus === 'Closed') return '#a6a0a4ff';
+    }
+    return '#5d595cff';
+};
+
+export const getDisplayText = (booking) => {
+    if (booking.pastDate) {
+        return 'Blocked';
+    }
+    return booking.chartStatus || 'NONE';
 }
