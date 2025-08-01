@@ -111,14 +111,15 @@ const BookingSearch = () => {
   return (
     <div className="search-booking-container" >
       <div className="search-header" >
-        Search
+        Search Bookings
       </div>
 
       <div className="search-form" >
         <div className="search-field" >
-          <label>Booking Date:</label>
+          <label htmlFor="bookingDate">Booking Date:</label>
           <input
             type="date"
+            id="bookingDate"
             name="bookingDate"
             value={searchCriteria.bookingDate}
             onChange={handleInputChange}
@@ -127,9 +128,10 @@ const BookingSearch = () => {
         </div>
 
         <div className="search-field" >
-          <label>Guest Name:</label>
+          <label htmlFor="guestName">Guest Name:</label>
           <input
             type="text"
+            id="guestName"
             name="guestName"
             placeholder="Enter guest name"
             value={searchCriteria.guestName}
@@ -139,9 +141,10 @@ const BookingSearch = () => {
         </div>
 
         <div className="search-field" >
-          <label>Check In Date:</label>
+          <label htmlFor="checkInDate">Check In Date:</label>
           <input
             type="date"
+            id="checkInDate"
             name="checkInDate"
             value={searchCriteria.checkInDate}
             onChange={handleInputChange}
@@ -150,9 +153,10 @@ const BookingSearch = () => {
         </div>
 
         <div className="search-field" >
-          <label>Contact Number:</label>
+          <label htmlFor="contactNumber">Contact Number:</label>
           <input
             type="text"
+            id="contactNumber"
             name="contactNumber"
             placeholder="Enter contact number"
             value={searchCriteria.contactNumber}
@@ -162,9 +166,10 @@ const BookingSearch = () => {
         </div>
 
         <div className="search-field" >
-          <label>Booking ID:</label>
+          <label htmlFor="bookingID">Booking ID:</label>
           <input
             type="text"
+            id="bookingID"
             name="bookingID"
             placeholder="Enter booking ID"
             value={searchCriteria.bookingID}

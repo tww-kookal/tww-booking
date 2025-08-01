@@ -70,8 +70,8 @@ describe('Dashboard Component', () => {
     });
   });
 
-  xtest('shows error message if data fetch fails', async () => {
-    const { loadFromSheetToBookings } = require('../../src/modules/constants');
+  test('shows error message if data fetch fails', async () => {
+    const { loadFromSheetToBookings } = require('../../src/modules/common.module');
     loadFromSheetToBookings.mockRejectedValueOnce(new Error('Failed'));
     render(<Dashboard />);
     await waitFor(() => {
