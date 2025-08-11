@@ -1,3 +1,62 @@
+
+import dayjs from 'dayjs';
+import api from './apiClient';
+
+/**
+ * Loads all bookings from the server.
+ *
+ * @async
+ * @returns {Promise<Array<Booking>>} A promise that resolves to an array of booking objects.
+ */
+export const getAllBookings = async (startingDate = dayjs().format("YYYY-MM-DD")) => {
+    console.log("Booking.Module::getAllBookings::Fetching all bookings since", startingDate);
+    try {
+        const response = await api.get("/rooms/listAllBookings/" + startingDate || dayjs().format('YYYY-MM-DD'));
+        const sortedBookings = (response.data.bookings || []).sort((a, b) => {
+            return a.check_in.localeCompare(b.check_in);
+        });
+        console.log("Booking.Module::getAllBookings::Fetched all bookings", sortedBookings.length);
+        return sortedBookings
+    } catch (error) {
+        console.log("Booking.Module::getAllBookings::Error fetching all bookings", error);
+        return []
+    }
+}
+
+/**
+ * Loads all rooms from the server.
+ *
+ * @async
+ * @returns {Promise<Array<Room>>} A promise that resolves to an array of booking objects.
+ */
+export const getAllRooms = async () => {
+    try {
+        const response = await api.get("/rooms/");
+        console.log("Booking.Module::getAllRooms::Fetched all rooms", response.data);
+        return response.data?.rooms || [];
+    } catch (error) {
+        console.error("Booking.Module::getAllRooms::Error fetching all rooms", error);
+        return []
+    }
+}
+
+/**
+ * get the number of guests for the day
+ *
+ * @async
+ * @returns {Promise<Array<Booking>>} A promise that resolves to an array of booking objects.
+ */
+export const getGuestsForDay = async (startingDate = dayjs().format("YYYY-MM-DD")) => {
+    try {
+        const response = await api.get("/rooms/guestsForDay/" + startingDate || dayjs().format('YYYY-MM-DD'));
+        const guestsForDay = response.data || 0;
+        return guestsForDay
+    } catch (error) {
+        console.error("Booking.Module::getGuestsForDay::Error fetching guests for day", error);
+        return 0
+    }
+}
+
 /**
  * Validates a booking object to ensure all required fields are present and that the check-out date is after the check-in date.
  *
@@ -33,87 +92,119 @@ export const validateBooking = (booking) => {
     return errors;
 };
 
-/**
- * Converts a booking object into an array suitable for writing to a Google Sheet.
- *
- * @param {object} booking - The booking object to convert.
- * @param {string} booking.roomName - The name of the room.
- * @param {string} booking.customerName - The name of the customer.
- * @param {string} booking.contactNumber - The contact number of the customer.
- * @param {number} booking.numberOfPeople - The number of people in the booking.
- * @param {string} booking.checkInDate - The check-in date.
- * @param {string} booking.checkOutDate - The check-out date.
- * @param {number} booking.numberOfNights - The number of nights booked.
- * @param {string} booking.status - The status of the booking.
- * @param {string} booking.bookingDate - The date the booking was made.
- * @param {string} booking.sourceOfBooking - The source of the booking.
- * @param {number} booking.roomAmount - The amount charged for the room.
- * @param {number} booking.advancePaid - The amount of advance paid.
- * @param {string} booking.advancePaidTo - The recipient of the advance payment.
- * @param {number} booking.food - The amount charged for food.
- * @param {number} booking.campFire - The amount charged for campfire.
- * @param {number} booking.otherServices - The amount charged for other services.
- * @param {number} booking.balanceToPay - The remaining balance to pay.
- * @param {number} booking.totalAmount - The total amount for the booking.
- * @param {number} booking.commission - The commission earned on the booking.
- * @param {number} booking.twwRevenue - The revenue for The Westwood on the booking.
- * @param {string} booking.balancePaidTo - The recipient of the balance payment.
- * @param {string} booking.bookingID - The unique identifier for the booking.
- * @param {string} booking.remarks - Any remarks or notes about the booking.
- * @returns {Array<string|number>} An array of booking details suitable for writing to a Google Sheet.
- */
-export const convertBookingToSheetsRecord = (booking) => {
-    return [
-        booking.roomName,
-        booking.customerName,
-        booking.contactNumber,
-        booking.numberOfPeople,
-        booking.checkInDate,
-        booking.checkOutDate,
-        booking.numberOfNights,
-        booking.status,
-        booking.bookingDate,
-        booking.sourceOfBooking,
-        booking.roomAmount,
-        booking.advancePaid,
-        booking.advancePaidTo,
-        0, // Placeholder for room balance
-        booking.food,
-        booking.campFire,
-        0, // Placeholder for heater
-        0, // Placeholder for safari
-        booking.otherServices,
-        booking.balanceToPay,
-        booking.totalAmount,
-        booking.commission,
-        booking.twwRevenue,
-        booking.balancePaidTo,
-        booking.bookingID,
-        booking.remarks
-    ];
-}
 
-/**
- * Finds the row index of a booking in an array of all bookings, based on matching booking ID, room name, check-in date, and check-out date.
- *
- * @param {Array<object>} allBookings - An array of all booking objects to search through.
- * @param {string} booking.bookingID - The unique identifier for the booking.
- * @param {string} booking.roomName - The name of the room.
- * @param {string} booking.checkInDate - The check-in date.
- * @param {string} booking.checkOutDate - The check-out date.
- * @returns {number} The index of the booking in the array, or -1 if not found.
- */
-export const findSheetRowToUpdate = (allBookings, booking) => {
-    let rowIndex = -1;
-    //Find the booking row by booking ID and room name and checkin date    
-    allBookings.forEach((iBooking, index) => {
-        if (iBooking.bookingID == booking.bookingID &&
-            iBooking.roomName === booking.roomName &&
-            iBooking.checkInDate === booking.checkInDate &&
-            iBooking.checkOutDate === booking.checkOutDate) {
-            rowIndex = index;
-            console.log(`Found booking at row index: ${rowIndex + 1}`);
-        }
-    });
-    return rowIndex;
-}
+export const handleGenerateReceipt = (booking) => {
+    // Create a printable receipt
+    const receiptWindow = window.open('', '_blank');
+
+    receiptWindow.document.write(`
+            <html>
+                <head>
+                    <title>Booking Receipt - ${booking.customerName}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                        .receipt { max-width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; }
+                        .header { text-align: center; margin-bottom: 20px; }
+                        .booking-details { margin-bottom: 20px; }
+                        .booking-details table { width: 100%; border-collapse: collapse; }
+                        .booking-details th, .booking-details td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+                        .financial-summary { margin-top: 30px; border-top: 2px solid #333; padding-top: 20px; }
+                        .total { font-weight: bold; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt">
+                        <div class="header">
+                            <h1>The Westwood</h1>
+                            <h2>Booking Receipt</h2>
+                        </div>
+                        
+                        <div class="booking-details">
+                            <h3>Booking Information</h3>
+                            <table>
+                                <tr>
+                                    <th>Booking ID:</th>
+                                    <td>${booking.bookingID}</td>
+                                </tr>
+                                <tr>
+                                    <th>Customer Name:</th>
+                                    <td>${booking.customerName}</td>
+                                </tr>
+                                <tr>
+                                    <th>Room:</th>
+                                    <td>${booking.roomName}</td>
+                                </tr>
+                                <tr>
+                                    <th>Check-in Date:</th>
+                                    <td>${booking.checkInDate}</td>
+                                </tr>
+                                <tr>
+                                    <th>Check-out Date:</th>
+                                    <td>${booking.checkOutDate}</td>
+                                </tr>
+                                <tr>
+                                    <th>Number of Nights:</th>
+                                    <td>${booking.numberOfNights}</td>
+                                </tr>
+                                <tr>
+                                    <th>Number of People:</th>
+                                    <td>${booking.numberOfPeople}</td>
+                                </tr>
+                                <tr>
+                                    <th>Contact Number:</th>
+                                    <td>${booking.contactNumber}</td>
+                                </tr>
+                                <tr>
+                                    <th>Status:</th>
+                                    <td>${booking.status}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="financial-summary">
+                            <h3>Financial Summary</h3>
+                            <table>
+                                <tr>
+                                    <th>Room Amount:</th>
+                                    <td>₹${booking.roomAmount}</td>
+                                </tr>
+                                ${booking.food > 0 ? `<tr>
+                                    <th>Food:</th>
+                                    <td>₹${booking.food}</td>
+                                </tr>` : ''}
+                                ${booking.campFire > 0 ? `<tr>
+                                    <th>Camp Fire:</th>
+                                    <td>₹${booking.campFire}</td>
+                                </tr>` : ''}
+                                ${booking.otherServices > 0 ? `<tr>
+                                    <th>Other Services:</th>
+                                    <td>₹${booking.otherServices}</td>
+                                </tr>` : ''}
+                                <tr>
+                                    <th>Advance Paid:</th>
+                                    <td>₹${booking.advancePaid}</td>
+                                </tr>
+                                <tr class="total">
+                                    <th>Balance to Pay:</th>
+                                    <td>₹${booking.balanceToPay}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="footer" style="margin-top: 40px; text-align: center;">
+                            <p>Thank you for choosing The Westwood!</p>
+                            <p>For any inquiries, please contact us.</p>
+                        </div>
+                        
+                        <div class="no-print" style="margin-top: 30px; text-align: center;">
+                            <button onclick="window.print()">Print Receipt</button>
+                        </div>
+                    </div>
+                </body>
+            </html>
+        `);
+
+    receiptWindow.document.close();
+};
+

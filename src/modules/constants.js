@@ -1,5 +1,3 @@
-import { SHEET_ID } from '../config';
-
 /**
  * @constant {object} BOOKING_DEFAULT - Default values for a booking.
  * @property {string} BOOKING_DATE - The default booking date, set to today's date in ISO format.
@@ -39,46 +37,34 @@ export const BOOKING_DEFAULT = {
  * @property {string} remarks - Any remarks or notes about the booking, default is an empty string.
  */
 export const DEFAULT_BOOKING = {
-    roomName: BOOKING_DEFAULT.ROOM_NAME,
-    customerName: '',
-    contactNumber: '',
-    numberOfPeople: 0,
-    checkInDate: '',
-    checkOutDate: '',
-    numberOfNights: 0,
+    room_name: BOOKING_DEFAULT.ROOM_NAME,
+    customer_name: '',
+    contact_number: '',
+    number_of_people: 0,
+    check_in: '',
+    check_out: '',
+    number_of_nights: 0,
     status: BOOKING_DEFAULT.STATUS,
-    bookingDate: BOOKING_DEFAULT.BOOKING_DATE,
-    sourceOfBooking: '',
-    roomAmount: 0,
-    advancePaid: 0,
-    advancePaidTo: '',
-    food: 0,
-    campFire: 0,
-    otherServices: 0,
-    balanceToPay: 0,
-    totalAmount: 0,
+    booking_date: BOOKING_DEFAULT.BOOKING_DATE,
+    source_of_booking: '',
+    room_price: 0,
+    advance_paayment: 0,
+    advance_paid_to: '',
+    food_price: 0,
+    service_price: 0,
+    balance_to_pay: 0,
+    total_price: 0,
     commission: 0,
-    twwRevenue: 0,
-    balancePaidTo: '',
-    bookingID: '',
+    final_price_paid_to: '',
+    booking_id: '',
     remarks: ''
 }
-
-/**
- * @constant {string} RANGE - The range of cells in the Google Sheet to read data from.
- */
-export const RANGE = "Sheet1!A2:Z"; // Adjust range
-
-/**
- * @constant {string} SHEET_ID - The ID of the Google Sheet.
- */
-export { SHEET_ID };
 
 /**
  * @constant {Array<string>} roomOptions - An array of available room options.
  */
 export const roomOptions = ['Cedar', 'Pine', 'Teak', 'Maple', 'Tent'];
-
+export const ROOM_NAMES = roomOptions
 /**
  * @constant {object} roomAvailabilityStatusColors - An object mapping booking statuses to their corresponding colors.
  * @property {string} Confirmed - Hex color code for 'Confirmed' status.
@@ -96,7 +82,22 @@ export const roomAvailabilityStatusColors = {
 /**
  * @constant {Array<string>} statusOptions - An array of available status options.
  */
-export const statusOptions = ['Confirmed', 'Cancelled'];
+export const statusOptions = ['confirmed', 'cancelled'];
+
+export const BOOKING_STATUS = {
+    'CONFIRMED': 'confirmed',
+    'CANCELLED': 'cancelled',
+    'AVAILABLE': 'available',
+    'CLOSED': 'closed',
+    'BOOKED': 'booked',
+    'PENDING': 'pending',
+    'PAID': 'paid',
+    'UNPAID': 'unpaid',
+    'REFUNDED': 'refunded',
+    'CHECKED_IN': 'checked_in',
+    'BOOKED': 'booked'
+}
+
 
 /**
  * @constant {Array<string>} sourceOptions - An array of available source options.

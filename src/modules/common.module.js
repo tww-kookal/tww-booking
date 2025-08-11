@@ -1,4 +1,4 @@
-import { RANGE, SHEET_ID, DEFAULT_BOOKING, roomOptions } from "./constants";
+import { DEFAULT_BOOKING, roomOptions, BOOKING_STATUS } from "./constants";
 import dayjs from 'dayjs';
 
 /**
@@ -46,46 +46,6 @@ export const getCommissionPercent = (source) => {
 };
 
 /**
- * Converts Google Sheets data to an array of booking objects.
- *
- * @param {Array<Array<string>>} sheetData - The data from Google Sheets.
- * @returns {Array<Booking>} An array of booking objects.
- */
-export const convertGoogleDataToBookings = (sheetData) => {
-    // Skip header row
-    // const rows = sheetData.slice(1);
-    console.log("Query From Google Data Sheet Returned ", sheetData.length);
-    return sheetData.map((row) => {
-        return arrayToBooking(row);
-    });
-}
-
-/**
- * Loads booking data from Google Sheets.
- *
- * @async
- * @returns {Promise<Array<Booking>>} A promise that resolves to an array of booking objects.
- */
-export const loadFromSheetToBookings = async () => {
-    try {
-        const res = await window.gapi.client.sheets.spreadsheets.values.get({
-            spreadsheetId: SHEET_ID,
-            range: RANGE,
-        });
-
-        if (res.result.values && res.result.values.length > 0) {
-            return convertGoogleDataToBookings(res.result.values);
-        } else {
-            console.error("❌ No bookings found in the sheet.");
-            return [];
-        }
-    } catch (error) {
-        console.error("❌ Error fetching data from Google Sheets:", error);
-        return [];
-    }
-}
-
-/**
  * Calculates the commission amount based on the source and amount.
  *
  * @param {string} source - The source of the booking.
@@ -113,43 +73,6 @@ export const parseNumber = (val) => {
 };
 
 /**
- * Converts an array row from Google Sheets into a booking object.
- *
- * @param {Array<string>} row - The array row from Google Sheets.
- * @returns {Booking} A booking object.
- */
-export const arrayToBooking = (row) => {
-    return {
-        roomName: row[0] || '',
-        customerName: row[1] || '',
-        contactNumber: row[2] || '',
-        numberOfPeople: Number(row[3] ? row[3].replace(/,/g, '') : 0) || 0,
-        checkInDate: row[4] || '',
-        checkOutDate: row[5] || '',
-        numberOfNights: Number(row[6] ? row[6].replace(/,/g, '') : 0) || 0,
-        status: row[7] || '',
-        bookingDate: row[8] || '',
-        sourceOfBooking: row[9] || '',
-        roomAmount: Number(row[10] ? row[10].replace(/,/g, '') : 0) || 0,
-        advancePaid: Number(row[11] ? row[11].replace(/,/g, '') : 0) || 0,
-        advancePaidTo: row[12] || '',
-        //
-        food: Number(row[14] ? row[14].replace(/,/g, '') : 0) || 0,
-        campFire: Number(row[15] ? row[15].replace(/,/g, '') : 0) || 0,
-        //
-        //
-        otherServices: Number(row[18] ? row[18].replace(/,/g, '') : 0) || 0,
-        balanceToPay: Number(row[19] ? row[19].replace(/,/g, '') : 0) || 0,
-        totalAmount: Number(row[20] ? row[20].replace(/,/g, '') : 0) || 0,
-        commission: Number(row[21] ? row[21].replace(/,/g, '') : 0) || 0,
-        twwRevenue: Number(row[22] ? row[22].replace(/,/g, '') : 0) || 0,
-        balancePaidTo: row[23] || '',
-        bookingID: row[24] || '',
-        remarks: row[25] || ''
-    };
-}
-
-/**
  * Sorts an array of booking objects by check-in date and then by customer name.
  *
  * @param {Array<Booking>} bookings - The array of booking objects to sort.
@@ -159,12 +82,12 @@ export const sortBookings = (bookings) => {
     // Sort the filtered results by check-in date
     return bookings.sort((a, b) => {
         // Convert YYYY-MM-DD strings to Date objects for proper date comparison
-        const dateA = a.checkInDate ? new Date(a.checkInDate) : new Date(0);
-        const dateB = b.checkInDate ? new Date(b.checkInDate) : new Date(0);
+        const dateA = a.check_in ? new Date(a.check_in) : new Date(0);
+        const dateB = b.check_in ? new Date(b.check_in) : new Date(0);
 
         // If check-in dates are the same, sort by customer name
         if (dateA.getTime() === dateB.getTime()) {
-            return a.customerName.localeCompare(b.customerName);
+            return a.customer_name.localeCompare(b.customer_name);
         }
         // Otherwise sort by check-in date (ascending order)
         return dateA - dateB;
@@ -181,56 +104,56 @@ export const sortBookings = (bookings) => {
  */
 export const prepareChartData = (bookings, dateSet, memoizedDates) => {
     const chartData = bookings
-        .filter((booking) => dateSet.has(booking.checkInDate))
+        .filter((booking) => dateSet.has(booking.check_in))
         .map((booking) => ({
             ...booking,
-            chartStatus: dayjs(booking.checkInDate, "YYYY-MM-DD").isBefore(dayjs()) ? 'Closed' : booking.status,
+            chart_status: dayjs(booking.check_in, "YYYY-MM-DD").isBefore(dayjs()) ? BOOKING_STATUS.CLOSED : booking.status,
         }));
 
     const allData = [];
     for (const date of memoizedDates) {
         for (const room of roomOptions) {
-            const booking = chartData.find((b) => dayjs(b.checkInDate, "YYYY-MM-DD").isSame(date) && b.roomName === room);
+            const booking = chartData.find((b) => dayjs(b.check_in, "YYYY-MM-DD").isSame(date) && b.room_name === room);
             if (!booking && dayjs(date, "YYYY-MM-DD").isBefore(dayjs())) {
                 // If no booking exists for this room on this date and its a past date, add a default booking with Closed status
                 allData.push({
                     ...DEFAULT_BOOKING,
-                    roomName: room,
-                    checkInDate: date,
-                    checkOutDate: date,
-                    chartStatus: 'Closed',
-                    status: 'Available',
-                    chartData: 'INJECTED',
-                    pastDate: true
+                    room_name: room,
+                    check_in: date,
+                    check_out: date,
+                    chart_status: BOOKING_STATUS.CLOSED,
+                    status: BOOKING_STATUS.AVAILABLE,
+                    chart_data: 'INJECTED',
+                    past_date: true
                 });
             } else if (!booking) {
                 // If no booking exists for this room for today and future
                 allData.push({
                     ...DEFAULT_BOOKING,
-                    roomName: room,
-                    checkInDate: date,
-                    checkOutDate: date,
-                    chartStatus: 'Available',
-                    status: 'Available',
-                    chartData: 'INJECTED',
-                    pastDate: false
+                    room_name: room,
+                    check_in: date,
+                    check_out: date,
+                    chart_status: BOOKING_STATUS.AVAILABLE,
+                    status: BOOKING_STATUS.AVAILABLE,
+                    chart_data: 'INJECTED',
+                    past_date: false
                 });
-            } else if (booking && dayjs(booking.checkInDate, "YYYY-MM-DD").isBefore(dayjs())) {
+            } else if (booking && dayjs(booking.check_in, "YYYY-MM-DD").isBefore(dayjs())) {
                 // If booking exists for this room on this date and its a past date, add a default booking with Closed status
                 // This is to ensure that past bookings are shown as closed
                 allData.push({
                     ...booking,
-                    chartStatus: 'Closed',
-                    chartData: 'ACTUAL',
-                    pastDate: true
+                    chart_status: BOOKING_STATUS.CLOSED,
+                    chart_data: 'ACTUAL',
+                    past_date: true
                 });
             } else if (booking) {
                 // If booking exists for this room on this date and future, add it to the data
                 allData.push({
                     ...booking,
-                    chartStatus: booking.status,
-                    chartData: 'ACTUAL',
-                    pastDate: false
+                    chart_status: booking.status,
+                    chart_data: 'ACTUAL',
+                    past_date: false
                 });
             }
         }
@@ -239,23 +162,23 @@ export const prepareChartData = (bookings, dateSet, memoizedDates) => {
 }
 
 export const getStatusColor = (booking) => {
-    if (booking.pastDate) {
-        if (booking.status === 'Available') return '#1c461eff'
-        else if (booking.status === 'Confirmed') return '#0d447cff'
-        else if (booking.status === 'Cancelled') return '#762900ff';
-        else if (booking.status === 'Closed') return '#6c686bff';
+    if (booking.past_date) {
+        if (booking.status === BOOKING_STATUS.AVAILABLE) return '#1c461eff'
+        else if (booking.status === BOOKING_STATUS.CONFIRMED) return '#0d447cff'
+        else if (booking.status === BOOKING_STATUS.CANCELLED) return '#762900ff';
+        else if (booking.status === BOOKING_STATUS.CLOSED) return '#6c686bff';
     } else {
-        if (booking.chartStatus === 'Available') return '#388e3c'
-        else if (booking.chartStatus === 'Confirmed') return '#1976d2'
-        else if (booking.chartStatus === 'Cancelled') return '#e65100';
-        else if (booking.chartStatus === 'Closed') return '#a6a0a4ff';
+        if (booking.chart_status === BOOKING_STATUS.AVAILABLE) return '#388e3c'
+        else if (booking.chart_status === BOOKING_STATUS.CONFIRMED) return '#1976d2'
+        else if (booking.chart_status === BOOKING_STATUS.CANCELLED) return '#e65100';
+        else if (booking.chart_status === BOOKING_STATUS.CLOSED) return '#a6a0a4ff';
     }
     return '#5d595cff';
 };
 
 export const getDisplayText = (booking) => {
-    if (booking.pastDate) {
+    if (booking.past_date) {
         return 'Blocked';
     }
-    return booking.chartStatus || 'NONE';
+    return booking.chart_status || 'NONE';
 }

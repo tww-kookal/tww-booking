@@ -2,6 +2,7 @@ import React from 'react';
 import '../css/bookingList.large.css';
 import '../css/bookingList.handheld.css';
 import dayjs from 'dayjs';
+import { BOOKING_STATUS } from '../modules/constants';
 
 const BookingList = ({
     loading,
@@ -25,22 +26,22 @@ const BookingList = ({
                     {paginatedResults.map((booking, index) => (
                         <div
                             key={index}
-                            className={`booking-card ${booking.status === 'Cancelled' ? 'cancelled-booking' : ''}`}
+                            className={`booking-card ${booking.status === BOOKING_STATUS.CANCELLED ? 'cancelled-booking' : ''}`}
                             onClick={() => handleViewBooking(booking)}
                             style={{
                                 background:
-                                    booking.status === 'Confirmed'
+                                    booking.status === BOOKING_STATUS.CONFIRMED
                                         ? '#e3f2fd' // Light blue
-                                        : booking.status === 'Cancelled'
+                                        : booking.status === BOOKING_STATUS.CANCELLED
                                             ? '#ffe0b2' // Light orange
-                                            : booking.status === 'Available'
+                                            : booking.status === BOOKING_STATUS.AVAILABLE
                                                 ? '#c8e6c9' // Light green
                                                 : '#eeeeee', // Light grey
-                                border: `2px solid ${booking.status === 'Confirmed'
+                                border: `2px solid ${booking.status === BOOKING_STATUS.CONFIRMED
                                     ? '#1976d2'
-                                    : booking.status === 'Cancelled'
+                                    : booking.status === BOOKING_STATUS.CANCELLED
                                         ? '#e65100'
-                                        : booking.status === 'Available'
+                                        : booking.status === BOOKING_STATUS.AVAILABLE
                                             ? '#388e3c'
                                             : '#a6a0a4ff' // Default color for other statuses
                                     }`
@@ -48,50 +49,50 @@ const BookingList = ({
                         >
                             <div className="card-row">
                                 <span className="card-label">
-                                    🛏️{booking.roomName}&nbsp;
+                                    🛏️{booking.room_name}&nbsp;
                                 </span>
                                 <span className="card-value">
-                                    <span className="card-value-status">{booking.status}&nbsp;🧑‍💼{booking.numberOfPeople || '- '}</span>
+                                    <span className="card-value-status">{booking.status}&nbsp;🧑‍💼{booking.number_of_people || '- '}</span>
                                 </span>
                             </div>
                             <div className="card-row">
                                 <span className="card-label">Booking ID:&nbsp;</span>
-                                <span className="card-value">{booking.bookingID}</span>
+                                <span className="card-value">{booking.booking_id}</span>
                             </div>
                             <div className="card-row" >
                                 <span className="card-label" >Guest:&nbsp;</span>
-                                <span className="card-value" >{booking.customerName}</span>
+                                <span className="card-value" >{booking.customer_name}</span>
                             </div>
                             <div className="card-row">
                                 <span className="card-value">
-                                    {dayjs(booking.checkInDate, "YYYY-MM-DD").format("MMM DD 'YY")} <span style={{ color: '#888' }}>to</span> {dayjs(booking.checkOutDate, "YYYY-MM-DD").format("MMM DD 'YY")}
-                                    &nbsp;({booking.numberOfNights} nights)
+                                    {dayjs(booking.check_in, "YYYY-MM-DD").format("MMM DD 'YY")} <span style={{ color: '#888' }}>to</span> {dayjs(booking.check_out, "YYYY-MM-DD").format("MMM DD 'YY")}
+                                    &nbsp;({booking.number_of_nights || '----'} nights)
                                 </span>
                             </div>
                             <div className="card-row">
-                                {booking.contactNumber && (
+                                {booking.contact_number && (
                                     // <div className="card-row">
                                     <span className="card-value"><a
-                                        href={`tel:${booking.contactNumber}`}
+                                        href={`tel:${booking.contact_number}`}
                                         style={{ color: '#1976d2', textDecoration: 'none', fontWeight: 600 }}
                                         onClick={e => e.stopPropagation()}
                                     >
-                                        <span role="img" aria-label="phone" style={{ marginRight: '4px' }}>📞</span> {booking.contactNumber}
+                                        <span role="img" aria-label="phone" style={{ marginRight: '4px' }}>📞</span> {booking.contact_number || ' -- '}
                                     </a></span>
                                     // </div>
                                 )}
                             </div>
                             <div className="card-row">
                                 <span className="card-label">Source:&nbsp;</span> 
-                                <span className="card-value">{booking.sourceOfBooking || '-'}</span>
+                                <span className="card-value">{booking.source_of_booking || '-'}</span>
                             </div>
                             <div className="card-row">
                                 <span className="card-label">Amount:&nbsp;</span> 
-                                <span className="card-value">₹{booking.roomAmount || 0}</span>
+                                <span className="card-value">₹{booking.room_price || 0}</span>
                             </div>
                             <div className="card-row">
                                 <span className="card-value">{'✔️'} Breakfast</span>
-                                <span className="card-value">&nbsp;{booking.campFire ? '✔️' : '❌'} Campfire</span>
+                                <span className="card-value">&nbsp;{booking.service_price ? '✔️' : '❌'} Campfire</span>
                                 <span className="card-value">&nbsp;{booking.remarks ? '📒' : ''}</span>
                             </div>
                         </div>

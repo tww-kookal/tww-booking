@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { sortBookings, loadFromSheetToBookings } from "../modules/common.module";
+import { sortBookings } from "../modules/common.module";
 import dayjs from 'dayjs';
 import '../css/bookingSearch.large.css';
 import '../css/bookingSearch.handheld.css';
 import BookingList from "./BookingList";
+import { getAllBookings } from "../modules/booking.module";
+import { BOOKING_STATUS } from "../modules/constants";
 
 const BookingSearch = () => {
   const navigate = useNavigate();
@@ -31,11 +33,11 @@ const BookingSearch = () => {
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fetchGoogleSheetRecords = async () => {
+  const fetchBookings = async () => {
     setLoading(true);
     setError("");
     try {
-      const allBookings = await loadFromSheetToBookings();
+      const allBookings = await getAllBookings();
       let filteredResults = [];
       const initialDate = dayjs(initialCheckInDate, "YYYY-MM-DD");
 
@@ -47,24 +49,24 @@ const BookingSearch = () => {
 
       if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
         filteredResults = allBookings.filter(booking => {
-          return dayjs(booking.checkInDate, "YYYY-MM-DD").isAfter(initialDate) && booking.status !== 'Cancelled';
+          return dayjs(booking.check_in, "YYYY-MM-DD").isAfter(initialDate) && booking.status !== BOOKING_STATUS.CANCELLED;
         });
       } else {
         filteredResults = allBookings.filter(booking => {
           const matchesBookingDate = !searchCriteria.bookingDate ||
-            booking.bookingDate.includes(searchCriteria.bookingDate);
+            booking.booking_date.includes(searchCriteria.bookingDate);
 
           const matchesGuestName = !searchCriteria.guestName ||
-            booking.customerName.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
+            booking.customer_name.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
 
           const matchesCheckInDate = !searchCriteria.checkInDate ||
-            exactStartDate ? booking.checkInDate.includes(searchCriteria.checkInDate) : dayjs(booking.checkInDate, 'YYYY-MM-DD').add(-1, "day").isAfter(dayjs(searchCriteria.checkInDate, 'YYYY-MM-DD'));
+            exactStartDate ? booking.check_in.includes(searchCriteria.checkInDate) : dayjs(booking.check_in, 'YYYY-MM-DD').add(-1, "day").isAfter(dayjs(searchCriteria.checkInDate, 'YYYY-MM-DD'));
 
           const matchesContactNumber = !searchCriteria.contactNumber ||
-            booking.contactNumber.includes(searchCriteria.contactNumber);
+            booking.contact_number.includes(searchCriteria.contactNumber);
 
           const matchesBookingID = !searchCriteria.bookingID ||
-            booking.bookingID.toLowerCase().includes(searchCriteria.bookingID.toLowerCase());
+            booking.booking_id == searchCriteria.bookingID;
 
           return matchesBookingDate && matchesGuestName && matchesCheckInDate &&
             matchesContactNumber && matchesBookingID;
@@ -73,7 +75,7 @@ const BookingSearch = () => {
       setResults(sortBookings(filteredResults));
       setCurrentPage(1);
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.error("BookingSearch::FetchBookings::Error fetching data:", err);
       setError("Failed to fetch bookings. Please try again.");
       setResults([]);
     } finally {
@@ -82,15 +84,15 @@ const BookingSearch = () => {
   };
 
   useEffect(() => {
-    fetchGoogleSheetRecords();
+    fetchBookings();
   }, []);
 
   const handleSearch = () => {
-    fetchGoogleSheetRecords();
+    fetchBookings();
   };
 
   const handleViewBooking = (booking) => {
-    navigate(`/booking/${encodeURIComponent(booking.customerName)}`, {
+    navigate(`/booking/${encodeURIComponent(booking.booking_id)}`, {
       state: {
         preloadedBooking: booking,
         from: 'search'

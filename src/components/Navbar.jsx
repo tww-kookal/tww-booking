@@ -23,7 +23,7 @@ const Navbar = () => {
       </div>
 
       <div className={`navbar-links ${isMenuOpen ? 'active' : ''}`} >
-        <Link to="/" className={location.pathname === '/' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+        <Link to="/dashboard" className={location.pathname === '/' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
           Dashboard
         </Link>
         <Link to="/availability" className={location.pathname === '/availability' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>

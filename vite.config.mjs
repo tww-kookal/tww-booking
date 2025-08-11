@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/tww-booking/',
   build: {
     outDir: 'dist',     // Custom output directory inside public
     emptyOutDir: true,
@@ -14,7 +13,6 @@ export default defineConfig({
     }
   },
   server: {
-    port: 5173,
     headers: {
       // Comment these during dev
       // 'Cross-Origin-Opener-Policy': 'same-origin',

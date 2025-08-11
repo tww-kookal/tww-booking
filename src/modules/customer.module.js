@@ -1,0 +1,89 @@
+
+import dayjs from 'dayjs';
+import api from './apiClient';
+
+/**
+ * Loads all customers from the server.
+ *
+ * @async
+ * @returns {Promise<Array<Customer>>} A promise that resolves to an array of customer objects.
+ */
+export const getAllCustomers = async () => {
+    console.log("Customer.Module::getAllCustomers::Fetching all customers");
+    try {
+        const response = await api.get("/customers/");
+        return response.data?.customers || []
+    } catch (error) {
+        console.log("Customer.Module::getAllCustomers::Error fetching all customers", error);
+        return []
+    }
+}
+
+/**
+ * Loads customer by ID from the server.
+ *
+ * @async
+ * @returns {Promise<Customer>} A promise that resolves to a customer object.
+ */
+export const getCustomerById = async (customer_id) => {
+    console.log("Customer.Module::getCustomerById::Fetching customer by ID");
+    try {
+        const response = await api.get("/customers/byID/" + customer_id);
+        return response.data?.customer || {}
+    } catch (error) {
+        console.log("Customer.Module::getCustomerById::Error fetching customer by ID", error);
+        return {}
+    }
+}
+
+/**
+ * Validates a booking object to ensure all required fields are present and that the check-out date is after the check-in date.
+ *
+ * @param {object} customer - The customer object to validate.
+ * @param {string} customer.customer_name - The name of the customer.
+ * @param {string} customer.phone - The contact number of the customer.
+ * @param {string} customer.email - The contact email of the customer
+ * @param {string} customer.customer_id - Id of the customer
+ * @returns {Array<string>} An array of error messages. If the array is empty, the customer is valid.
+ */
+export const validateCustomer = (customer) => {
+    const errors = [];
+
+    // Check required fields
+    if (!customer.customer_name) {
+        errors.push('Customer Name is required');
+    }
+    if (!customer.phone) {
+        errors.push('Phone is required');
+    }
+
+    return errors;
+};
+
+
+export const addCustomer = async (customer) => {
+    console.log("Customer.Module::addCustomer::Adding customer");
+    try {
+        const response = await api.post("/customers/create", customer);
+        return response.data?.customer || {}
+    } catch (error) {
+        console.log("Customer.Module::addCustomer::Error adding customer", error);
+        return {}
+    }
+}
+
+export const updateCustomer = async (customer) => {
+    console.log("Customer.Module::updateCustomer::Updating customer");
+    try {
+        const response = await api.post("/customers/update", {
+                ...customer, 
+                customer_id: customer.customer_id.toString()
+            });
+
+        return response.data?.customer || {}
+    } catch (error) {
+        console.log("Customer.Module::updateCustomer::Error updating customer", error);
+        return {}
+    }
+}
+

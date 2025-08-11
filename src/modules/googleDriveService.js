@@ -1,5 +1,7 @@
 // Use window.gapi instead of importing from gapi-script
-import { FOLDER_ID } from '../config'
+//import { FOLDER_ID } from './config'
+
+const FOLDER_ID = '11lLEqPPaWkk27LWTd1YFMnp4nQH_KI55'
 
 /**
  * Uploads a file to Google Drive.
