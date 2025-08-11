@@ -18,6 +18,13 @@ export default defineConfig({
       // Comment these during dev
       // 'Cross-Origin-Opener-Policy': 'same-origin',
       // 'Cross-Origin-Embedder-Policy': 'require-corp'      
+    },
+    proxy: {
+      '/api/v1': {
+        target: 'https://tww-service.up.railway.app',
+        changeOrigin: true,
+        secure: false
+      }
     }
   }
 })
