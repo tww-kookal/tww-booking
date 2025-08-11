@@ -10,7 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import AvailabilityChart from "./pages/AvailabilityChart";
 import BookingSearch from "./pages/BookingSearch";
 import Booking from "./pages/Booking";
-import Customer from "./components/Customer";
+import Customer from "./pages/Customer";
 
 export default function App() {
     return (
