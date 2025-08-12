@@ -1,9 +1,13 @@
+// FILEPATH: d:/Xigma/apps/reactjs/tww-booking/src/pages/Login.jsx
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Box, TextField, Button, Typography, Paper } from '@mui/material';
 import axios from 'axios';
 import api from '../modules/apiClient';
 import { persistTokensReceived } from '../contexts/constants';
+
+import '../css/login.large.css';
+import '../css/login.handheld.css';
 
 export default function Login() {
     const [username, setUsername] = useState('');
@@ -43,19 +47,37 @@ export default function Login() {
     };
 
     return (
-        <Container maxWidth="sm">
-            <Paper elevation={3} sx={{ p: 4, mt: 8 }}>
-                <Typography variant="h5" gutterBottom>
-                    Login
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <TextField label="Username" value={username} onChange={(e) => setUsername(e.target.value)} fullWidth />
-                    <TextField type="password" label="Password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth />
-                    <Button variant="contained" color="primary" onClick={handleLogin}>
+        <div className="login-container">
+            <div className="login-paper">
+                <h2>Sign In</h2>
+                <form
+                  className="login-form"
+                  onSubmit={e => {
+                    e.preventDefault();
+                    handleLogin();
+                  }}
+                >
+                    <input
+                        className="login-input"
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                    <input
+                        className="login-input"
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <button className="login-button" type="submit">
                         Sign In
-                    </Button>
-                </Box>
-            </Paper>
-        </Container>
+                    </button>
+                </form>
+            </div>
+        </div>
     );
 }

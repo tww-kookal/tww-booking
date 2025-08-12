@@ -2,47 +2,44 @@
 @media (min-width: 1000px) {
   /* Adjusted for screens greater than 1000 pixels */
 
+  /* FILEPATH: d:/xigma/apps/reactjs/tww-booking/src/css/navbar.large.css */
+
+  /* Desktop / large screen styles */
   .navbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background-color: #2d0000;
+    justify-content: space-between;
+    background-color: #333;
+    padding: 0.5rem 1rem;
     color: white;
-    padding: 1rem 2rem;
+    position: relative;
     border-radius: 8px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;    
   }
 
   .navbar-brand {
-    display: flex;
-    align-items: center;
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
   }
 
-  .menu-icon {
-    display: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-
-  .navbar-links {
+  /* Always show links on large screens */
+  .navbar-links-large {
     display: flex;
     gap: 1rem;
-    align-items: center;
-    font-size: 1.5rem;
-    font-weight: bold;
   }
 
-  .navbar-links a {
+  .navbar-links-large a {
     color: white;
     text-decoration: none;
-    padding: 0.5rem 1rem;
-    border-radius: 5px;
+    padding: 0.5rem;
   }
 
-  .navbar-links a.active,
-  .navbar-links a:hover {
-    background-color: #99000098;
+  .navbar-links-large a.active {
+    border-bottom: 2px solid #fff;
   }
 
+  /* Hide hamburger icon on large screens */
+  .menu-icon {
+    display: none;
+  }
 }

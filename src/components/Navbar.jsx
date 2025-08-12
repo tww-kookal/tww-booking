@@ -1,3 +1,5 @@
+// FILEPATH: d:/xigma/apps/reactjs/tww-booking/src/components/NavBar.jsx
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import '../css/navbar.large.css';
@@ -22,17 +24,38 @@ const Navbar = () => {
         ☰
       </div>
 
-      <div className={`navbar-links ${isMenuOpen ? 'active' : ''}`} >
-        <Link to="/dashboard" className={location.pathname === '/' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+      {/* Overlay menu for mobile */}
+      {isMenuOpen && (
+        <div className="navbar-overlay" onClick={() => setIsMenuOpen(false)}>
+          <div className="navbar-links-overlay" onClick={e => e.stopPropagation()}>
+            <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+              Dashboard
+            </Link>
+            <Link to="/availability" className={location.pathname === '/availability' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+              Availability
+            </Link>
+            <Link to="/search" className={location.pathname === '/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+              Search
+            </Link>
+            <Link to="/booking" className={location.pathname.includes('/booking') ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+              New
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* Always visible links on large screens */}
+      <div className="navbar-links-large">
+        <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''}>
           Dashboard
         </Link>
-        <Link to="/availability" className={location.pathname === '/availability' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+        <Link to="/availability" className={location.pathname === '/availability' ? 'active' : ''}>
           Availability
         </Link>
-        <Link to="/search" className={location.pathname === '/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+        <Link to="/search" className={location.pathname === '/search' ? 'active' : ''}>
           Search
         </Link>
-        <Link to="/booking" className={location.pathname.includes('/booking') ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+        <Link to="/booking" className={location.pathname.includes('/booking') ? 'active' : ''}>
           New
         </Link>
       </div>
