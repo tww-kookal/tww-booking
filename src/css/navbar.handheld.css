@@ -3,44 +3,61 @@
   /* Adjusted for screens less than 1000 pixels */
 
   .navbar {
+    /*flex-wrap: wrap;*/
     display: flex;
+    width: 92%;
     justify-content: space-between;
     align-items: center;
     background-color: #2d0000;
     color: white;
-    padding: 1rem 2rem;
+    padding: 1rem;
     border-radius: 8px;
   }
 
   .navbar-brand {
     display: flex;
+    width: 80%;
     align-items: center;
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
   }
 
   .menu-icon {
     display: block;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    width: 10%;
     cursor: pointer;
+    user-select: none;
+    padding: 0.5rem;
+    color: #fff;
   }
 
   .navbar-links {
+    display: none;
+    flex-direction: column;
+    width: 60%;
+    background-color: #333;
+    gap: 0.2rem;
+    align-items: left;
+    font-size: 1.2rem;
+    font-weight: normal;
+  }
+
+  .navbar-links.active {
     display: flex;
-    gap: 1rem;
-    align-items: center;
-    font-size: 1.7rem;
-    font-weight: bold;
   }
 
   .navbar-links a {
     color: white;
     text-decoration: none;
-    padding: 0.5rem 1rem;
+    padding: 0.2rem;
     border-radius: 5px;
   }
 
-  .navbar-links a.active,
+  .navbar-links a.active{
+    background-color: #555;
+  }
+
   .navbar-links a:hover {
     background-color: #99000098;
   }
