@@ -3,14 +3,14 @@
   /* Adjusted for screens less than 1000 pixels */
 
   .booking-card {
-    width: calc(100% - 0.5rem);
+    width: calc(95%);
     /* One cards per row */
     box-sizing: border-box;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.339);
-    margin-bottom: 1rem;
-    font-size: 3rem;
+    margin-bottom: 0.2rem;
+    font-size: 1.2rem;
     padding: 1rem;
     cursor: pointer;
     transition: box-shadow 0.2s;
@@ -36,7 +36,7 @@
   }
 
   .table-container h3 {
-    font-size: 2.5rem;
+    font-size: 1rem;
   }
 
   .card-list {
@@ -44,6 +44,7 @@
     flex: auto;
     flex-wrap: wrap;
     gap: 1rem;
+    width: 100%;
     justify-content: flex-start;
     /* Distribute items evenly */
   }
@@ -69,18 +70,19 @@
 
   /* Pagination Styles */
   .pagination {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 20px;
-    font-size: 3rem;
+    font-size: 1.2rem;
     padding: 10px 0;
   }
 
   .pagination-button {
     background-color: #f0f0f0;
     border: 1px solid #ddd;
-    font-size: 3rem;
+    font-size: 1.2rem;
     color: #333;
     padding: 8px 12px;
     margin: 0 5px;
