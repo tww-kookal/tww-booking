@@ -255,7 +255,7 @@ const Booking = () => {
             <h2>Room Booking Form</h2>
             <div className='form-group'>
                 <label>Identity Document:</label>
-                <input
+                <input className='form-input'
                     type="file"
                     onChange={(e) => setUploadedFile(e.target.files[0])}
                     accept=".pdf,.jpg,.jpeg,.png"

@@ -1,5 +1,6 @@
 /* Mobile view */
 @media (max-width: 999px) {
+
   /* Adjusted for screens less than 1000 pixels */
   .booking-form-container {
     max-width: 90%;
@@ -18,6 +19,28 @@
     text-align: center;
     margin-bottom: 0.5rem;
     color: #333;
+    font-size: 2rem;
+  }
+
+  .booking-form-container .button-primary,
+  .booking-form-container .button-secondary,
+  .booking-form-container input,
+  .booking-form-container textarea {
+    font-size: 1.2rem !important;
+  }
+
+  .booking-form-container select,
+  .booking-form-container select option{
+    font-size: 1.2rem !important;
+    font-family: inherit;
+  }
+
+
+  .booking-form-container input:focus,
+  .booking-form-container select:focus,
+  .booking-form-container select option:focus,
+  .booking-form-container textarea:focus {
+    font-size: 1.2rem !important;
   }
 
   .form-group {
@@ -31,7 +54,7 @@
     font-weight: 600;
     margin-bottom: 0.4rem;
     color: #555;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
   }
 
   .form-group input,
@@ -54,7 +77,7 @@
 
   .form-buttons {
     display: flex;
-    justify-content: space-between;
+    justify-content: stretch;
     margin-top: 0.5rem;
     gap: 10px;
   }
@@ -73,7 +96,7 @@
   .form-buttons button:hover {
     opacity: 0.9;
   }
-  
+
   .button-primary {
     background-color: #007bff;
     color: white;
