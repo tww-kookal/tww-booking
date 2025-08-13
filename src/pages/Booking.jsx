@@ -281,7 +281,7 @@ const Booking = () => {
                 <div className='form-group'>
                     <label htmlFor="customer_id">Customer Name</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <select id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
+                        <select style = {{width: '55%'}} id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
                             <option value="">Select Customer</option>
                             {customers.map(c => (
                                 <option key={c.customer_id} value={c.customer_id}>{c.customer_name} - {c.phone}</option>
