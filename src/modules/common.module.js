@@ -38,10 +38,12 @@ export const getInitials = (name) => {
  * @returns {number} The commission percentage.
  */
 export const getCommissionPercent = (source) => {
-    if (source.trim().toLocaleLowerCase() === "sangeetha") return 8;
-    else if (['walkin', 'direct', 'walk-in'].includes(source.trim().toLocaleLowerCase())) return 0;
-    else if (['mmt', 'agoda'].includes(source.trim().toLocaleLowerCase())) return 30;
-    else if (['owners', 'owner', "pranav", "rk", "balan", 'unknown', 'undefined', ''].includes(source.trim().toLocaleLowerCase())) return 0;
+    return 0;
+    if (source && source.trim().toLocaleLowerCase() === "sangeetha") return 8;
+    else if (source && ['walkin', 'direct', 'walk-in'].includes(source.trim().toLocaleLowerCase())) return 0;
+    else if (source && ['mmt', 'agoda'].includes(source.trim().toLocaleLowerCase())) return 30;
+    else if (source && ['owners', 'owner', "pranav", "rk", "balan", 'unknown', 'undefined', ''].includes(source.trim().toLocaleLowerCase())) return 0;
+    else if (source && ['tww', 'the westwood'].includes(source.trim().toLocaleLowerCase())) return 10;
     else return 10; // Who are supposed to be agents
 };
 

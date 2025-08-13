@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 /**
  * @constant {object} BOOKING_DEFAULT - Default values for a booking.
  * @property {string} BOOKING_DATE - The default booking date, set to today's date in ISO format.
@@ -6,6 +8,9 @@
  */
 export const BOOKING_DEFAULT = {
     BOOKING_DATE: new Date().toISOString().split('T')[0],
+    CHECK_IN: new dayjs().format('YYYY-MM-DD'),
+    CHECK_OUT: new dayjs().add(1, 'day').format('YYYY-MM-DD'),
+    NUMBER_OF_NIGHTS: 1,
     ROOM_NAME: 'Cedar',
     STATUS: 'Confirmed'
 }
@@ -37,26 +42,29 @@ export const BOOKING_DEFAULT = {
  * @property {string} remarks - Any remarks or notes about the booking, default is an empty string.
  */
 export const DEFAULT_BOOKING = {
-    room_name: BOOKING_DEFAULT.ROOM_NAME,
-    customer_name: '',
-    contact_number: '',
+    booking_id: 0,
+    room_id: 0,
+    customer_id: 0,
     number_of_people: 0,
-    check_in: '',
-    check_out: '',
-    number_of_nights: 0,
+    check_in: BOOKING_DEFAULT.CHECK_IN,
+    check_out: BOOKING_DEFAULT.CHECK_OUT,
+    number_of_nights: BOOKING_DEFAULT.NUMBER_OF_NIGHTS,
     status: BOOKING_DEFAULT.STATUS,
     booking_date: BOOKING_DEFAULT.BOOKING_DATE,
-    source_of_booking: '',
+    source_of_booking_id: 0,
     room_price: 0,
-    advance_paayment: 0,
-    advance_paid_to: '',
+    advance_paid: 0,
+    advance_paid_to: 0,
     food_price: 0,
     service_price: 0,
     balance_to_pay: 0,
+    balance_paid_to: 0,
     total_price: 0,
+    tax_percent:0,
+    tax_price:0,
+    discount_price:0,
     commission: 0,
-    final_price_paid_to: '',
-    booking_id: '',
+    final_price_paid_to: 0,
     remarks: ''
 }
 

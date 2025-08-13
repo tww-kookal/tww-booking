@@ -71,27 +71,30 @@ export const validateBooking = (booking) => {
     const errors = [];
 
     // Check required fields
-    if (!booking.customerName) {
-        errors.push('Customer Name is required');
+    console.log("booking.customer_id", booking.customer_id)
+    if (!booking.customer_id && booking.customer_id !== 0) {
+        errors.push('Select a Guest / Customer');
     }
-    if (!booking.checkInDate) {
+    if (!booking.check_in) {
         errors.push('Check-in Date is required');
     }
-    if (!booking.checkOutDate) {
+    if (!booking.check_out) {
         errors.push('Check-out Date is required');
-    }
-    if (!booking.contactNumber) {
-        errors.push('Contact Number is required');
     }
 
     // Check date validity
-    if (new Date(booking.checkInDate) >= new Date(booking.checkOutDate)) {
+    if (new Date(booking.check_in) >= new Date(booking.check_out)) {
         errors.push('Check-out Date must be after Check-in Date');
     }
 
     return errors;
 };
 
+export const createNewBooking = async (booking) => {
+    const res = await api.post("/rooms/bookRoom", booking);
+    console.log("Booking.Module::createNewBooking::Created new booking", res);
+    return res.data?.booking;
+}
 
 export const handleGenerateReceipt = (booking) => {
     // Create a printable receipt
@@ -125,35 +128,35 @@ export const handleGenerateReceipt = (booking) => {
                             <table>
                                 <tr>
                                     <th>Booking ID:</th>
-                                    <td>${booking.bookingID}</td>
+                                    <td>${booking.booking_id}</td>
                                 </tr>
                                 <tr>
                                     <th>Customer Name:</th>
-                                    <td>${booking.customerName}</td>
+                                    <td>${booking.customer_name}</td>
                                 </tr>
                                 <tr>
                                     <th>Room:</th>
-                                    <td>${booking.roomName}</td>
+                                    <td>${booking.room_name}</td>
                                 </tr>
                                 <tr>
                                     <th>Check-in Date:</th>
-                                    <td>${booking.checkInDate}</td>
+                                    <td>${booking.check_in}</td>
                                 </tr>
                                 <tr>
                                     <th>Check-out Date:</th>
-                                    <td>${booking.checkOutDate}</td>
+                                    <td>${booking.check_out}</td>
                                 </tr>
                                 <tr>
                                     <th>Number of Nights:</th>
-                                    <td>${booking.numberOfNights}</td>
+                                    <td>${booking.number_of_nights}</td>
                                 </tr>
                                 <tr>
                                     <th>Number of People:</th>
-                                    <td>${booking.numberOfPeople}</td>
+                                    <td>${booking.number_of_people}</td>
                                 </tr>
                                 <tr>
                                     <th>Contact Number:</th>
-                                    <td>${booking.contactNumber}</td>
+                                    <td>${booking.contact_number}</td>
                                 </tr>
                                 <tr>
                                     <th>Status:</th>
@@ -167,7 +170,7 @@ export const handleGenerateReceipt = (booking) => {
                             <table>
                                 <tr>
                                     <th>Room Amount:</th>
-                                    <td>₹${booking.roomAmount}</td>
+                                    <td>₹${booking.room_price}</td>
                                 </tr>
                                 ${booking.food > 0 ? `<tr>
                                     <th>Food:</th>
@@ -175,19 +178,15 @@ export const handleGenerateReceipt = (booking) => {
                                 </tr>` : ''}
                                 ${booking.campFire > 0 ? `<tr>
                                     <th>Camp Fire:</th>
-                                    <td>₹${booking.campFire}</td>
-                                </tr>` : ''}
-                                ${booking.otherServices > 0 ? `<tr>
-                                    <th>Other Services:</th>
-                                    <td>₹${booking.otherServices}</td>
+                                    <td>₹${booking.camp_fire}</td>
                                 </tr>` : ''}
                                 <tr>
                                     <th>Advance Paid:</th>
-                                    <td>₹${booking.advancePaid}</td>
+                                    <td>₹${booking.advance_paid}</td>
                                 </tr>
                                 <tr class="total">
                                     <th>Balance to Pay:</th>
-                                    <td>₹${booking.balanceToPay}</td>
+                                    <td>₹${booking.balance_to_pay}</td>
                                 </tr>
                             </table>
                         </div>

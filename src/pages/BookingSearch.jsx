@@ -92,9 +92,10 @@ const BookingSearch = () => {
   };
 
   const handleViewBooking = (booking) => {
-    navigate(`/booking/${encodeURIComponent(booking.booking_id)}`, {
+    navigate(`/booking`, {
       state: {
         preloadedBooking: booking,
+
         from: 'search'
       }
     });

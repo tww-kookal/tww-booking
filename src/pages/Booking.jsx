@@ -5,25 +5,25 @@ import { statusOptions, sourceOptions, DEFAULT_BOOKING } from "../modules/consta
 import { getCommissionPercent, calculateCommission, parseNumber } from "../modules/common.module";
 import { getAllCustomers } from '../modules/customer.module';
 import { uploadToDrive } from '../modules/googleDriveService';
-import { validateBooking, handleGenerateReceipt, getAllBookings, getAllRooms } from '../modules/booking.module';
+import { validateBooking, handleGenerateReceipt, createNewBooking, getAllRooms } from '../modules/booking.module';
+import { getAllUsers } from '../modules/users.module';
 
 import '../css/booking.large.css';
 import '../css/booking.handheld.css';
 
 const Booking = () => {
-    const { id } = useParams();
     const location = useLocation();
     const preloadedBooking = location.state?.preloadedBooking;
+
     const navigate = useNavigate();
     const defaultBooking = DEFAULT_BOOKING;
-    const [records, setRecords] = useState([]);
-    const [currentIndex, setCurrentIndex] = useState(-1);
     const [booking, setBooking] = useState({
         ...defaultBooking
     });
 
     const [rooms, setRooms] = useState([]);
     const [customers, setCustomers] = useState([]);
+    const [users, setUsers] = useState([]);
 
     useEffect(() => {
         if (location.state?.bookingDraft) {
@@ -33,6 +33,17 @@ const Booking = () => {
             setCustomers(prev => [...prev, location.state.createdCustomer]);
         }
     }, [location.state]);
+
+    useEffect(() => {
+        getAllUsers().then(users => {
+            setUsers(users);
+            setErrorMessage('');
+        }).catch(err => {
+            console.error('Booking::Error fetching users:', err);
+            setErrorMessage('Failed to fetch users');
+        }).finally(() => {
+        })
+    }, [])
 
     useEffect(() => {
         getAllCustomers().then(customers => {
@@ -58,65 +69,13 @@ const Booking = () => {
     }, [])
 
     useEffect(() => {
+        console.log("PreLoaded Booking ", preloadedBooking)
         if (preloadedBooking) {
             setBooking({
                 ...preloadedBooking
             });
-        } else if (id) {
-            // If we have an ID but no preloaded booking, we should fetch the booking data
-            const fetchBookingById = async () => {
-                setIsSubmitting(true);
-                try {
-                    const allBookings = await getAllBookings();
-                    if (allBookings && allBookings.length > 0) {
-                        // Convert to bookings and find the one with matching ID (customer name)
-
-                        const decodedId = decodeURIComponent(id);
-                        const foundBooking = allBookings.find(booking => booking.customer_name === decodedId);
-
-                        if (foundBooking) {
-                            setBooking(foundBooking);
-                        } else {
-                            setErrorMessage(`Booking for ${decodedId} not found`);
-                        }
-                    } else {
-                        setErrorMessage('No bookings found in the system');
-                    }
-                } catch (err) {
-                    console.error('Booking::Error fetching booking:', err);
-                    setErrorMessage('Failed to fetch booking details');
-                } finally {
-                    setIsSubmitting(false);
-                }
-            };
-
-            fetchBookingById();
         }
-    }, [preloadedBooking, id]);
-
-    useEffect(() => {
-        // Auto calculate nights, commission, balances, etc.
-        const inDate = new Date(booking.check_in);
-        const outDate = new Date(booking.check_out);
-        const numberOfNights = booking.number_of_nights || Math.max(0, (outDate - inDate) / (1000 * 60 * 60 * 24));
-
-        const commission = calculateCommission(booking.source_of_booking, booking.room_price);
-        const balanceToPay = (booking.room_price + booking.food_price + booking.service_price) - booking.advance_paid || 0;
-        const twwRevenue = (booking.room_price + booking.food_price + booking.service_price) - commission;
-
-        setBooking(prev => ({
-            ...prev,
-            numberOfNights,
-            commission,
-            balanceToPay,
-            twwRevenue
-        }));
-    }, [booking.check_in, booking.check_out, booking.room_price, booking.food_price, booking.service_price, booking.advance_paid || 0]);
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setBooking(prev => ({ ...prev, [name]: name === 'numberOfPeople' || name.includes('Amount') || name === 'food' || name === 'campFire' || name === 'advancePaid' ? +value : value }));
-    // };
+    }, [preloadedBooking]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -125,8 +84,6 @@ const Booking = () => {
                 ...prev,
                 [name]: value,
             };
-            console.log("Changed ", updated)
-            
             const checkInDate = dayjs(updated.check_in, "YYYY-MM-DD");
             const checkOutDate = dayjs(updated.check_out, "YYYY-MM-DD");
 
@@ -137,7 +94,7 @@ const Booking = () => {
             }
 
             // Calculate commission based on source of booking
-            const source = updated.source_of_booking || '';
+            const source = updated.source_of_booking_id || '';
             const roomAmount = parseNumber(updated.room_price || 0);
             const food = parseNumber(updated.food_price || 0);
             const campFire = parseNumber(updated.service_price || 0);
@@ -145,7 +102,7 @@ const Booking = () => {
             updated.commission = calculateCommission(source, roomAmount);
 
             // Balance To Pay = Room + Food + Camp - Advance
-            //updated.balanceToPay = roomAmount + food + campFire - advance;
+            updated.balance_to_pay = roomAmount + food + campFire - advance;
 
             // TWW Revenue = Room + Food + Camp - Commission
             updated.tww_revenue = roomAmount + food + campFire - updated.commission;
@@ -176,6 +133,7 @@ const Booking = () => {
         if (errors && errors.length > 0) {
             setErrorMessage(errors.join(', '));
             setIsFormDisabled(false); // Re-enable on error
+            setIsSubmitting(false);
             return;
         }
 
@@ -196,38 +154,44 @@ const Booking = () => {
 
         try {
             // Determine if this is an update or a new booking
-            const isUpdate = id || preloadedBooking;
+            const isUpdate = preloadedBooking;
 
             console.log('Booking::Existing Booking to Update ? ', isUpdate);
+            console.log("Booking::Update Booking ", booking)
 
             if (isUpdate) {
-                // Invoke Update API
-                setSuccessMessage('Booking Updated successfully!');
-                console.log('Booking::Booking Update successfully');
+                // Invoke Update API                \
+                // updateBooking(booking).then((res) => {
+                //     setBooking(res);
+                //     setSuccessMessage('Booking Updated successfully!');
+                //     console.log('Booking::Booking Update successfully');
+                //     handleGenerateReceipt(booking);
+                //              // Reset form after 2 seconds if it's a new booking
+                // setTimeout(() => {
+                //     if (!isUpdate) {
+                //         handleAddNew();
+                //     }
+                //     setSuccessMessage('');
+                // }, 2000);
+                //
+                // }).catch((err) => {
+                //     console.error('Booking::Error updating booking:', err);
+                //     setErrorMessage('Failed to update booking. Please try again.');
+                // })
             } else {
                 // For new bookings, simply append
                 // Invoke New Booking 
-                setSuccessMessage('Booking saved successfully!');
-                console.log('Booking::Booking created successfully');
+                createNewBooking(booking).then((createdBooking) => {
+                    setSuccessMessage('Booking saved successfully!');
+                    handleGenerateReceipt(createdBooking);
+                    navigate("/dashboard")
+                }).catch((err) => {
+                    console.error('Booking::Error creating booking:', err.response?.data?.detail || err.message);
+                    setErrorMessage(`Failed to create booking. ${err.response?.data?.detail || err.message}`);
+                })
             }
 
-            // Add to local state as well
-            if (currentIndex >= 0) {
-                const updated = [...records];
-                updated[currentIndex] = booking;
-                setRecords(updated);
-            } else {
-                setRecords([...records, booking]);
-            }
 
-            // Reset form after 2 seconds if it's a new booking
-            setTimeout(() => {
-                if (!isUpdate) {
-                    handleAddNew();
-                }
-                handleGenerateReceipt(booking);
-                setSuccessMessage('');
-            }, 2000);
         } catch (error) {
             console.error('Error saving booking:', error);
             setErrorMessage('Failed to save booking. Please try again.');
@@ -281,7 +245,7 @@ const Booking = () => {
                 <div className='form-group'>
                     <label htmlFor="customer_id">Customer Name</label>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <select style = {{width: '55%'}} id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
+                        <select style={{ width: '55%' }} id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
                             <option value="">Select Customer</option>
                             {customers.map(c => (
                                 <option key={c.customer_id} value={c.customer_id}>{c.customer_name} - {c.phone}</option>
@@ -345,9 +309,9 @@ const Booking = () => {
 
                 <div className='form-group'>
                     <label>Source of Booking:</label>
-                    <select name="source_of_booking" value={booking.source_of_booking} onChange={handleChange}>
+                    <select name="source_of_booking_id" value={booking.source_of_booking_id} onChange={handleChange}>
                         <option value="">Select</option>
-                        {sourceOptions.map(s => <option key={s} value={s}>{s}</option>)}
+                        {users.map(s => <option key={s.user_id} value={s.user_id}>{s.first_name} {s.last_name}</option>)}
                     </select>
                 </div>
 
@@ -361,7 +325,10 @@ const Booking = () => {
 
                     <div className='form-group'>
                         <label>Advance Paid To:</label>
-                        <input type="text" name="advance_paid_to" value={booking.advance_paid_to} onChange={handleChange} />
+                        <select name="advance_paid_to" value={booking.advance_paid_to} onChange={handleChange}>
+                            <option value="">Select User</option>
+                            {users.map(r => <option key={r.user_id} value={r.user_id}>{r.first_name} - {r.last_name}</option>)}
+                        </select>
                     </div>
 
                     <div className='form-group'>
@@ -375,7 +342,7 @@ const Booking = () => {
                     </div>
 
                     <div className='form-group'>
-                        <label>Commission {getCommissionPercent(booking.source_of_booking)}% :</label>
+                        <label>Commission {/*getCommissionPercent(booking.source_of_booking_id)*/}% :</label>
                         <input type="number" name="commission" value={booking.commission} readOnly />
                     </div>
 
@@ -386,7 +353,10 @@ const Booking = () => {
 
                     <div className='form-group'>
                         <label>Balance Paid To:</label>
-                        <input type="text" name="balance_paid_to" value={booking.balance_paid_to} onChange={handleChange} />
+                        <select name="balance_paid_to" value={booking.balance_paid_to} onChange={handleChange}>
+                            <option value="">Select User</option>
+                            {users.map(r => <option key={r.user_id} value={r.user_id}>{r.first_name} - {r.last_name}</option>)}
+                        </select>
                     </div>
 
                     <div className='form-group'>
@@ -406,13 +376,13 @@ const Booking = () => {
                     <button
                         type="button"
                         className="button-primary"
-                        //onClick={handleUpdate}
+                        onClick={handleUpdate}
                         disabled={isSubmitting || isFormDisabled}
                     >
                         {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update' : 'Save'}
                     </button>
                     <button type="button" className="button-secondary"
-                        //onClick={() => handleGenerateReceipt(booking)} 
+                        onClick={() => handleGenerateReceipt(booking)} 
                         disabled={isFormDisabled}>Generate Receipt</button>
                 </div>
             </form>
