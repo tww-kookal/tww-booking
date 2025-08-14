@@ -4,7 +4,9 @@ import '../css/dashboard.handheld.css';
 import '../css/dashboard.large.css';
 import { getStartingCharacters } from '../modules/common.module';
 import { getAllBookings, getGuestsForDay } from '../modules/booking.module';
-import { BOOKING_STATUS, ROOM_NAMES } from '../modules/constants';
+import { BOOKING_STATUS } from '../modules/constants';
+
+import dayjs from 'dayjs';
 
 const Dashboard = () => {
   const [todayCheckIns, setTodayCheckIns] = useState(0);
@@ -30,7 +32,7 @@ const Dashboard = () => {
 
       getAllBookings().then(bookings => {
         if (bookings) {
-          const today = new Date().toISOString().split('T')[0];
+          const today = new dayjs().format("YYYY-MM-DD");
           // Calculate stats
           const upcomingBookings = bookings.filter(booking => {
             return booking.check_in >= today && booking.status !== BOOKING_STATUS.CANCELLED; // Assuming index 8 is status
@@ -43,25 +45,25 @@ const Dashboard = () => {
           setTodayCheckIns(todayCheckIns);
 
           const todayCheckOuts = bookings.filter(booking => {
-            return booking.check_out === today && booking.status !== BOOKING_STATUS.CANCELLED; // Assuming index 4 is check-out date
+            return booking.check_out === today && booking.status == BOOKING_STATUS.CONFIRMED; // Assuming index 4 is check-out date
           }).length;
           setTodayCheckOuts(todayCheckOuts);
 
           const todayCheckInDetails = bookings.filter(booking => {
             return booking.check_in === today && booking.status !== BOOKING_STATUS.CANCELLED
           }).map(booking => ({
-            customerName: getStartingCharacters(booking.customer_name),
-            numberOfPeople: booking.number_of_people,
-            roomName: booking.room_name
+            customer_name: getStartingCharacters(booking.customer_name),
+            number_of_people: booking.number_of_people,
+            room_name: booking.room_name
           }));
           setTodayCheckInDetails(todayCheckInDetails);
 
           const todayCheckOutDetails = bookings.filter(booking => {
             return booking.check_out === today && booking.status !== BOOKING_STATUS.CANCELLED
           }).map(booking => ({
-            customerName: getStartingCharacters(booking.customer_name || booking.customer_id),
-            numberOfPeople: booking.number_of_people,
-            roomName: booking.room_name
+            customer_name: getStartingCharacters(booking.customer_name),
+            number_of_people: booking.number_of_people,
+            room_name: booking.room_name
           }));
           setTodayCheckOutDetails(todayCheckOutDetails);
           setError(null);

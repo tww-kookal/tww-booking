@@ -28,8 +28,6 @@ const Customer = () => {
     useEffect(() => {
         if (toUpdateCustomerId) {
             getCustomerById(toUpdateCustomerId).then(customer => {
-                console.log("Customer:: cust id ", toUpdateCustomerId)
-                console.log("Customer::useEffect::", customer)
                 setToUpdateCustomer(true)
                 setCustomer(customer || null);
                 setErrorMessage('');
@@ -126,22 +124,18 @@ const Customer = () => {
             console.log("Customer::With Customer ID ", customer.customer_id)
             let createdCustomer = null;
             if (customer.customer_id) {
-                await updateCustomer(customer);
+                createdCustomer = await updateCustomer(customer);
             } else {
                 createdCustomer = await addCustomer(customer);
             }
 
-            // Reset form after 2 seconds if it's a new booking
-            setTimeout(() => {
-                // After saving new customer
-                navigate(location.state?.returnTo || '/booking/', {
-                    state: {
-                        ...location.state,
-                        createdCustomer: createdCustomer
-                    }
-                });
-                setSuccessMessage('');
-            }, 2000);
+            navigate(location.state?.returnTo || '/booking/', {
+                state: {
+                    ...location.state,
+                    createdCustomer: createdCustomer,
+                    toUpdateCustomer: toUpdateCustomer
+                }
+            });
         } catch (error) {
             console.error('Error updating customer:', error);
             setErrorMessage('Failed to update customer. Please try again.');
@@ -152,51 +146,48 @@ const Customer = () => {
     };
 
     const handleCancel = () => {
-        console.log("Customer::handleCancel::", customer)
+        console.log("Customer::handleCancel::", location.state)
         navigate(location.state?.returnTo || '/booking/', {
             state: {
-                ...location.state             
+                ...location.state,
+                toUpdateCustomer: toUpdateCustomer
             }
         });
     };
 
     return (
         <div className="customer-form-container">
-            <h2>Customer {toUpdateCustomer ? "Update" : "Create"} Form</h2>
+            <h2>{toUpdateCustomer ? "Update" : "Create"} Customer
+                {toUpdateCustomer ?
+                    <i> ({customer.customer_id})</i>
+                    : ""}
+            </h2>
             {successMessage && (<div className="success-message">{successMessage}</div>)}
             {errorMessage && (<div className="error-message">{errorMessage}</div>)}
 
             <form onSubmit={e => e.preventDefault()}>
                 <div className='form-group'>
-                    <label>Customer ID:</label>
-                    <input type="text" name="customer_id" value={customer.customer_id} readOnly />
-                </div>
-                <div className='form-group'>
-                    <label>Customer Name:</label>
+                    <label>Name</label>
                     <input type="text" name="customer_name" value={customer.customer_name} onChange={handleChange} />
                 </div>
 
                 <div className='form-group'>
-                    <label>Contact Number:</label>
+                    <label>Phone</label>
                     <input type="tel" name="phone" value={customer.phone} onChange={handleChange} />
                 </div>
 
-                {/* Optional Fields */}
-                <fieldset>
-                    <legend>Optional</legend>
-                    <div className='form-group'>
-                        <label>EMail:</label>
-                        <input type="email" name="email" value={customer.email} onChange={handleChange} />
-                    </div>
-                    <div className='form-group'>
-                        <label>Area:</label>
-                        <input type="text" name="area" value={customer.area} onChange={handleChange} />
-                    </div>
-                    <div className='form-group'>
-                        <label>City:</label>
-                        <input type="text" name="city" value={customer.city} onChange={handleChange} />
-                    </div>
-                </fieldset>
+                <div className='form-group'>
+                    <label>EMail</label>
+                    <input type="email" name="email" value={customer.email} onChange={handleChange} />
+                </div>
+                <div className='form-group'>
+                    <label>Area</label>
+                    <input type="text" name="area" value={customer.area} onChange={handleChange} />
+                </div>
+                <div className='form-group'>
+                    <label>City</label>
+                    <input type="text" name="city" value={customer.city} onChange={handleChange} />
+                </div>
 
                 {/* Buttons */}
                 <div className="form-buttons">

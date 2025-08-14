@@ -33,46 +33,17 @@ const BookingSearch = () => {
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fetchBookings = async () => {
+  const fetchFutureBookings = async () => {
     setLoading(true);
     setError("");
     try {
-      const allBookings = await getAllBookings();
-      let filteredResults = [];
-      const initialDate = dayjs(initialCheckInDate, "YYYY-MM-DD");
-
+      const allBookings = await getAllBookings(dayjs().add(-1, 'day').format('YYYY-MM-DD'));
       if (!allBookings || allBookings.length <= 0) {
         setResults([]);
         setError("No bookings found");
         return;
       }
-
-      if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
-        filteredResults = allBookings.filter(booking => {
-          return dayjs(booking.check_in, "YYYY-MM-DD").isAfter(initialDate) && booking.status !== BOOKING_STATUS.CANCELLED;
-        });
-      } else {
-        filteredResults = allBookings.filter(booking => {
-          const matchesBookingDate = !searchCriteria.bookingDate ||
-            booking.booking_date.includes(searchCriteria.bookingDate);
-
-          const matchesGuestName = !searchCriteria.guestName ||
-            booking.customer_name.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
-
-          const matchesCheckInDate = !searchCriteria.checkInDate ||
-            exactStartDate ? booking.check_in.includes(searchCriteria.checkInDate) : dayjs(booking.check_in, 'YYYY-MM-DD').add(-1, "day").isAfter(dayjs(searchCriteria.checkInDate, 'YYYY-MM-DD'));
-
-          const matchesContactNumber = !searchCriteria.contactNumber ||
-            booking.contact_number.includes(searchCriteria.contactNumber);
-
-          const matchesBookingID = !searchCriteria.bookingID ||
-            booking.booking_id == searchCriteria.bookingID;
-
-          return matchesBookingDate && matchesGuestName && matchesCheckInDate &&
-            matchesContactNumber && matchesBookingID;
-        });
-      }
-      setResults(sortBookings(filteredResults));
+      setResults(sortBookings(allBookings));
       setCurrentPage(1);
     } catch (err) {
       console.error("BookingSearch::FetchBookings::Error fetching data:", err);
@@ -84,10 +55,41 @@ const BookingSearch = () => {
   };
 
   useEffect(() => {
-    fetchBookings();
+    fetchFutureBookings();
   }, []);
 
+  const fetchBookings = async (searchCriteria) => {
+    ////////////////// Need to Change This /////////////////
+    fetchFutureBookings()
+  };
+
   const handleSearch = () => {
+      // if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
+      //   filteredResults = allBookings.filter(booking => {
+      //     return dayjs(booking.check_in, "YYYY-MM-DD").isAfter(initialDate) && booking.status !== BOOKING_STATUS.CANCELLED;
+      //   });
+      // } else {
+      //   filteredResults = allBookings.filter(booking => {
+      //     const matchesBookingDate = !searchCriteria.bookingDate ||
+      //       booking.booking_date.includes(searchCriteria.bookingDate);
+
+      //     const matchesGuestName = !searchCriteria.guestName ||
+      //       booking.customer_name.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
+
+      //     const matchesCheckInDate = !searchCriteria.checkInDate ||
+      //       exactStartDate ? booking.check_in.includes(searchCriteria.checkInDate) : dayjs(booking.check_in, 'YYYY-MM-DD').add(-1, "day").isAfter(dayjs(searchCriteria.checkInDate, 'YYYY-MM-DD'));
+
+      //     const matchesContactNumber = !searchCriteria.contactNumber ||
+      //       booking.contact_number.includes(searchCriteria.contactNumber);
+
+      //     const matchesBookingID = !searchCriteria.bookingID ||
+      //       booking.booking_id == searchCriteria.bookingID;
+
+      //     return matchesBookingDate && matchesGuestName && matchesCheckInDate &&
+      //       matchesContactNumber && matchesBookingID;
+      //   });
+      // }
+      // fetchBookings( with respective search criteria object)
     fetchBookings();
   };
 
@@ -95,7 +97,6 @@ const BookingSearch = () => {
     navigate(`/booking`, {
       state: {
         preloadedBooking: booking,
-
         from: 'search'
       }
     });

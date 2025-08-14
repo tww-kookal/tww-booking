@@ -20,6 +20,11 @@
     color: #333;
   }
 
+
+  .customer-form-container .form-group{
+    flex-direction: row;
+  }
+
   .form-group {
     display: flex;
     flex-direction: column;
@@ -29,6 +34,7 @@
 
   .form-group label {
     font-weight: 600;
+    width:40%;
     margin-bottom: 0.4rem;
     color: #555;
   }
@@ -36,6 +42,7 @@
   .form-group input,
   .form-group select,
   .form-group textarea {
+    width:60%;
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
     border: 1px solid #ccc;

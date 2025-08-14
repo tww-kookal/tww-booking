@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { statusOptions, sourceOptions, DEFAULT_BOOKING } from "../modules/constants";
-import { getCommissionPercent, calculateCommission, parseNumber } from "../modules/common.module";
-import { getAllCustomers } from '../modules/customer.module';
+import { DEFAULT_BOOKING } from "../modules/constants";
+import { calculateCommission, parseNumber } from "../modules/common.module";
+import { getAllCustomers, updateCustomer } from '../modules/customer.module';
 import { uploadToDrive } from '../modules/googleDriveService';
-import { validateBooking, handleGenerateReceipt, createNewBooking, getAllRooms } from '../modules/booking.module';
+import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getAllRooms } from '../modules/booking.module';
 import { getAllUsers } from '../modules/users.module';
 
 import '../css/booking.large.css';
@@ -27,10 +27,25 @@ const Booking = () => {
 
     useEffect(() => {
         if (location.state?.bookingDraft) {
-            setFormData(location.state.bookingDraft);
+            setBooking(location.state?.bookingDraft);
         }
         if (location.state?.createdCustomer) {
-            setCustomers(prev => [...prev, location.state.createdCustomer]);
+            let updateCustomer = location.state?.toUpdateCustomer || true
+            if (!updateCustomer)
+                setCustomers(prev => [...prev, location.state.createdCustomer]);
+            setBooking(prev => ({
+                ...prev,
+                customer_id: location.state.createdCustomer.customer_id
+            }));
+        }
+        if (location.state?.createdUser) {
+            let updateUser = location.state?.toUpdateUser || true
+            if (!updateUser)
+                setUsers(prev => [...prev, location.state.createdUser]);
+            setBooking(prev => ({
+                ...prev,
+                source_of_booking_id: location.state.createdUser.user_id
+            }));
         }
     }, [location.state]);
 
@@ -55,7 +70,6 @@ const Booking = () => {
         }).finally(() => {
         })
     }, [])
-
 
     useEffect(() => {
         getAllRooms().then(rooms => {
@@ -94,18 +108,25 @@ const Booking = () => {
             }
 
             // Calculate commission based on source of booking
-            const source = updated.source_of_booking_id || '';
+            const source = updated.source_of_booking_id || 0;
             const roomAmount = parseNumber(updated.room_price || 0);
             const food = parseNumber(updated.food_price || 0);
             const campFire = parseNumber(updated.service_price || 0);
-            const advance = parseNumber(updated.advance_paid || 0);
-            updated.commission = calculateCommission(source, roomAmount);
+            const advance = parseNumber(updated.advance_payment || 0);
+            updated.commission = calculateCommission(users, source, roomAmount);
+            updated.is_commission_settled = false;
 
             // Balance To Pay = Room + Food + Camp - Advance
             updated.balance_to_pay = roomAmount + food + campFire - advance;
+            updated.total_price = roomAmount + food + campFire;
+            updated.is_final_price_paid = false;
+            updated.final_price_payment_method = 'GPAY';
+            updated.balance_payment_method = 'GPAY';    
 
-            // TWW Revenue = Room + Food + Camp - Commission
-            updated.tww_revenue = roomAmount + food + campFire - updated.commission;
+            updated.tax_percent = 0;
+            updated.tax_price = (updated.total_price * updated.tax_percent) / 100;
+            updated.discount_price = 0;
+            updated.total_price = updated.total_price + updated.tax_price - updated.discount_price;
 
             return updated;
         });
@@ -160,24 +181,14 @@ const Booking = () => {
             console.log("Booking::Update Booking ", booking)
 
             if (isUpdate) {
-                // Invoke Update API                \
-                // updateBooking(booking).then((res) => {
-                //     setBooking(res);
-                //     setSuccessMessage('Booking Updated successfully!');
-                //     console.log('Booking::Booking Update successfully');
-                //     handleGenerateReceipt(booking);
-                //              // Reset form after 2 seconds if it's a new booking
-                // setTimeout(() => {
-                //     if (!isUpdate) {
-                //         handleAddNew();
-                //     }
-                //     setSuccessMessage('');
-                // }, 2000);
-                //
-                // }).catch((err) => {
-                //     console.error('Booking::Error updating booking:', err);
-                //     setErrorMessage('Failed to update booking. Please try again.');
-                // })
+                updateBooking(booking).then((updatedBooking) => {
+                    setSuccessMessage('Booking updated successfully!');
+                    handleGenerateReceipt(updatedBooking);
+                    navigate("/dashboard")
+                }).catch((err) => {
+                    console.error('Booking::Error updating booking:', err.response?.data?.detail || err.message);
+                    setErrorMessage(`Failed to update booking. ${err.response?.data?.detail || err.message}`);
+                })
             } else {
                 // For new bookings, simply append
                 // Invoke New Booking 
@@ -216,26 +227,26 @@ const Booking = () => {
 
     return (
         <div className="booking-form-container">
-            <h2>Room Booking Form</h2>
-            <div className='form-group'>
-                <label>Identity Document:</label>
+            <h2>
+                Booking&nbsp;
+                {preloadedBooking && (<>({preloadedBooking.booking_id})</>)}
+                {!preloadedBooking && <>(New)</>}
+            </h2>
+            {/* <div className='form-group'>
+                <label>Identity Document</label>
                 <input className='form-input'
                     type="file"
                     onChange={(e) => setUploadedFile(e.target.files[0])}
                     accept=".pdf,.jpg,.jpeg,.png"
                 />
-            </div>
+            </div> */}
 
             {successMessage && (<div className="success-message">{successMessage}</div>)}
             {errorMessage && (<div className="error-message">{errorMessage}</div>)}
 
             <form onSubmit={e => e.preventDefault()}>
                 <div className='form-group'>
-                    <label>Booking ID:</label>
-                    <input type="text" name="booking_id" value={booking.booking_id} readOnly />
-                </div>
-                <div className='form-group'>
-                    <label>Room Name:</label>
+                    <label>Room</label>
                     <select name="room_id" value={booking.room_id} onChange={handleChange}>
                         <option value="">Select Room</option>
                         {rooms.map(r => <option key={r.room_id} value={r.room_id}>{r.room_name}</option>)}
@@ -243,136 +254,155 @@ const Booking = () => {
                 </div>
 
                 <div className='form-group'>
-                    <label htmlFor="customer_id">Customer Name</label>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <select style={{ width: '55%' }} id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
-                            <option value="">Select Customer</option>
-                            {customers.map(c => (
-                                <option key={c.customer_id} value={c.customer_id}>{c.customer_name} - {c.phone}</option>
-                            ))}
-                        </select>
-
-                        <button
-                            type="button"
-                            onClick={() => navigate('/customers/new', { state: { returnTo: '/booking', booking } })}
-                            style={{ padding: '4px 8px' }}
-                        >
-                            + New
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => navigate('/customers/new', { state: { returnTo: '/booking', customer_id: booking.customer_id } })}
-                            style={{ padding: '4px 8px' }}
-                        >
-                            + Update
-                        </button>
-                    </div>
-
+                    <label htmlFor="customer_id">Guest</label>
+                    <select id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
+                        <option value="">Select Customer</option>
+                        {customers.map(c => (
+                            <option key={c.customer_id} value={c.customer_id}>{c.customer_name} - {c.phone}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className='form-group' style={{ alignItems: "center" }}>
+                    <label></label>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/customers/new', { state: { returnTo: '/booking', bookingDraft: booking } })}
+                        style={{ padding: '4px 8px' }}
+                    >
+                        + New
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/customers/new', { state: { returnTo: '/booking', bookingDraft: booking, customer_id: booking.customer_id } })}
+                        style={{ padding: '4px 8px' }}
+                    >
+                        + Update
+                    </button>
                 </div>
 
-                <div className='form-group'>
-                    <label>Booking Date:</label>
+                {/* <div className='form-group'>
+                    <label>Book Date</label>
                     <input type="date" name="booking_date" value={booking.booking_date} readOnly />
-                </div>
+                </div> */}
 
                 <div className='form-group'>
-                    <label>Check In Date:</label>
+                    <label>Check In</label>
                     <input type="date" name="check_in" value={booking.check_in} onChange={handleChange} />
                 </div>
 
                 <div className='form-group'>
-                    <label>Check Out Date:</label>
+                    <label>Check Out</label>
                     <input type="date" name="check_out" value={booking.check_out} onChange={handleChange} />
                 </div>
 
+                {/* <div className='form-group'>
+                    <label>&nbsp;for {booking.number_of_nights} Nights</label>
+                </div> */}
+
                 <div className='form-group'>
-                    <label>Number of People:</label>
+                    <label>People</label>
                     <input type="number" name="number_of_people" value={booking.number_of_people} onChange={handleChange} />
                 </div>
 
-                <div className='form-group'>
-                    <label>Number of Nights:</label>
-                    <input type="number" name="number_of_nights" value={booking.number_of_nights} readOnly />
-                </div>
 
-                <div className='form-group'>
-                    <label>Status:</label>
+                {/* <div className='form-group'>
+                    <label>Status</label>
                     <select name="status" value={booking.status} onChange={handleChange}>
                         {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
-                </div>
+                </div> */}
 
                 <div className='form-group'>
-                    <label>Room Amount:</label>
+                    <label>Amount</label>
                     <input type="number" name="room_price" value={booking.room_price} onChange={handleChange} />
                 </div>
 
                 <div className='form-group'>
-                    <label>Source of Booking:</label>
+                    <label>Source</label>
                     <select name="source_of_booking_id" value={booking.source_of_booking_id} onChange={handleChange}>
                         <option value="">Select</option>
-                        {users.map(s => <option key={s.user_id} value={s.user_id}>{s.first_name} {s.last_name}</option>)}
+                        {users.map(s => <option key={s.user_id} value={s.user_id}>{s.first_name} {s.last_name} ({s.booking_commission || 0}%)</option>)}
                     </select>
+                </div>
+                <div className='form-group' style={{ alignItems: "center" }}>
+                    <label></label>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/user/new', { state: { returnTo: '/booking', bookingDraft: booking } })}
+                        style={{ padding: '4px 8px' }}
+                    >
+                        + New
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => navigate('/user/new', { state: { returnTo: '/booking', bookingDraft: booking, user_id: booking.source_of_booking_id } })}
+                        style={{ padding: '4px 8px' }}
+                    >
+                        + Update
+                    </button>
+                </div>
+                <div className='form-group'>
+                    <label style={{ fontSize: '1.2rem' }}>Commission</label>
+                    <input type="number" name="commission" value={booking.commission} readOnly />
                 </div>
 
                 {/* Optional Fields */}
                 <fieldset>
-                    <legend>Optional</legend>
+                    <legend>Advance</legend>
                     <div className='form-group'>
-                        <label>Advance Paid:</label>
-                        <input type="number" name="advance_paid" value={booking.advance_paid} onChange={handleChange} />
+                        <label>Amount</label>
+                        <input type="number" name="advance_payment" value={booking.advance_payment} onChange={handleChange} />
                     </div>
-
                     <div className='form-group'>
-                        <label>Advance Paid To:</label>
+                        <label>Paid To</label>
                         <select name="advance_paid_to" value={booking.advance_paid_to} onChange={handleChange}>
                             <option value="">Select User</option>
-                            {users.map(r => <option key={r.user_id} value={r.user_id}>{r.first_name} - {r.last_name}</option>)}
+                            {users.map(r => <option key={r.user_id} value={r.user_id}>{r.first_name} {r.last_name}</option>)}
                         </select>
                     </div>
-
+                </fieldset>
+                <fieldset>
+                    <legend>Services</legend>
                     <div className='form-group'>
-                        <label>Food:</label>
+                        <label>Food</label>
                         <input type="number" name="food_price" value={booking.food_price} onChange={handleChange} />
                     </div>
 
                     <div className='form-group'>
-                        <label>Camp Fire:</label>
+                        <label>Camp Fire</label>
                         <input type="number" name="service_price" value={booking.service_price} onChange={handleChange} />
                     </div>
-
+                </fieldset>
+                <fieldset>
+                    <legend>Balance</legend>
                     <div className='form-group'>
-                        <label>Commission {/*getCommissionPercent(booking.source_of_booking_id)*/}% :</label>
-                        <input type="number" name="commission" value={booking.commission} readOnly />
-                    </div>
-
-                    <div className='form-group'>
-                        <label>Balance To Pay:</label>
+                        <label>Amount</label>
                         <input type="number" name="balance_to_pay" value={booking.balance_to_pay} readOnly />
                     </div>
-
                     <div className='form-group'>
-                        <label>Balance Paid To:</label>
+                        <label>Paid ?</label>
+                        <input type="checkbox" name="is_balance_paid" value={booking.is_balance_paid} onChange={handleChange} />
+                    </div>
+                    <div className='form-group'>
+                        <label>Paid To</label>
                         <select name="balance_paid_to" value={booking.balance_paid_to} onChange={handleChange}>
                             <option value="">Select User</option>
                             {users.map(r => <option key={r.user_id} value={r.user_id}>{r.first_name} - {r.last_name}</option>)}
                         </select>
                     </div>
-
-                    <div className='form-group'>
-                        <label>Remarks:</label>
-                        <textarea name="remarks" value={booking.remarks} onChange={handleChange} rows={3} />
+                </fieldset>
+                <fieldset>
+                    <legend>Remarks</legend>
+                    <div className='form-group' style={{ width: "100%" }}>
+                        <textarea style={{ width: "100%" }} name="remarks" value={booking.remarks} onChange={handleChange} rows={3} />
                     </div>
                 </fieldset>
 
                 {/* Buttons */}
                 <div className="form-buttons">
                     <button type="button" className="button-secondary"
-                        //onClick={handleCancel} 
+                        onClick={handleCancel}
                         disabled={isFormDisabled}>Cancel</button>
-                    <button type="button" className="button-secondary"
-                        //onClick={handleAddNew} 
-                        disabled={isFormDisabled}>Clear</button>
                     <button
                         type="button"
                         className="button-primary"
@@ -382,8 +412,8 @@ const Booking = () => {
                         {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update' : 'Save'}
                     </button>
                     <button type="button" className="button-secondary"
-                        onClick={() => handleGenerateReceipt(booking)} 
-                        disabled={isFormDisabled}>Generate Receipt</button>
+                        onClick={() => handleGenerateReceipt(booking)}
+                        disabled={isFormDisabled}>Receipt</button>
                 </div>
             </form>
         </div>

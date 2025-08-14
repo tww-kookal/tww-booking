@@ -42,6 +42,7 @@ export const BOOKING_DEFAULT = {
  * @property {string} remarks - Any remarks or notes about the booking, default is an empty string.
  */
 export const DEFAULT_BOOKING = {
+    booked_by_id: 0, 
     booking_id: 0,
     room_id: 0,
     customer_id: 0,
@@ -53,18 +54,24 @@ export const DEFAULT_BOOKING = {
     booking_date: BOOKING_DEFAULT.BOOKING_DATE,
     source_of_booking_id: 0,
     room_price: 0,
-    advance_paid: 0,
+    advance_payment: 0,
     advance_paid_to: 0,
+    advance_payment_method: 'GPAY',
     food_price: 0,
     service_price: 0,
     balance_to_pay: 0,
+    is_balance_paid: false,
+    balance_payment_method: 'GPAY',
     balance_paid_to: 0,
     total_price: 0,
     tax_percent:0,
     tax_price:0,
     discount_price:0,
     commission: 0,
+    is_commission_settled: false,
     final_price_paid_to: 0,
+    is_final_price_paid: false, 
+    final_price_payment_method: 'GPAY',
     remarks: ''
 }
 

@@ -2,7 +2,7 @@
 @media (min-width: 1000px) {
   /* Adjusted for screens more than 1000 pixels */
 
-  .booking-form-container {
+  .user-form-container {
     max-width: 90%;
     width: 90%;
     margin: 0 auto;
@@ -15,26 +15,20 @@
     font-size: 1.2rem
   }
 
-  .booking-form-container h2 {
+  .user-form-container h2 {
     text-align: center;
     margin-bottom: 1.5rem;
     color: #333;
   }
 
-  .booking-form-container .form-group {
-    display: flex;
-    flex-direction: row;
-  }
-
   .form-group {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     margin-bottom: 1rem;
   }
 
   .form-group label {
     font-weight: 600;
-    width: 25%;
     margin-bottom: 0.4rem;
     color: #555;
   }
@@ -43,7 +37,6 @@
   .form-group select,
   .form-group textarea {
     padding: 0.5rem 0.75rem;
-    width: 50%;
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 1rem;

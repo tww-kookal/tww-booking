@@ -11,7 +11,7 @@ import api from './apiClient';
 export const getAllBookings = async (startingDate = dayjs().format("YYYY-MM-DD")) => {
     console.log("Booking.Module::getAllBookings::Fetching all bookings since", startingDate);
     try {
-        const response = await api.get("/rooms/listAllBookings/" + startingDate || dayjs().format('YYYY-MM-DD'));
+        const response = await api.get("/booking/listBookingsByCheckInDate/" + startingDate || dayjs().format('YYYY-MM-DD'));
         const sortedBookings = (response.data.bookings || []).sort((a, b) => {
             return a.check_in.localeCompare(b.check_in);
         });
@@ -48,7 +48,7 @@ export const getAllRooms = async () => {
  */
 export const getGuestsForDay = async (startingDate = dayjs().format("YYYY-MM-DD")) => {
     try {
-        const response = await api.get("/rooms/guestsForDay/" + startingDate || dayjs().format('YYYY-MM-DD'));
+        const response = await api.get("/booking/guestsForDay/" + startingDate || dayjs().format('YYYY-MM-DD'));
         const guestsForDay = response.data || 0;
         return guestsForDay
     } catch (error) {
@@ -91,8 +91,24 @@ export const validateBooking = (booking) => {
 };
 
 export const createNewBooking = async (booking) => {
-    const res = await api.post("/rooms/bookRoom", booking);
+    const res = await api.post("/booking/createBooking", booking);
     console.log("Booking.Module::createNewBooking::Created new booking", res);
+    return res.data?.booking;
+}
+
+export const updateBooking = async (booking) => {
+    // remove the advance_paid_to_user from the booking object
+    delete booking.balance_paid_to_user;
+    delete booking.advance_paid_to_user;
+    delete booking.contact_email;
+    delete booking.contact_number;
+    delete booking.customer_name;
+    delete booking.room_name;
+    delete booking.source_of_booking;
+    delete booking.final_price_paid_to_id;
+
+    const res = await api.post("/booking/updateBooking", booking);
+    console.log("Booking.Module::updateBooking::Updated booking", res);
     return res.data?.booking;
 }
 
@@ -156,7 +172,7 @@ export const handleGenerateReceipt = (booking) => {
                                 </tr>
                                 <tr>
                                     <th>Contact Number:</th>
-                                    <td>${booking.contact_number}</td>
+                                    <td>${booking.customer_phone}</td>
                                 </tr>
                                 <tr>
                                     <th>Status:</th>
@@ -174,15 +190,15 @@ export const handleGenerateReceipt = (booking) => {
                                 </tr>
                                 ${booking.food > 0 ? `<tr>
                                     <th>Food:</th>
-                                    <td>₹${booking.food}</td>
+                                    <td>₹${booking.food_price}</td>
                                 </tr>` : ''}
                                 ${booking.campFire > 0 ? `<tr>
                                     <th>Camp Fire:</th>
-                                    <td>₹${booking.camp_fire}</td>
+                                    <td>₹${booking.service_price}</td>
                                 </tr>` : ''}
                                 <tr>
                                     <th>Advance Paid:</th>
-                                    <td>₹${booking.advance_paid}</td>
+                                    <td>₹${booking.advance_payment}</td>
                                 </tr>
                                 <tr class="total">
                                     <th>Balance to Pay:</th>

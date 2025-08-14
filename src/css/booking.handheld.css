@@ -43,15 +43,31 @@
     font-size: 1.2rem !important;
   }
 
+  .booking-form-container .form-group{
+    display: flex;
+    flex-direction: row;
+  }
+
+  .form-label {
+    display: flex;
+    width:100%;
+    align-items: flex-end;
+    align-content: flex-end;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+
+
   .form-group {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     margin-bottom: 0.5rem;
     font-size: 1rem;
   }
 
   .form-group label {
     font-weight: 600;
+    width: 40%;
     margin-bottom: 0.4rem;
     color: #555;
     font-size: 1.5rem;
@@ -60,6 +76,7 @@
   .form-group input,
   .form-group select,
   .form-group textarea {
+    width: 60%;
     padding: 0.5rem 0.75rem;
     border-radius: 6px;
     border: 1px solid #ccc;

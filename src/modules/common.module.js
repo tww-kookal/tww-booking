@@ -32,30 +32,19 @@ export const getInitials = (name) => {
 };
 
 /**
- * Returns the commission percentage based on the source of booking.
- *
- * @param {string} source - The source of the booking.
- * @returns {number} The commission percentage.
- */
-export const getCommissionPercent = (source) => {
-    return 0;
-    if (source && source.trim().toLocaleLowerCase() === "sangeetha") return 8;
-    else if (source && ['walkin', 'direct', 'walk-in'].includes(source.trim().toLocaleLowerCase())) return 0;
-    else if (source && ['mmt', 'agoda'].includes(source.trim().toLocaleLowerCase())) return 30;
-    else if (source && ['owners', 'owner', "pranav", "rk", "balan", 'unknown', 'undefined', ''].includes(source.trim().toLocaleLowerCase())) return 0;
-    else if (source && ['tww', 'the westwood'].includes(source.trim().toLocaleLowerCase())) return 10;
-    else return 10; // Who are supposed to be agents
-};
-
-/**
  * Calculates the commission amount based on the source and amount.
  *
- * @param {string} source - The source of the booking.
+ * @param {Array<User>} users - The array of user objects.
+ * @param {string} source_user_id - The source user id of the booking.
  * @param {number} amount - The total amount of the booking.
  * @returns {number} The calculated commission amount.
  */
-export const calculateCommission = (source, amount) => {
-    return (parseNumber(amount) * getCommissionPercent(source)) / 100;
+export const calculateCommission = (users, source_user_id, amount) => {
+    let foundUser = users.find(user => user.user_id == source_user_id)
+    if (foundUser){
+        return (parseNumber(amount) * foundUser.booking_commission || 0) / 100;
+    }
+    return 0;    
 };
 
 /**
