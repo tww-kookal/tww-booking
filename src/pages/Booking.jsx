@@ -25,8 +25,10 @@ const Booking = () => {
         ...defaultBooking, 
         check_in: checkInDate,
         check_out: dayjs(checkInDate, 'YYYY-MM-DD').add(1, 'day').format("YYYY-MM-DD"),
-        room_id: selectedRoom.room_id,
-        room_price: selectedRoom.room_price || 0,
+        ...(selectedRoom && {
+            room_id: selectedRoom.room_id,
+            room_price: selectedRoom.room_price || 0,
+        }),
     });
 
     const [rooms, setRooms] = useState([]);
