@@ -17,7 +17,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
     const DEFAULT_NUMBER_OF_DAYS = 28;
 
     const [startDate, setStartDate] = useState(
-        propStartDate ? dayjs(propStartDate) : dayjs()
+        propStartDate ? dayjs(propStartDate) : dayjs().add(-3, 'day')
     );
 
     const dates = useMemo(() =>
