@@ -75,11 +75,11 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-    <ToastContainer />
+      <ToastContainer />
       <>
         <div className="stats-grid">
           <div className="stat-card">
-            <Link to="/search" state={{ exactStartDate: true }} className="action-button search">
+            <Link to="/availability" state={{ exactStartDate: true }} className="action-button search">
               <h3>Today's Check-ins</h3>
             </Link>
             <p className="stat-value">{todayCheckIns}</p>
@@ -91,7 +91,7 @@ const Dashboard = () => {
           </div>
 
           <div className="stat-card">
-            <Link to="/search" state={{ exactStartDate: true }} className="action-button search">
+            <Link to="/availability" state={{ exactStartDate: true }} className="action-button search">
               <h3>Today's Check-outs</h3>
             </Link>
             <p className="stat-value">{todayCheckOuts}</p>
@@ -103,7 +103,7 @@ const Dashboard = () => {
           </div>
           <div className="stat-card">
             <Link
-              to="/search"
+              to="/availability"
               state={{ defaultCheckInDate: "2020-01-01" }}
               className="action-button search"
             >
