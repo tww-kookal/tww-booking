@@ -3,7 +3,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import dayjs from 'dayjs';
-import { prepareChartData, getStartingCharacters, getDisplayText, getStatusColor } from '../modules/common.module';
+import { prepareChartData, getStartingCharacters, getDisplayText, getStatusColorForActual, getStatusColor } from '../modules/common.module';
 import '../css/availabilityChart.handheld.css';
 import '../css/availabilityChart.large.css';
 import { getAllBookings, getBooking, getAllRooms } from '../modules/booking.module';
@@ -103,16 +103,42 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                     </div>
                     {rooms.map(room => {
                         const parameterDate = dayjs(date, "YYYY-MM-DD");
-                        const bookingActual = data.find(
+                        let bookingActual = data.find(
                             b =>
                                 b.chart_data === 'ACTUAL' &&
                                 b.room_name === room.room_name &&
                                 //check if parameterDate is between check_in and check_out
                                 (new dayjs(b.check_in, "YYYY-MM-DD").isSame(parameterDate) ||
-                                    new dayjs(b.check_out, "YYYY-MM-DD").isSame(parameterDate) ||
+                                    //new dayjs(b.check_out, "YYYY-MM-DD").isSame(parameterDate) ||
                                     (parameterDate.isAfter(new dayjs(b.check_in, "YYYY-MM-DD")) &&
                                         parameterDate.isBefore(new dayjs(b.check_out, "YYYY-MM-DD"))))
                         );
+
+                        //update BookingActual roomname = 'none' and room id as 0 and status as available
+                        if (bookingActual) {
+                            let actualCheckOut = dayjs(bookingActual.check_out, "YYYY-MM-DD")
+                            let actualCheckIn = dayjs(bookingActual.check_in, "YYYY-MM-DD")
+                            if (parameterDate.isSame(actualCheckIn)) {
+                                bookingActual = {
+                                    ...bookingActual,
+                                    isTodayCheckIn: true,
+                                    isTodayCheckOut: false,
+                                };
+                            } else if (parameterDate.isSame(actualCheckOut)) {
+                                bookingActual = {
+                                    ...bookingActual,
+                                    isTodayCheckOut: true,
+                                    isTodayCheckIn: false,
+                                };
+                            } else if (parameterDate.isSame(actualCheckIn) && parameterDate.isSame(actualCheckOut)) {
+                                bookingActual = {
+                                    ...bookingActual,
+                                    isTodayCheckIn: true,
+                                    isTodayCheckOut: true,
+                                };
+                            }
+                        }
+
                         const bookingInjected = data.find(
                             b =>
                                 b.chart_data === 'INJECTED' &&
@@ -122,9 +148,9 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                         let bgColor = '#5d595cff';
                         let displayText = '';
                         if (bookingActual) {
-                            bgColor = getStatusColor(bookingActual);
-                            displayText = `${getStartingCharacters(bookingActual.customer_name)} 
-                            ${bookingActual.number_of_people ? `(🧑‍💼${bookingActual.number_of_people})` : ''} `;
+                            bgColor = getStatusColorForActual(bookingActual);
+                            displayText = `${getStartingCharacters(bookingActual.customer_name)}
+                    ${bookingActual.number_of_people ? `(🧑‍💼${bookingActual.number_of_people})` : ''} `;
                         } else if (bookingInjected) {
                             bgColor = getStatusColor(bookingInjected);
                             displayText = getDisplayText(bookingInjected);

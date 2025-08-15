@@ -152,6 +152,24 @@ export const prepareChartData = (bookings, dateSet, memoizedDates) => {
     return allData;
 }
 
+export const getStatusColorForActual = (booking) => {
+    if (booking.past_date) {
+        if (booking.status === BOOKING_STATUS.AVAILABLE) return '#1c461eff'
+        else if (booking.status === BOOKING_STATUS.CONFIRMED) return '#0d447cff'
+        else if (booking.status === BOOKING_STATUS.CANCELLED) return '#762900ff';
+        else if (booking.status === BOOKING_STATUS.CLOSED) return '#6c686bff';
+    } else {
+        if (booking.chart_status === BOOKING_STATUS.AVAILABLE) return '#388e3c'
+        else if (booking.chart_status === BOOKING_STATUS.CONFIRMED && !booking.isTodayCheckIn && !booking.isTodayCheckOut) return '#1976d2'
+        else if (booking.chart_status === BOOKING_STATUS.CONFIRMED && !booking.isTodayCheckIn && booking.isTodayCheckOut) return '#104880ff'
+        else if (booking.chart_status === BOOKING_STATUS.CONFIRMED && booking.isTodayCheckIn && !booking.isTodayCheckOut) return '#83befaff'
+        else if (booking.chart_status === BOOKING_STATUS.CONFIRMED && booking.isTodayCheckIn && booking.isTodayCheckOut) return '#d201f7ff'
+        else if (booking.chart_status === BOOKING_STATUS.CANCELLED) return '#e65100';
+        else if (booking.chart_status === BOOKING_STATUS.CLOSED) return '#a6a0a4ff';
+    }
+    return '#5d595cff';
+};
+
 export const getStatusColor = (booking) => {
     if (booking.past_date) {
         if (booking.status === BOOKING_STATUS.AVAILABLE) return '#1c461eff'
