@@ -93,7 +93,8 @@ const Booking = () => {
         console.log("PreLoaded Booking ", preloadedBooking)
         if (preloadedBooking) {
             setBooking({
-                ...preloadedBooking
+                ...preloadedBooking,
+                remarks: preloadedBooking.remarks || '',
             });
         }
     }, [preloadedBooking]);

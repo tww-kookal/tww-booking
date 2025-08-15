@@ -70,7 +70,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
             })
         } else if (booking.chart_data === 'INJECTED') {
             // Navigate to booking to create a new booking
-            navigate("/booking", {state: {checkInDate : selectedDate, selectedRoom: selectedRoom}})
+            navigate("/booking", { state: { checkInDate: selectedDate, selectedRoom: selectedRoom } })
         }
     };
 
@@ -107,7 +107,11 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                             b =>
                                 b.chart_data === 'ACTUAL' &&
                                 b.room_name === room.room_name &&
-                                new dayjs(b.check_in, "YYYY-MM-DD").isSame(parameterDate)
+                                //check if parameterDate is between check_in and check_out
+                                (new dayjs(b.check_in, "YYYY-MM-DD").isSame(parameterDate) ||
+                                    new dayjs(b.check_out, "YYYY-MM-DD").isSame(parameterDate) ||
+                                    (parameterDate.isAfter(new dayjs(b.check_in, "YYYY-MM-DD")) &&
+                                        parameterDate.isBefore(new dayjs(b.check_out, "YYYY-MM-DD"))))
                         );
                         const bookingInjected = data.find(
                             b =>

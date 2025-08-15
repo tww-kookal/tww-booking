@@ -23,7 +23,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "vite build && gh-pages -d dist",
+    "deploy": "gh-pages -d dist",
     "test": "jest --env=jsdom",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
