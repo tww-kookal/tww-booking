@@ -1,5 +1,6 @@
-// Roles.jsx
 import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import api from "../modules/apiClient";
 
 export default function Roles() {
@@ -30,6 +31,7 @@ export default function Roles() {
 
   return (
     <div style={{ padding: 24 }}>
+      <ToastContainer />
       <h2>Roles</h2>
       <form onSubmit={createRole}>
         <input value={role_name} onChange={e => setRoleName(e.target.value)} placeholder="role name" />

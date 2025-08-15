@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import dayjs from 'dayjs';
 import { prepareChartData, getStartingCharacters, getDisplayText, getStatusColor } from '../modules/common.module';
 import '../css/availabilityChart.handheld.css';
@@ -7,7 +9,6 @@ import { getAllBookings, getAllRooms } from '../modules/booking.module';
 
 const AvailabilityChart = ({ startDate: propStartDate }) => {
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [data, setData] = useState([]);
     const [rooms, setRooms] = useState([]);
 
@@ -26,34 +27,27 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
 
     useEffect(() => {
         const filterBookings = async () => {
-            setLoading(true);
             const dateSet = new Set(
                 Array.from({ length: DEFAULT_NUMBER_OF_DAYS }, (_, i) => startDate.add(i, "day").format("YYYY-MM-DD"))
             );
 
             getAllRooms().then(rooms => {
-                setLoading(true);
                 setRooms(rooms || []);
-                setError(null)
             }).catch(err => {
                 console.error("AvailabilityChart::Error fetching rooms:", err);
-                setError("Unable to get the rooms");
+                toast.error("Unable to get the rooms");
                 setRooms([]);
             }).finally(() => {
-                setLoading(false);
             })
 
             getAllBookings(startDate.format("YYYY-MM-DD")).then(bookings => {
-                setLoading(true);
                 const allData = prepareChartData(bookings, dateSet, memoizedDates);
-                setError(null);
                 setData(allData);
             }).catch(err => {
                 console.error("AvailabilityChart::Error fetching data:", err);
-                setError("Failed to fetch bookings. Please try again.");
+                toast.error("Failed to fetch bookings. Please try again.");
                 setData([]);
             }).finally(() => {
-                setLoading(false);
             });
         };
         filterBookings();
@@ -140,8 +134,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
 
     return (
         <div className="room-chart-container">
-            {error && <div className="error-message">{error}</div>}
-            {loading ? 'Fetching from data store...' : ''}
+            <ToastContainer />
             <div className='form-search'>
                 <label>Start Date: &nbsp;</label>
                 <input

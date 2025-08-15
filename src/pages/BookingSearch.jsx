@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import { sortBookings } from "../modules/common.module";
 import dayjs from 'dayjs';
@@ -24,7 +26,6 @@ const BookingSearch = () => {
   });
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Reduced items per page for better mobile view
 
@@ -35,19 +36,18 @@ const BookingSearch = () => {
 
   const fetchFutureBookings = async () => {
     setLoading(true);
-    setError("");
     try {
       const allBookings = await getAllBookings(dayjs().add(-1, 'day').format('YYYY-MM-DD'));
       if (!allBookings || allBookings.length <= 0) {
         setResults([]);
-        setError("No bookings found");
+        toast.error("No bookings found");
         return;
       }
       setResults(sortBookings(allBookings));
       setCurrentPage(1);
     } catch (err) {
       console.error("BookingSearch::FetchBookings::Error fetching data:", err);
-      setError("Failed to fetch bookings. Please try again.");
+      toast.error("Failed to fetch bookings. Please try again.");
       setResults([]);
     } finally {
       setLoading(false);
@@ -114,6 +114,7 @@ const BookingSearch = () => {
 
   return (
     <div className="search-booking-container" >
+      <ToastContainer />
       <div className="search-header" >
         Search Bookings
       </div>
@@ -199,8 +200,6 @@ const BookingSearch = () => {
         </button>
       </div>
 
-      {error && <div className="error-message">{error}</div>}
-
       <BookingList
         loading={loading}
         results={results}
@@ -209,7 +208,6 @@ const BookingSearch = () => {
         currentPage={currentPage}
         handlePageChange={handlePageChange}
         handleViewBooking={handleViewBooking}
-        error={error}
       />
     </div>
   );

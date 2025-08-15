@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import api from "../modules/apiClient";
 import { Link } from "react-router-dom";
 
@@ -24,6 +26,7 @@ export default function Rooms() {
 
     return (
         <div style={{ padding: 24 }}>
+            <ToastContainer />
             <h2>Check Room Availability</h2>
             <form onSubmit={check}>
                 <label>Check-in</label>

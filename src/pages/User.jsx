@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { validateUser, addUser, updateUser, getUserById } from '../modules/users.module';
@@ -11,8 +13,6 @@ const User = () => {
     const location = useLocation();
     const preloadedUser = location.state?.preloadedUser;
     const toUpdateUserId = location.state?.user_id;
-    console.log("User::id", id)
-    console.log("User::toUpdateUserId", toUpdateUserId)
 
     const navigate = useNavigate();
     const [toUpdateUser, setToUpdateUser] = useState(false);
@@ -30,14 +30,11 @@ const User = () => {
     useEffect(() => {
         if (toUpdateUserId) {
             getUserById(toUpdateUserId).then(user => {
-                console.log("User:: user id ", toUpdateUserId)
-                console.log("User::useEffect::", user)
                 setToUpdateUser(true)
                 setUser(user || null);
-                setErrorMessage('');
             }).catch(err => {
                 console.error('User::Error fetching user:', err);
-                setErrorMessage('Failed to fetch user details');
+                toast.error('Failed to fetch user details');
             }).finally(() => {
 
             })
@@ -52,10 +49,9 @@ const User = () => {
         } else if (id) {
             getUserById(id).then(user => {
                 setUser(user || null);
-                setErrorMessage('');
             }).catch(err => {
                 console.error('User::Error fetching user:', err);
-                setErrorMessage('Failed to fetch user details');
+                toast.error('Failed to fetch user details');
             }).finally(() => {
 
             })
@@ -103,12 +99,9 @@ const User = () => {
         });
         setIsFormDisabled(false); // Disable the form
         setIsSubmitting(false);
-        setErrorMessage('')
     };
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
     const [isFormDisabled, setIsFormDisabled] = useState(false);
 
     const handleUpdate = async () => {
@@ -117,7 +110,7 @@ const User = () => {
         // Validate required fields
         let errors = validateUser(user);
         if (errors && errors.length > 0) {
-            setErrorMessage(errors.join(', '));
+            toast.error(errors.join(', '));
             setIsFormDisabled(false); // Re-enable on error
             setIsSubmitting(false);
             return;
@@ -125,7 +118,6 @@ const User = () => {
 
         try {
             // Update or Add User
-            console.log("User::With User ID ", user.user_id)
             let createdUser = null;
             if (user.user_id) {
                 createdUser = await updateUser(user);
@@ -140,10 +132,9 @@ const User = () => {
                     toUpdateUser: toUpdateUser
                 }
             });
-            setSuccessMessage('');
         } catch (error) {
             console.error('Error updating user:', error);
-            setErrorMessage('Failed to update user. Please try again.');
+            toast.error('Failed to update user. Please try again.');
         } finally {
             setIsFormDisabled(false); // Re-enable after operation
             setIsSubmitting(false);
@@ -164,9 +155,6 @@ const User = () => {
     return (
         <div className="user-form-container">
             <h2>{toUpdateUser ? "Update" : "Create"} User {toUpdateUserId && <>({toUpdateUserId})</>}</h2>
-
-            {successMessage && (<div className="success-message">{successMessage}</div>)}
-            {errorMessage && (<div className="error-message">{errorMessage}</div>)}
 
             <form onSubmit={e => e.preventDefault()}>
                 <div className='form-group'>

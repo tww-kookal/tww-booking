@@ -1,4 +1,6 @@
 import React from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../css/bookingList.large.css';
 import '../css/bookingList.handheld.css';
 import dayjs from 'dayjs';
@@ -12,9 +14,9 @@ const BookingList = ({
     currentPage,
     handlePageChange,
     handleViewBooking,
-    error,
 }) => (
     <div className="results-section responsive-booking-list">
+        <ToastContainer />
         {loading ? (
             <div className="loading-indicator">Loading bookings...</div>
         ) : results.length > 0 ? (
@@ -120,7 +122,7 @@ const BookingList = ({
                     </div>
                 )}
             </div>
-        ) : !error && (
+        ) : (
             <div className="no-results">No bookings found. Try adjusting your search criteria.</div>
         )}
     </div>

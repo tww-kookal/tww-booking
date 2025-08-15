@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { validateCustomer, updateCustomer, addCustomer, getCustomerById } from '../modules/customer.module';
@@ -30,10 +32,9 @@ const Customer = () => {
             getCustomerById(toUpdateCustomerId).then(customer => {
                 setToUpdateCustomer(true)
                 setCustomer(customer || null);
-                setErrorMessage('');
             }).catch(err => {
                 console.error('Customer::Error fetching customer:', err);
-                setErrorMessage('Failed to fetch customer details');
+                toast.error('Failed to fetch customer details');
             }).finally(() => {
 
             })
@@ -48,10 +49,9 @@ const Customer = () => {
         } else if (id) {
             getCustomerById(id).then(customer => {
                 setCustomer(customer || null);
-                setErrorMessage('');
             }).catch(err => {
                 console.error('Customer::Error fetching customer:', err);
-                setErrorMessage('Failed to fetch customer details');
+                toast.error('Failed to fetch customer details');
             }).finally(() => {
 
             })
@@ -100,12 +100,9 @@ const Customer = () => {
         });
         setIsFormDisabled(false); // Disable the form
         setIsSubmitting(false);
-        setErrorMessage('')
     };
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
     const [isFormDisabled, setIsFormDisabled] = useState(false);
 
     const handleUpdate = async () => {
@@ -114,7 +111,7 @@ const Customer = () => {
         // Validate required fields
         let errors = validateCustomer(customer);
         if (errors && errors.length > 0) {
-            setErrorMessage(errors.join(', '));
+            toast.error(errors.join(', '));
             setIsFormDisabled(false); // Re-enable on error
             return;
         }
@@ -138,7 +135,7 @@ const Customer = () => {
             });
         } catch (error) {
             console.error('Error updating customer:', error);
-            setErrorMessage('Failed to update customer. Please try again.');
+            toast.error('Failed to update customer. Please try again.');
         } finally {
             setIsFormDisabled(false); // Re-enable after operation
             setIsSubmitting(false);
@@ -157,14 +154,12 @@ const Customer = () => {
 
     return (
         <div className="customer-form-container">
+            <ToastContainer />
             <h2>{toUpdateCustomer ? "Update" : "Create"} Customer
                 {toUpdateCustomer ?
                     <i> ({customer.customer_id})</i>
                     : ""}
             </h2>
-            {successMessage && (<div className="success-message">{successMessage}</div>)}
-            {errorMessage && (<div className="error-message">{errorMessage}</div>)}
-
             <form onSubmit={e => e.preventDefault()}>
                 <div className='form-group'>
                     <label>Name</label>

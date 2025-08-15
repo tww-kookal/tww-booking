@@ -1,6 +1,8 @@
 // FILEPATH: d:/Xigma/apps/reactjs/tww-booking/src/pages/Login.jsx
 
 import React, { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import api from '../modules/apiClient';
@@ -42,12 +44,14 @@ export default function Login() {
             navigate("/dashboard");
 
         } catch (error) {
-            console.error(error);
+            console.error("Login Failed ", error);
+            toast.error("Login failed");
         }
     };
 
     return (
         <div className="login-container">
+            <ToastContainer />
             <div className="login-paper">
                 <h2>Sign In</h2>
                 <form

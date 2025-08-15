@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { DEFAULT_BOOKING } from "../modules/constants";
@@ -52,10 +54,9 @@ const Booking = () => {
     useEffect(() => {
         getAllUsers().then(users => {
             setUsers(users);
-            setErrorMessage('');
         }).catch(err => {
             console.error('Booking::Error fetching users:', err);
-            setErrorMessage('Failed to fetch users');
+            toast.error('Failed to fetch users');
         }).finally(() => {
         })
     }, [])
@@ -63,10 +64,9 @@ const Booking = () => {
     useEffect(() => {
         getAllCustomers().then(customers => {
             setCustomers(customers);
-            setErrorMessage('');
         }).catch(err => {
             console.error('Booking::Error fetching customers:', err);
-            setErrorMessage('Failed to fetch customers');
+            toast.error('Failed to fetch customers');
         }).finally(() => {
         })
     }, [])
@@ -74,10 +74,9 @@ const Booking = () => {
     useEffect(() => {
         getAllRooms().then(rooms => {
             setRooms(rooms);
-            setErrorMessage('');
         }).catch(err => {
             console.error('Booking::Error fetching rooms:', err);
-            setErrorMessage('Failed to fetch rooms');
+            toast.error('Failed to fetch rooms');
         }).finally(() => {
         })
     }, [])
@@ -141,8 +140,6 @@ const Booking = () => {
     };
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [successMessage, setSuccessMessage] = useState('');
-    const [errorMessage, setErrorMessage] = useState('');
     const [uploadedFile, setUploadedFile] = useState(null);
     const [isFormDisabled, setIsFormDisabled] = useState(false);
 
@@ -152,7 +149,7 @@ const Booking = () => {
         // Validate required fields
         let errors = validateBooking(booking);
         if (errors && errors.length > 0) {
-            setErrorMessage(errors.join(', '));
+            toast.error(errors.join(', '));
             setIsFormDisabled(false); // Re-enable on error
             setIsSubmitting(false);
             return;
@@ -165,7 +162,7 @@ const Booking = () => {
                 console.log('Identity Document uploaded successfully');
             } catch (error) {
                 console.error('Booking:: Error uploading file:', error);
-                setErrorMessage('Failed to upload Identity Document. Please try again.');
+                toast.error('Failed to upload Identity Document. Please try again.');
                 return;
             } finally {
                 setIsSubmitting(false);
@@ -182,30 +179,30 @@ const Booking = () => {
 
             if (isUpdate) {
                 updateBooking(booking).then((updatedBooking) => {
-                    setSuccessMessage('Booking updated successfully!');
+                    toast.success('Booking updated successfully!');
                     handleGenerateReceipt(updatedBooking);
                     navigate("/dashboard")
                 }).catch((err) => {
                     console.error('Booking::Error updating booking:', err.response?.data?.detail || err.message);
-                    setErrorMessage(`Failed to update booking. ${err.response?.data?.detail || err.message}`);
+                    toast.error(`Failed to update booking. ${err.response?.data?.detail || err.message}`);
                 })
             } else {
                 // For new bookings, simply append
                 // Invoke New Booking 
                 createNewBooking(booking).then((createdBooking) => {
-                    setSuccessMessage('Booking saved successfully!');
+                    toast.success('Booking saved successfully!');
                     handleGenerateReceipt(createdBooking);
                     navigate("/dashboard")
                 }).catch((err) => {
                     console.error('Booking::Error creating booking:', err.response?.data?.detail || err.message);
-                    setErrorMessage(`Failed to create booking. ${err.response?.data?.detail || err.message}`);
+                    toast.error(`Failed to create booking. ${err.response?.data?.detail || err.message}`);
                 })
             }
 
 
         } catch (error) {
             console.error('Error saving booking:', error);
-            setErrorMessage('Failed to save booking. Please try again.');
+            toast.error('Failed to save booking. Please try again.');
         } finally {
             setIsFormDisabled(false); // Re-enable after operation
             setIsSubmitting(false);
@@ -227,6 +224,7 @@ const Booking = () => {
 
     return (
         <div className="booking-form-container">
+            <ToastContainer />
             <h2>
                 Booking&nbsp;
                 {preloadedBooking && (<>({preloadedBooking.booking_id})</>)}
@@ -240,9 +238,6 @@ const Booking = () => {
                     accept=".pdf,.jpg,.jpeg,.png"
                 />
             </div> */}
-
-            {successMessage && (<div className="success-message">{successMessage}</div>)}
-            {errorMessage && (<div className="error-message">{errorMessage}</div>)}
 
             <form onSubmit={e => e.preventDefault()}>
                 <div className='form-group'>
