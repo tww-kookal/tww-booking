@@ -40,7 +40,6 @@ const BookingSearch = () => {
       const allBookings = await getAllBookings(dayjs().add(-1, 'day').format('YYYY-MM-DD'));
       if (!allBookings || allBookings.length <= 0) {
         setResults([]);
-        toast.error("No bookings found");
         return;
       }
       setResults(sortBookings(allBookings));
@@ -64,32 +63,32 @@ const BookingSearch = () => {
   };
 
   const handleSearch = () => {
-      // if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
-      //   filteredResults = allBookings.filter(booking => {
-      //     return dayjs(booking.check_in, "YYYY-MM-DD").isAfter(initialDate) && booking.status !== BOOKING_STATUS.CANCELLED;
-      //   });
-      // } else {
-      //   filteredResults = allBookings.filter(booking => {
-      //     const matchesBookingDate = !searchCriteria.bookingDate ||
-      //       booking.booking_date.includes(searchCriteria.bookingDate);
+    // if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
+    //   filteredResults = allBookings.filter(booking => {
+    //     return dayjs(booking.check_in, "YYYY-MM-DD").isAfter(initialDate) && booking.status !== BOOKING_STATUS.CANCELLED;
+    //   });
+    // } else {
+    //   filteredResults = allBookings.filter(booking => {
+    //     const matchesBookingDate = !searchCriteria.bookingDate ||
+    //       booking.booking_date.includes(searchCriteria.bookingDate);
 
-      //     const matchesGuestName = !searchCriteria.guestName ||
-      //       booking.customer_name.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
+    //     const matchesGuestName = !searchCriteria.guestName ||
+    //       booking.customer_name.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
 
-      //     const matchesCheckInDate = !searchCriteria.checkInDate ||
-      //       exactStartDate ? booking.check_in.includes(searchCriteria.checkInDate) : dayjs(booking.check_in, 'YYYY-MM-DD').add(-1, "day").isAfter(dayjs(searchCriteria.checkInDate, 'YYYY-MM-DD'));
+    //     const matchesCheckInDate = !searchCriteria.checkInDate ||
+    //       exactStartDate ? booking.check_in.includes(searchCriteria.checkInDate) : dayjs(booking.check_in, 'YYYY-MM-DD').add(-1, "day").isAfter(dayjs(searchCriteria.checkInDate, 'YYYY-MM-DD'));
 
-      //     const matchesContactNumber = !searchCriteria.contactNumber ||
-      //       booking.contact_number.includes(searchCriteria.contactNumber);
+    //     const matchesContactNumber = !searchCriteria.contactNumber ||
+    //       booking.contact_number.includes(searchCriteria.contactNumber);
 
-      //     const matchesBookingID = !searchCriteria.bookingID ||
-      //       booking.booking_id == searchCriteria.bookingID;
+    //     const matchesBookingID = !searchCriteria.bookingID ||
+    //       booking.booking_id == searchCriteria.bookingID;
 
-      //     return matchesBookingDate && matchesGuestName && matchesCheckInDate &&
-      //       matchesContactNumber && matchesBookingID;
-      //   });
-      // }
-      // fetchBookings( with respective search criteria object)
+    //     return matchesBookingDate && matchesGuestName && matchesCheckInDate &&
+    //       matchesContactNumber && matchesBookingID;
+    //   });
+    // }
+    // fetchBookings( with respective search criteria object)
     fetchBookings();
   };
 

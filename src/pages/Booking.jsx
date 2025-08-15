@@ -16,11 +16,17 @@ import '../css/booking.handheld.css';
 const Booking = () => {
     const location = useLocation();
     const preloadedBooking = location.state?.preloadedBooking;
+    const checkInDate = location.state?.checkInDate || dayjs().format("YYYY-MM-DD");  //If from Availability chart to book a room
+    const selectedRoom = location.state?.selectedRoom || undefined;
 
     const navigate = useNavigate();
     const defaultBooking = DEFAULT_BOOKING;
     const [booking, setBooking] = useState({
-        ...defaultBooking
+        ...defaultBooking, 
+        check_in: checkInDate,
+        check_out: dayjs(checkInDate, 'YYYY-MM-DD').add(1, 'day').format("YYYY-MM-DD"),
+        room_id: selectedRoom.room_id,
+        room_price: selectedRoom.room_price || 0,
     });
 
     const [rooms, setRooms] = useState([]);
@@ -389,7 +395,7 @@ const Booking = () => {
                 <fieldset>
                     <legend>Remarks</legend>
                     <div className='form-group' style={{ width: "100%" }}>
-                        <textarea style={{ width: "100%" }} name="remarks" value={booking.remarks} onChange={handleChange} rows={3} />
+                        <textarea style={{ width: "100%" }} name="remarks" value={booking.remarks || ''} onChange={handleChange} rows={3} />
                     </div>
                 </fieldset>
 

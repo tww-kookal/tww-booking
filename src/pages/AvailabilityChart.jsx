@@ -1,16 +1,18 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
 import dayjs from 'dayjs';
 import { prepareChartData, getStartingCharacters, getDisplayText, getStatusColor } from '../modules/common.module';
 import '../css/availabilityChart.handheld.css';
 import '../css/availabilityChart.large.css';
-import { getAllBookings, getAllRooms } from '../modules/booking.module';
+import { getAllBookings, getBooking, getAllRooms } from '../modules/booking.module';
 
 const AvailabilityChart = ({ startDate: propStartDate }) => {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState([]);
     const [rooms, setRooms] = useState([]);
+    const navigate = useNavigate();
 
     const DEFAULT_NUMBER_OF_DAYS = 28;
 
@@ -57,8 +59,19 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
         setStartDate(dayjs(e.target.value));
     };
 
-    const onBookingClick = (booking) => {
-        // Implement your booking click logic here
+    const onBookingClick = (booking, selectedDate, selectedRoom) => {
+        console.log("Is Injected or Actual ", selectedDate)
+        if (booking.chart_data === 'ACTUAL') {
+            getBooking(booking.booking_id).then(booking => {
+                navigate("/booking", { state: { preloadedBooking: booking } })
+            }).catch(err => {
+                console.error("AvailabilityChart::Error fetching booking:", err);
+                toast.error("Failed to fetch booking. Please try again.");
+            })
+        } else if (booking.chart_data === 'INJECTED') {
+            // Navigate to booking to create a new booking
+            navigate("/booking", {state: {checkInDate : selectedDate, selectedRoom: selectedRoom}})
+        }
     };
 
     // Mobile-friendly card layout: horizontal alignment for rooms per date
@@ -118,8 +131,8 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                                 className="room-chart-room"
                                 style={{ backgroundColor: bgColor }}
                                 onClick={bookingActual && bookingActual.status !== 'Available'
-                                    ? () => onBookingClick(bookingActual)
-                                    : bookingInjected ? () => onBookingClick(bookingInjected) : undefined}
+                                    ? () => onBookingClick(bookingActual, date, room)
+                                    : bookingInjected ? () => onBookingClick(bookingInjected, date, room) : undefined}
                             >
                                 <span style={{ fontSize: '1.15em' }}> {/* Increased font size by 2 */}
                                     {displayText}

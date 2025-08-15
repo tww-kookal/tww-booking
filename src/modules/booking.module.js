@@ -1,4 +1,3 @@
-
 import dayjs from 'dayjs';
 import api from './apiClient';
 
@@ -20,6 +19,24 @@ export const getAllBookings = async (startingDate = dayjs().format("YYYY-MM-DD")
     } catch (error) {
         console.log("Booking.Module::getAllBookings::Error fetching all bookings", error);
         return []
+    }
+}
+
+/**
+ * Loads all bookings from the server.
+ *
+ * @async
+ * @returns {Promise<<Booking>} A promise that resolves to an array of booking objects.
+ */
+export const getBooking = async (booking_id = 0) => {
+    console.log("Booking.Module::getBooking::Fetching booking with id", booking_id);
+    try {
+        const response = await api.get("/booking/byID/" + booking_id);
+        console.log("Booking.Module::getBooking::Fetched booking", response.data?.booking);
+        return response.data?.booking
+    } catch (error) {
+        console.log("Booking.Module::getBooking::Error fetching booking", error);
+        throw error
     }
 }
 
