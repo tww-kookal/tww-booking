@@ -1,43 +1,146 @@
 // Use window.gapi instead of importing from gapi-script
-//import { FOLDER_ID } from './config'
-
 const FOLDER_ID = '11lLEqPPaWkk27LWTd1YFMnp4nQH_KI55'
+const CLIENT_ID = '579207931969-qagsptumrm49d4subjqguf5g3inmep1d.apps.googleusercontent.com'
+const API_KEY = "AIzaSyCeXvBubOb87QiniO-DCJBviiA8VyJmbw0";
+//const SCOPES = "https://www.googleapis.com/auth/drive.file";
+const SCOPES = "https://www.googleapis.com/auth/drive.readonly";
+const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+
+let tokenClient;
+let isAuthenticated = false;
 
 /**
- * Uploads a file to Google Drive.
- * @async
- * @param {File} file - The file to upload.
- * @param {string} bookingID - The booking ID associated with the file.
- * @returns {Promise<void>}
+ * Initializes the Google API client
  */
-export const uploadToDrive = async (file, bookingID) => {
-    const metadata = {
-        name: `${bookingID}_${file.name}`,
-        mimeType: file.type,
-        parents: FOLDER_ID ? [FOLDER_ID] : [],
-    };
+export const initGapiClient = () => {
+    return new Promise((resolve, reject) => {
+        if (!window.gapi) {
+            reject(new Error("gapi not loaded"));
+            return;
+        }
 
-    const reader = new FileReader();
-    const fileContent = await new Promise((resolve, reject) => {
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = error => reject(error);
-        reader.readAsDataURL(file);
+        window.gapi.load("client", async () => {
+            try {
+                await window.gapi.client.init({
+                    apiKey: API_KEY,
+                    discoveryDocs: DISCOVERY_DOCS,
+                });
+                resolve();
+            } catch (err) {
+                reject(err);
+            }
+        });
     });
-
-    const accessToken = window.gapi.auth.getToken().access_token;
-    const form = new FormData(); 
-    form.append(
-        "metadata",
-        new Blob([JSON.stringify(metadata)], { type: "application/json" })
-    );
-    form.append("file", file);
-
-    const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id", {
-        method: "POST",
-        headers: new Headers({ Authorization: "Bearer " + accessToken }),
-        body: form,
-    });
-
-    const data = await res.json();
-    console.log(`Uploaded File ID: ${data.id}`);
 };
+
+/**
+ * Ensures authentication happens once and token is reused
+ */
+const authenticate = () => {
+    return new Promise((resolve, reject) => {
+        if (isAuthenticated && window?.gapi?.client?.getToken()) {
+            resolve(); // already authenticated
+            return;
+        }
+
+        try {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: (tokenResponse) => {
+                    if (tokenResponse && tokenResponse.access_token) {
+                        isAuthenticated = true;
+                        resolve();
+                    } else {
+                        reject(new Error("Failed to authenticate with Google"));
+                    }
+                },
+            });
+
+            tokenClient.requestAccessToken();
+        } catch (err) {
+            reject(err);
+        }
+    });
+};
+
+async function listFilesRecursively(folderId) {
+    const results = [];
+
+    // Fetch files/folders inside the given folder
+    const response = await window.gapi.client.drive.files.list({
+        q: `'${folderId}' in parents and trashed=false`,
+        fields: "files(id, name, mimeType, webViewLink)"
+    });
+
+    const files = response.result.files;
+
+    for (let file of files) {
+        if (file.mimeType === "application/vnd.google-apps.folder") {
+            // If it's a folder, recurse into it
+            const children = await listFilesRecursively(file.id);
+            results.push({
+                ...file,
+                children
+            });
+        } else {
+            // If it's a file, just push
+            results.push(file);
+        }
+    }
+
+    return results;
+}
+
+/**
+ * Fetch files from a folder (requires auth)
+ * @param {string} folderId - Google Drive Folder ID
+ */
+const fetchFilesInFolder = async (folderId) => {
+    return new Promise((resolve, reject) => {
+        authenticate().then(() => {
+            // Fetch files/folders inside the given folder
+            window.gapi.client.drive.files.list({
+                q: `'${folderId}' in parents and trashed=false`,
+                fields: "files(id, name, mimeType, webViewLink)"
+            }).then((response) => {
+                resolve(response.result.files || []);
+            }).catch((err) => {
+                console.log("fetchFilesInFolder::Error authenticating with Google1 ", err);
+                reject(err);
+            });
+        }).catch((err) => {
+            console.log("fetchFilesInFolder::Error authenticating with Google2 ", err);
+            reject(err);
+        });
+    }).catch((err) => {
+        console.log("fetchFilesInFolder::Error authenticating with Google3 ", err);
+        reject(err);
+    })
+};
+
+/**
+ * Loads bookings and attaches fetched files (auth only once)
+ */
+export const loadBookingsWithAttachments = async (bookings) => {
+    await authenticate(); // authenticate only once here
+
+    const fetchedFiles = await fetchFilesInFolder(FOLDER_ID);
+
+    for (let booking of bookings) {
+        booking.attachments = fetchedFiles.filter(file => file.name.includes(booking.booking_id));
+    }
+
+    return bookings;
+};
+
+const getFilesInBookingFolder = async (fetchedFiles, booking_id) => {
+    let filesInBookingFolder = []
+    for (let file of fetchedFiles) {
+        if (file.mimeType === "application/vnd.google-apps.folder" && file.name == booking_id) {
+            // If it's a folder, recurse into it
+            filesInBookingFolder = await fetchFilesInFolder(file.id);
+        }
+    }
+    return filesInBookingFolder
+}

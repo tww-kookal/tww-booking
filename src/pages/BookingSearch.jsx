@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
-import { sortBookings } from "../modules/common.module";
 import dayjs from 'dayjs';
-import '../css/bookingSearch.large.css';
-import '../css/bookingSearch.handheld.css';
 import BookingList from "./BookingList";
 import { getAllBookings } from "../modules/booking.module";
-import { BOOKING_STATUS } from "../modules/constants";
+import { initGapiClient, loadBookingsWithAttachments } from '../modules/googleDriveService';
+
+import '../css/bookingSearch.large.css';
+import '../css/bookingSearch.handheld.css';
 
 const BookingSearch = () => {
   const navigate = useNavigate();
@@ -29,6 +29,10 @@ const BookingSearch = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Reduced items per page for better mobile view
 
+  useEffect(() => {
+    initGapiClient().catch((err) => console.error("Failed to init GAPI", err));
+  }, []);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
@@ -42,7 +46,8 @@ const BookingSearch = () => {
         setResults([]);
         return;
       }
-      setResults(sortBookings(allBookings));
+      let bookingsWithAttachments = await loadBookingsWithAttachments(allBookings)
+      setResults(bookingsWithAttachments);
       setCurrentPage(1);
     } catch (err) {
       console.error("BookingSearch::FetchBookings::Error fetching data:", err);

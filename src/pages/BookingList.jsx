@@ -59,7 +59,9 @@ const BookingList = ({
                             </div>
                             <div className="card-row">
                                 <span className="card-label">Booking ID:&nbsp;</span>
-                                <span className="card-value">{booking.booking_id}</span>
+                                <span className="card-value">{booking.booking_id}&nbsp;</span>
+                                <span className="card-value">{booking.attachments?.length > 0 ? '📎' : ''}&nbsp;</span>
+
                             </div>
                             <div className="card-row" >
                                 <span className="card-label" >Guest:&nbsp;</span>

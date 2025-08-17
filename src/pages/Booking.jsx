@@ -6,7 +6,6 @@ import dayjs from 'dayjs';
 import { DEFAULT_BOOKING } from "../modules/constants";
 import { calculateCommission, parseNumber } from "../modules/common.module";
 import { getAllCustomers, updateCustomer } from '../modules/customer.module';
-import { uploadToDrive } from '../modules/googleDriveService';
 import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getAllRooms } from '../modules/booking.module';
 import { getAllUsers } from '../modules/users.module';
 
