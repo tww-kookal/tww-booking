@@ -126,7 +126,7 @@ const Dashboard = () => {
               <span>New</span>
             </Link>
             <Link to="/availability" state={{ from: 'dashboard' }} className="action-button find">
-              <span className="icon"></span>
+              <span className="icon">↻</span>
               <span>Availability</span>
             </Link>
             <Link to="/search" className="action-button find">
