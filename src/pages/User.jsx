@@ -29,7 +29,7 @@ const User = () => {
 
     useEffect(() => {
         if (toUpdateUserId) {
-            getUserById(toUpdateUserId).then(user => {
+            getUserById(navigate, toUpdateUserId).then(user => {
                 setToUpdateUser(true)
                 setUser(user || null);
             }).catch(err => {
@@ -47,7 +47,7 @@ const User = () => {
                 ...preloadedUser
             });
         } else if (id) {
-            getUserById(id).then(user => {
+            getUserById(navigate, id).then(user => {
                 setUser(user || null);
             }).catch(err => {
                 console.error('User::Error fetching user:', err);
@@ -120,9 +120,9 @@ const User = () => {
             // Update or Add User
             let createdUser = null;
             if (user.user_id) {
-                createdUser = await updateUser(user);
+                createdUser = await updateUser(navigate, user);
             } else {
-                createdUser = await addUser(user);
+                createdUser = await addUser(navigate, user);
             }
 
             navigate(location.state?.returnTo || '/booking/', {

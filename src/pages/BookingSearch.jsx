@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import BookingList from "./BookingList";
 import { getAllBookings } from "../modules/booking.module";
-import { initGapiClient, loadBookingsWithAttachments } from '../modules/googleDriveService';
+import { loadBookingsWithAttachments } from '../modules/googleDriveService';
 
 import '../css/bookingSearch.large.css';
 import '../css/bookingSearch.handheld.css';
@@ -29,10 +29,6 @@ const BookingSearch = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Reduced items per page for better mobile view
 
-  useEffect(() => {
-    initGapiClient().catch((err) => console.error("Failed to init GAPI", err));
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
@@ -41,7 +37,7 @@ const BookingSearch = () => {
   const fetchFutureBookings = async () => {
     setLoading(true);
     try {
-      const allBookings = await getAllBookings(dayjs().add(-1, 'day').format('YYYY-MM-DD'));
+      const allBookings = await getAllBookings(navigate, dayjs().add(-1, 'day').format('YYYY-MM-DD'));
       if (!allBookings || allBookings.length <= 0) {
         setResults([]);
         return;

@@ -33,7 +33,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                 Array.from({ length: DEFAULT_NUMBER_OF_DAYS }, (_, i) => startDate.add(i, "day").format("YYYY-MM-DD"))
             );
 
-            getAllRooms().then(rooms => {
+            getAllRooms(navigate).then(rooms => {
                 setRooms(rooms || []);
             }).catch(err => {
                 console.error("AvailabilityChart::Error fetching rooms:", err);
@@ -42,7 +42,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
             }).finally(() => {
             })
 
-            getAllBookings(startDate.format("YYYY-MM-DD")).then(bookings => {
+            getAllBookings(navigate, startDate.format("YYYY-MM-DD")).then(bookings => {
                 const allData = prepareChartData(bookings, dateSet, memoizedDates);
                 setData(allData);
             }).catch(err => {
@@ -62,7 +62,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
     const onBookingClick = (booking, selectedDate, selectedRoom) => {
         console.log("Is Injected or Actual ", selectedDate)
         if (booking.chart_data === 'ACTUAL') {
-            getBooking(booking.booking_id).then(booking => {
+            getBooking(navigate, booking.booking_id).then(booking => {
                 navigate("/booking", { state: { preloadedBooking: booking } })
             }).catch(err => {
                 console.error("AvailabilityChart::Error fetching booking:", err);

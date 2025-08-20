@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import '../css/dashboard.handheld.css';
 import '../css/dashboard.large.css';
 import { getStartingCharacters } from '../modules/common.module';
@@ -18,6 +18,7 @@ const Dashboard = () => {
   const [upcomingBookings, setUpcomingBookings] = useState(0);
   const [todayCheckInDetails, setTodayCheckInDetails] = useState([]);
   const [todayCheckOutDetails, setTodayCheckOutDetails] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchBookingStats();
@@ -26,11 +27,11 @@ const Dashboard = () => {
   const fetchBookingStats = async () => {
     // No loading state set here to allow immediate render with default values
 
-    getGuestsForDay().then(guests => {
+    getGuestsForDay(navigate).then(guests => {
       setGuestsForDay(guests);
     });
 
-    getAllBookings().then(bookings => {
+    getAllBookings(navigate).then(bookings => {
       if (bookings) {
         const today = new dayjs().format("YYYY-MM-DD");
         // Calculate stats

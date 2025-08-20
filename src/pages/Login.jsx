@@ -1,87 +1,70 @@
-// FILEPATH: d:/Xigma/apps/reactjs/tww-booking/src/pages/Login.jsx
-
-import React, { useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import api from '../modules/apiClient';
-import { persistTokensReceived } from '../contexts/constants';
+import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
+import api from "../modules/apiClient";
+import { persistTokensReceived } from "../contexts/constants";
+import { FOLDER_ID } from "../modules/config";
 
 import '../css/login.large.css';
 import '../css/login.handheld.css';
 
 export default function Login() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [token, setToken] = useState(null);
-    const [user, setUser] = useState(null);
-
     const navigate = useNavigate();
 
-    const handleLogin = async () => {
-        try {
-            const params = new URLSearchParams();
-            params.append("username", username);
-            params.append("password", password);
-            const res = await axios.post(
-                `${api.defaults.baseURL}/login`,
-                params,
-                { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-            );
-            if (res.status !== 200) {
-                throw new Error("Login failed");
+    // 🔑 Single flow: login once and get access token
+    const login = useGoogleLogin({
+        flow: "implicit", // or "auth-code" if you want to exchange server-side
+        scope: "openid profile email https://www.googleapis.com/auth/drive.readonly",
+        response_type: "id_token token",   // ask for both
+        onSuccess: async (tokenResponse) => {
+            const { access_token, id_token } = tokenResponse;
+
+            try {
+                const resp = await api.post(`/users/googleAuth/login`, JSON.stringify({ token: access_token }));
+                persistTokensReceived(resp?.data?.user || undefined, access_token);
+                navigate('/dashboard')
+            } catch (err) {
+                console.error("Error logging in:", err.status);
+                if (err.status == 404) {
+                    try {
+                        console.log("Sign up.....")
+                        const signUpResp = await api.post(`/users/googleAuth/signup`, { token: access_token });
+                        persistTokensReceived(signUpResp?.data?.user || undefined, access_token);
+                        navigate("/dashboard");
+                    } catch (err) {
+                        console.error("Error signing up:", err);
+                        toast.error("Signup failed");
+                        return;
+                    }
+                }
             }
-            const data = res.data;
-            const accessToken = data.access_token;
-            const userObj = { username };
-
-            persistTokensReceived(username, accessToken);
-            setToken(accessToken);
-            setUser(userObj);
-
-            // Navigate after successful login
-            navigate("/dashboard");
-
-        } catch (error) {
-            console.error("Login Failed ", error);
+        },
+        onError: (err) => {
+            console.error("Login Failed:", err);
             toast.error("Login failed");
+
         }
-    };
+    });
+
+    const getGoogleDriveFiles = async (accessToken) => {
+        const res = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents`,
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        const files = await res.json();
+        console.log("Files in folder:", files);
+    }
+
+    const signInToApplication = async (accessToken) => {
+    }
+
 
     return (
         <div className="login-container">
             <ToastContainer />
-            <div className="login-paper">
-                <h2>Sign In</h2>
-                <form
-                  className="login-form"
-                  onSubmit={e => {
-                    e.preventDefault();
-                    handleLogin();
-                  }}
-                >
-                    <input
-                        className="login-input"
-                        type="text"
-                        placeholder="Username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        required
-                    />
-                    <input
-                        className="login-input"
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    <button className="login-button" type="submit">
-                        Sign In
-                    </button>
-                </form>
-            </div>
+            <button onClick={() => login()}>Sign in with Google</button>
         </div>
     );
 }

@@ -21,7 +21,7 @@ const Booking = () => {
     const navigate = useNavigate();
     const defaultBooking = DEFAULT_BOOKING;
     const [booking, setBooking] = useState({
-        ...defaultBooking, 
+        ...defaultBooking,
         check_in: checkInDate,
         check_out: dayjs(checkInDate, 'YYYY-MM-DD').add(1, 'day').format("YYYY-MM-DD"),
         ...(selectedRoom && {
@@ -59,7 +59,7 @@ const Booking = () => {
     }, [location.state]);
 
     useEffect(() => {
-        getAllUsers().then(users => {
+        getAllUsers(navigate).then(users => {
             setUsers(users);
         }).catch(err => {
             console.error('Booking::Error fetching users:', err);
@@ -69,7 +69,7 @@ const Booking = () => {
     }, [])
 
     useEffect(() => {
-        getAllCustomers().then(customers => {
+        getAllCustomers(navigate).then(customers => {
             setCustomers(customers);
         }).catch(err => {
             console.error('Booking::Error fetching customers:', err);
@@ -79,7 +79,7 @@ const Booking = () => {
     }, [])
 
     useEffect(() => {
-        getAllRooms().then(rooms => {
+        getAllRooms(navigate).then(rooms => {
             setRooms(rooms);
         }).catch(err => {
             console.error('Booking::Error fetching rooms:', err);
@@ -128,7 +128,7 @@ const Booking = () => {
             updated.total_price = roomAmount + food + campFire;
             updated.is_final_price_paid = false;
             updated.final_price_payment_method = 'GPAY';
-            updated.balance_payment_method = 'GPAY';    
+            updated.balance_payment_method = 'GPAY';
 
             updated.tax_percent = 0;
             updated.tax_price = (updated.total_price * updated.tax_percent) / 100;
@@ -186,7 +186,7 @@ const Booking = () => {
             console.log("Booking::Update Booking ", booking)
 
             if (isUpdate) {
-                updateBooking(booking).then((updatedBooking) => {
+                updateBooking(navigate, booking).then((updatedBooking) => {
                     toast.success('Booking updated successfully!');
                     handleGenerateReceipt(updatedBooking);
                     navigate("/dashboard")
@@ -197,7 +197,7 @@ const Booking = () => {
             } else {
                 // For new bookings, simply append
                 // Invoke New Booking 
-                createNewBooking(booking).then((createdBooking) => {
+                createNewBooking(navigate, booking).then((createdBooking) => {
                     toast.success('Booking saved successfully!');
                     handleGenerateReceipt(createdBooking);
                     navigate("/dashboard")

@@ -4,16 +4,17 @@ let TOKEN_RECEIVED = false
 let AUTH_TOKEN = ""
 let AUTH_USER_OBJECT = ""
 let AUTH_USER = ""
+let LOGGED_IN_USER = {}
 
-export const persistTokensReceived = (username, token) => {
+export const persistTokensReceived = (userDetails, access_token) => {
 
-    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    api.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
 
     //Setting to Local Variables
     TOKEN_RECEIVED = true;
-    AUTH_TOKEN = token;
-    AUTH_USER = username;
-    AUTH_USER_OBJECT = { username };
+    AUTH_TOKEN = access_token;
+    AUTH_USER = userDetails.username;
+    LOGGED_IN_USER = userDetails
 
     //Setting to Local Storage
     // localStorage.setItem("access_token", token);

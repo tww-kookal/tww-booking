@@ -8,13 +8,16 @@ import api from './apiClient';
  * @async
  * @returns {Promise<Array<User>>} A promise that resolves to an array of user objects.
  */
-export const getAllUsers = async () => {
+export const getAllUsers = async (navigate) => {
     console.log("Customer.Module::getAllUsers::Fetching all users");
     try {
         const response = await api.get("/users/");
         return response.data?.users || []
     } catch (error) {
         console.log("User.Module::getAllUsers::Error fetching all users", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
         return []
     }
 }
@@ -25,13 +28,16 @@ export const getAllUsers = async () => {
  * @async
  * @returns {Promise<User>} A promise that resolves to a user object.
  */
-export const getUserById = async (user_id) => {
+export const getUserById = async (navigate, user_id) => {
     console.log("User.Module::getUserById::Fetching user by ID");
     try {
         const response = await api.get("/users/getById/" + user_id);
         return response.data?.user
     } catch (error) {
         console.log("User.Module::getUserById::Error fetching user by ID", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
         throw error;
     }
 }
@@ -65,7 +71,7 @@ export const validateUser = (user) => {
     if (!user.phone) {
         errors.push('Phone');
     }
-    
+
     //if errors are not empty then remove the last comma and append with 'are required'
     if (errors.length > 0) {
         errors[errors.length - 1] = errors[errors.length - 1] + ' are required.';
@@ -74,28 +80,33 @@ export const validateUser = (user) => {
 };
 
 
-export const addUser = async (user) => {
+export const addUser = async (navigate, user) => {
     console.log("User.Module::addUser::Adding user");
     try {
         const response = await api.post("/users/create", user);
         return response.data?.user
     } catch (error) {
         console.error("User.Module::addUser::Error adding user", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
         throw error
-
     }
 }
 
-export const updateUser = async (user) => {
+export const updateUser = async (navigate, user) => {
     let thisUser = {
-            ...user, "user_id": user.user_id.toString(),
-            "booking_commission": user.booking_commission.toString()
-        }
+        ...user, "user_id": user.user_id.toString(),
+        "booking_commission": user.booking_commission.toString()
+    }
     try {
         const response = await api.post("/users/update", user);
         return response.data?.user
     } catch (error) {
         console.error("User.Module::updateUser::Error updating user", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
         throw error
     }
 }

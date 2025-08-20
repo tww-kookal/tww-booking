@@ -7,7 +7,7 @@ import api from './apiClient';
  * @async
  * @returns {Promise<Array<Booking>>} A promise that resolves to an array of booking objects.
  */
-export const getAllBookings = async (startingDate = dayjs().format("YYYY-MM-DD")) => {
+export const getAllBookings = async (navigate, startingDate = dayjs().format("YYYY-MM-DD")) => {
     console.log("Booking.Module::getAllBookings::Fetching all bookings since", startingDate);
     try {
         const response = await api.get("/booking/listBookingsByCheckInDate/" + startingDate || dayjs().format('YYYY-MM-DD'));
@@ -17,7 +17,11 @@ export const getAllBookings = async (startingDate = dayjs().format("YYYY-MM-DD")
         console.log("Booking.Module::getAllBookings::Fetched all bookings", sortedBookings.length);
         return sortedBookings
     } catch (error) {
-        console.log("Booking.Module::getAllBookings::Error fetching all bookings", error);
+        console.error("Booking.Module::getAllBookings::Error fetching all bookings", error);
+        console.error("BBBBBB :::: ", error?.code)
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
         return []
     }
 }
@@ -28,7 +32,7 @@ export const getAllBookings = async (startingDate = dayjs().format("YYYY-MM-DD")
  * @async
  * @returns {Promise<<Booking>} A promise that resolves to an array of booking objects.
  */
-export const getBooking = async (booking_id = 0) => {
+export const getBooking = async (navigate, booking_id = 0) => {
     console.log("Booking.Module::getBooking::Fetching booking with id", booking_id);
     try {
         const response = await api.get("/booking/byID/" + booking_id);
@@ -36,6 +40,9 @@ export const getBooking = async (booking_id = 0) => {
         return response.data?.booking
     } catch (error) {
         console.log("Booking.Module::getBooking::Error fetching booking", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
         throw error
     }
 }
@@ -46,13 +53,16 @@ export const getBooking = async (booking_id = 0) => {
  * @async
  * @returns {Promise<Array<Room>>} A promise that resolves to an array of booking objects.
  */
-export const getAllRooms = async () => {
+export const getAllRooms = async (navigate,) => {
     try {
         const response = await api.get("/rooms/");
         console.log("Booking.Module::getAllRooms::Fetched all rooms", response.data);
         return response.data?.rooms || [];
     } catch (error) {
         console.error("Booking.Module::getAllRooms::Error fetching all rooms", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        } 
         return []
     }
 }
@@ -63,13 +73,18 @@ export const getAllRooms = async () => {
  * @async
  * @returns {Promise<Array<Booking>>} A promise that resolves to an array of booking objects.
  */
-export const getGuestsForDay = async (startingDate = dayjs().format("YYYY-MM-DD")) => {
+export const getGuestsForDay = async (navigate, startingDate = dayjs().format("YYYY-MM-DD")) => {
     try {
         const response = await api.get("/booking/guestsForDay/" + startingDate || dayjs().format('YYYY-MM-DD'));
         const guestsForDay = response.data || 0;
         return guestsForDay
     } catch (error) {
         console.error("Booking.Module::getGuestsForDay::Error fetching guests for day", error);
+        console.error("BBBBBBGGGGG :::: ", error?.code)
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+
         return 0
     }
 }
@@ -107,13 +122,20 @@ export const validateBooking = (booking) => {
     return errors;
 };
 
-export const createNewBooking = async (booking) => {
-    const res = await api.post("/booking/createBooking", booking);
-    console.log("Booking.Module::createNewBooking::Created new booking", res);
-    return res.data?.booking;
+export const createNewBooking = async (navigate, booking) => {
+    try {
+        const res = await api.post("/booking/createBooking", booking);
+        console.log("Booking.Module::createNewBooking::Created new booking", res);
+        return res.data?.booking;
+    } catch (error) {
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        throw error
+    }
 }
 
-export const updateBooking = async (booking) => {
+export const updateBooking = async (navigate, booking) => {
     // remove the advance_paid_to_user from the booking object
     delete booking.balance_paid_to_user;
     delete booking.advance_paid_to_user;

@@ -1,10 +1,6 @@
 // Use window.gapi instead of importing from gapi-script
-const FOLDER_ID = '11lLEqPPaWkk27LWTd1YFMnp4nQH_KI55'
-const CLIENT_ID = '579207931969-qagsptumrm49d4subjqguf5g3inmep1d.apps.googleusercontent.com'
-const API_KEY = "AIzaSyCeXvBubOb87QiniO-DCJBviiA8VyJmbw0";
-//const SCOPES = "https://www.googleapis.com/auth/drive.file";
-const SCOPES = "https://www.googleapis.com/auth/drive.readonly";
-const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
+
+import { GOOGLE_APP_CLIENT_ID, API_KEY, SCOPES, DISCOVERY_DOCS } from './config';
 
 let tokenClient;
 let isAuthenticated = false;
@@ -45,7 +41,7 @@ const authenticate = () => {
 
         try {
             tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
+                client_id: GOOGLE_APP_CLIENT_ID,
                 scope: SCOPES,
                 callback: (tokenResponse) => {
                     if (tokenResponse && tokenResponse.access_token) {

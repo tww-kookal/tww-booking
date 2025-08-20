@@ -29,7 +29,7 @@ const Customer = () => {
 
     useEffect(() => {
         if (toUpdateCustomerId) {
-            getCustomerById(toUpdateCustomerId).then(customer => {
+            getCustomerById(navigate, toUpdateCustomerId).then(customer => {
                 setToUpdateCustomer(true)
                 setCustomer(customer || null);
             }).catch(err => {
@@ -47,7 +47,7 @@ const Customer = () => {
                 ...preloadedCustomer
             });
         } else if (id) {
-            getCustomerById(id).then(customer => {
+            getCustomerById(navigate, id).then(customer => {
                 setCustomer(customer || null);
             }).catch(err => {
                 console.error('Customer::Error fetching customer:', err);
@@ -121,9 +121,9 @@ const Customer = () => {
             console.log("Customer::With Customer ID ", customer.customer_id)
             let createdCustomer = null;
             if (customer.customer_id) {
-                createdCustomer = await updateCustomer(customer);
+                createdCustomer = await updateCustomer(navigate, customer);
             } else {
-                createdCustomer = await addCustomer(customer);
+                createdCustomer = await addCustomer(navigate, customer);
             }
 
             navigate(location.state?.returnTo || '/booking/', {

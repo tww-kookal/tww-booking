@@ -12,8 +12,10 @@ import BookingSearch from "./pages/BookingSearch";
 import Booking from "./pages/Booking";
 import Customer from "./pages/Customer";
 import User from "./pages/User";
+import { GOOGLE_APP_CLIENT_ID } from "./modules/config";
 
 export default function App() {
+
     return (
         <div>
             <Navbar />
