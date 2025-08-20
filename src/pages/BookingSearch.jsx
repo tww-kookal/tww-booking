@@ -5,7 +5,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import BookingList from "./BookingList";
 import { getAllBookings } from "../modules/booking.module";
-import { loadBookingsWithAttachments } from '../modules/googleDriveService';
 
 import '../css/bookingSearch.large.css';
 import '../css/bookingSearch.handheld.css';
@@ -34,16 +33,15 @@ const BookingSearch = () => {
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fetchFutureBookings = async () => {
+  const fetchFutureBookings = async (checkinSince = dayjs().add(-1, 'day').format('YYYY-MM-DD')) => {
     setLoading(true);
     try {
-      const allBookings = await getAllBookings(navigate, dayjs().add(-1, 'day').format('YYYY-MM-DD'));
+      const allBookings = await getAllBookings(navigate, checkinSince);
       if (!allBookings || allBookings.length <= 0) {
         setResults([]);
         return;
       }
-      let bookingsWithAttachments = await loadBookingsWithAttachments(allBookings)
-      setResults(bookingsWithAttachments);
+      setResults(allBookings);
       setCurrentPage(1);
     } catch (err) {
       console.error("BookingSearch::FetchBookings::Error fetching data:", err);
@@ -57,11 +55,6 @@ const BookingSearch = () => {
   useEffect(() => {
     fetchFutureBookings();
   }, []);
-
-  const fetchBookings = async (searchCriteria) => {
-    ////////////////// Need to Change This /////////////////
-    fetchFutureBookings()
-  };
 
   const handleSearch = () => {
     // if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
@@ -90,7 +83,7 @@ const BookingSearch = () => {
     //   });
     // }
     // fetchBookings( with respective search criteria object)
-    fetchBookings();
+    fetchFutureBookings(searchCriteria.checkInDate);
   };
 
   const handleViewBooking = (booking) => {

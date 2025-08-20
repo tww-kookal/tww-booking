@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { DEFAULT_BOOKING } from "../modules/constants";
 import { calculateCommission, parseNumber } from "../modules/common.module";
-import { getAllCustomers, updateCustomer } from '../modules/customer.module';
-import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getAllRooms } from '../modules/booking.module';
+import { getAllCustomers } from '../modules/customer.module';
+import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getAllRooms, fetchAttachments } from '../modules/booking.module';
 import { getAllUsers } from '../modules/users.module';
 
 import '../css/booking.large.css';
@@ -37,6 +37,12 @@ const Booking = () => {
     useEffect(() => {
         if (location.state?.bookingDraft) {
             setBooking(location.state?.bookingDraft);
+            fetchAttachments(location.state?.bookingDraft.booking_id, true).then(files => {
+                setBooking(prev => ({
+                    ...prev,
+                    attachments: files,
+                }));
+            });
         }
         if (location.state?.createdCustomer) {
             let updateCustomer = location.state?.toUpdateCustomer || true
@@ -94,6 +100,13 @@ const Booking = () => {
             setBooking({
                 ...preloadedBooking,
                 remarks: preloadedBooking.remarks || '',
+            });
+            fetchAttachments(preloadedBooking?.booking_id, true).then(files => {
+                setBooking(prev => ({
+                    ...prev,
+                    attachments: files,
+                }));
+                console.log("PreLoaded Booking ", booking)
             });
         }
     }, [preloadedBooking]);
@@ -237,6 +250,12 @@ const Booking = () => {
                 Booking&nbsp;
                 {preloadedBooking && (<>({preloadedBooking.booking_id})</>)}
                 {!preloadedBooking && <>(New)</>}
+                &nbsp;
+                {preloadedBooking && booking && booking.attachments && (
+                    <>
+                        {booking.attachments.map(a => (<a href={a.file_url} target="_blank" rel="noopener noreferrer">📎</a>))}
+                    </>
+                )}
             </h2>
             {/* <div className='form-group'>
                 <label>Identity Document</label>

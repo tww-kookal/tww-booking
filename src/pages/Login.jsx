@@ -48,19 +48,6 @@ export default function Login() {
         }
     });
 
-    const getGoogleDriveFiles = async (accessToken) => {
-        const res = await fetch(
-            `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents`,
-            { headers: { Authorization: `Bearer ${accessToken}` } }
-        );
-        const files = await res.json();
-        console.log("Files in folder:", files);
-    }
-
-    const signInToApplication = async (accessToken) => {
-    }
-
-
     return (
         <div className="login-container">
             <ToastContainer />

@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 import api from './apiClient';
+import { FOLDER_ID } from '../modules/config';
+import { getUserContext } from '../contexts/constants';
 
 /**
  * Loads all bookings from the server.
@@ -7,13 +9,17 @@ import api from './apiClient';
  * @async
  * @returns {Promise<Array<Booking>>} A promise that resolves to an array of booking objects.
  */
-export const getAllBookings = async (navigate, startingDate = dayjs().format("YYYY-MM-DD")) => {
+export const getAllBookings = async (navigate, startingDate = dayjs().format("YYYY-MM-DD"), loadAttachments = false) => {
     console.log("Booking.Module::getAllBookings::Fetching all bookings since", startingDate);
     try {
         const response = await api.get("/booking/listBookingsByCheckInDate/" + startingDate || dayjs().format('YYYY-MM-DD'));
         const sortedBookings = (response.data.bookings || []).sort((a, b) => {
             return a.check_in.localeCompare(b.check_in);
         });
+        for (let booking of sortedBookings) {
+            booking.attachments = await fetchAttachments(booking.booking_id, loadAttachments);
+        }
+
         console.log("Booking.Module::getAllBookings::Fetched all bookings", sortedBookings.length);
         return sortedBookings
     } catch (error) {
@@ -24,6 +30,56 @@ export const getAllBookings = async (navigate, startingDate = dayjs().format("YY
         }
         return []
     }
+}
+
+/**
+ * Loads the attachments for a booking if available else returns an empty array
+ */
+export const fetchAttachments = async (booking_id, loadAttachments = false) => {
+
+    const res = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents`,
+        { headers: { Authorization: `Bearer ${getUserContext().token}` } }
+    );
+    const files = await res.json();
+    if (files?.files) {
+        let fileIds = files.files
+            .filter(file => file.name == booking_id)
+            .map(file => ({
+                file_name: file.name,
+                file_id: file.id,
+            }));
+        if (fileIds && loadAttachments == false && fileIds.length == 1 ){
+            return [{
+                file_name: booking_id,
+                file_id: booking_id,
+                file_url: booking_id,
+                file_type: booking_id,
+                file_content: booking_id,
+                file_size: booking_id,
+            }]
+        }
+
+        if (fileIds && fileIds.length == 1 && loadAttachments) {
+            let attachments = await fetch(
+                `https://www.googleapis.com/drive/v3/files?q='${fileIds[0].file_id}'+in+parents&fields=files(id,name,mimeType,webViewLink,webContentLink)`,
+                { headers: { Authorization: `Bearer ${getUserContext().token}` } }
+            );
+            let attachmentFiles = await attachments.json();
+            console.log("attachments :: ", attachmentFiles)
+            return attachmentFiles.files.map(file => ({
+                file_name: file.name,
+                file_id: file.id,
+                file_url: file.webViewLink,
+                file_type: file.mimeType,
+                file_content: file.webContentLink,
+                file_size: file.size,
+
+            }))
+        }
+
+    }
+    return []
 }
 
 /**
@@ -62,7 +118,7 @@ export const getAllRooms = async (navigate,) => {
         console.error("Booking.Module::getAllRooms::Error fetching all rooms", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
-        } 
+        }
         return []
     }
 }
