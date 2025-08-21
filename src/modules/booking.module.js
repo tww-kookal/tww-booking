@@ -16,10 +16,6 @@ export const getAllBookings = async (navigate, startingDate = dayjs().format("YY
         const sortedBookings = (response.data.bookings || []).sort((a, b) => {
             return a.check_in.localeCompare(b.check_in);
         });
-        for (let booking of sortedBookings) {
-            booking.attachments = await fetchAttachments(booking.booking_id, loadAttachments);
-        }
-
         console.log("Booking.Module::getAllBookings::Fetched all bookings", sortedBookings.length);
         return sortedBookings
     } catch (error) {
@@ -30,6 +26,25 @@ export const getAllBookings = async (navigate, startingDate = dayjs().format("YY
         }
         return []
     }
+}
+
+
+/**
+ * Loads the attachments for all booking if available else returns an empty array
+ */
+export const getAllBookingsWithAttachments = async (navigate, startingDate = dayjs().format("YYYY-MM-DD"), loadAttachments = false) => {
+    let bookings = await getAllBookings(navigate, startingDate, loadAttachments);
+    return await getAttachmentForBookings(bookings, loadAttachments);
+}
+
+/**
+ * Loads the attachments for all booking if available else returns an empty array
+ */
+export const getAttachmentForBookings = async (bookings, loadAttachments = false) => {
+    for (let booking of bookings) {
+        booking.attachments = await fetchAttachments(booking.booking_id, loadAttachments);
+    }
+    return bookings;
 }
 
 /**

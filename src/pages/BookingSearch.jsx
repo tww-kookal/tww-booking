@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import BookingList from "./BookingList";
-import { getAllBookings } from "../modules/booking.module";
+import { getAllBookingsWithAttachments } from "../modules/booking.module";
 
 import '../css/bookingSearch.large.css';
 import '../css/bookingSearch.handheld.css';
@@ -36,7 +36,7 @@ const BookingSearch = () => {
   const fetchFutureBookings = async (checkinSince = dayjs().add(-1, 'day').format('YYYY-MM-DD')) => {
     setLoading(true);
     try {
-      const allBookings = await getAllBookings(navigate, checkinSince);
+      const allBookings = await getAllBookingsWithAttachments(navigate, checkinSince);
       if (!allBookings || allBookings.length <= 0) {
         setResults([]);
         return;

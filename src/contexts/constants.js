@@ -55,6 +55,6 @@ export const getUserContext = () => {
 
 
 export const isUserInRoles = (roles) => {
-    //return LOGGED_IN_USER_ROLES.some(role => roles.includes(role))
-    return false;
+    return LOGGED_IN_USER_ROLES.some(role => roles.includes(role))
+    //return false;
 }
