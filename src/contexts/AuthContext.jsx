@@ -14,12 +14,12 @@ export function AuthProvider({ children }) {
     // if (stored) setUser(JSON.parse(stored));
 
     if (isTokenReceived()) {
-      console.log("AuthContext::Tokens are Received")
+      console.debug("AuthContext::Tokens are Received")
       api.defaults.headers.common["Authorization"] = `Bearer ${AUTH_TOKEN}`;
       setToken(AUTH_TOKEN);
       setUser({AUTH_USER});
     } else {
-      console.log("AuthContext::Tokens are not Received")      
+      console.debug("AuthContext::Tokens are not Received")      
     }
 
   }, []);

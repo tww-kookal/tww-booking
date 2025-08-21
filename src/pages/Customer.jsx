@@ -118,7 +118,7 @@ const Customer = () => {
 
         try {
             // Update or Add Customer
-            console.log("Customer::With Customer ID ", customer.customer_id)
+            console.debug("Customer::With Customer ID ", customer.customer_id)
             let createdCustomer = null;
             if (customer.customer_id) {
                 createdCustomer = await updateCustomer(navigate, customer);
@@ -143,7 +143,7 @@ const Customer = () => {
     };
 
     const handleCancel = () => {
-        console.log("Customer::handleCancel::", location.state)
+        console.debug("Customer::handleCancel::")
         navigate(location.state?.returnTo || '/booking/', {
             state: {
                 ...location.state,

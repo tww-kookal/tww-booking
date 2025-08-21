@@ -96,7 +96,7 @@ const Booking = () => {
     }, [])
 
     useEffect(() => {
-        console.log("PreLoaded Booking ", preloadedBooking)
+        console.debug("PreLoaded Booking ")
         if (preloadedBooking) {
             setBooking({
                 ...preloadedBooking,
@@ -107,7 +107,7 @@ const Booking = () => {
                     ...prev,
                     attachments: files,
                 }));
-                console.log("PreLoaded Booking ", booking)
+                console.debug("PreLoaded Booking ")
             });
             getPaymentsForBooking(navigate, preloadedBooking?.booking_id).then(payments => {
                 setBooking(prev => ({
@@ -183,7 +183,7 @@ const Booking = () => {
         if (uploadedFile) {
             try {
                 //await uploadToDrive(uploadedFile, booking.bookingID);
-                console.log('Identity Document uploaded successfully');
+                console.debug('Identity Document uploaded successfully');
             } catch (error) {
                 console.error('Booking:: Error uploading file:', error);
                 toast.error('Failed to upload Identity Document. Please try again.');
@@ -198,8 +198,7 @@ const Booking = () => {
             // Determine if this is an update or a new booking
             const isUpdate = preloadedBooking;
 
-            console.log('Booking::Existing Booking to Update ? ', isUpdate);
-            console.log("Booking::Update Booking ", booking)
+            console.debug('Booking::Existing Booking to Update ? ', isUpdate);
 
             if (isUpdate) {
                 updateBooking(navigate, booking).then((updatedBooking) => {

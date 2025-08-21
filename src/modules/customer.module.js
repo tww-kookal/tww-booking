@@ -9,12 +9,12 @@ import api from './apiClient';
  * @returns {Promise<Array<Customer>>} A promise that resolves to an array of customer objects.
  */
 export const getAllCustomers = async (navigate) => {
-    console.log("Customer.Module::getAllCustomers::Fetching all customers");
+    console.debug("Customer.Module::getAllCustomers::Fetching all customers");
     try {
         const response = await api.get("/customers/");
         return response.data?.customers || []
     } catch (error) {
-        console.log("Customer.Module::getAllCustomers::Error fetching all customers", error);
+        console.error("Customer.Module::getAllCustomers::Error fetching all customers", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
@@ -29,12 +29,12 @@ export const getAllCustomers = async (navigate) => {
  * @returns {Promise<Customer>} A promise that resolves to a customer object.
  */
 export const getCustomerById = async (navigate, customer_id) => {
-    console.log("Customer.Module::getCustomerById::Fetching customer by ID");
+    console.debug("Customer.Module::getCustomerById::Fetching customer by ID");
     try {
         const response = await api.get("/customers/byID/" + customer_id);
         return response.data?.customer || {}
     } catch (error) {
-        console.log("Customer.Module::getCustomerById::Error fetching customer by ID", error);
+        console.error("Customer.Module::getCustomerById::Error fetching customer by ID", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
@@ -68,12 +68,12 @@ export const validateCustomer = (customer) => {
 
 
 export const addCustomer = async (navigate, customer) => {
-    console.log("Customer.Module::addCustomer::Adding customer");
+    console.debug("Customer.Module::addCustomer::Adding customer");
     try {
         const response = await api.post("/customers/create", customer);
         return response.data?.customer || {}
     } catch (error) {
-        console.log("Customer.Module::addCustomer::Error adding customer", error);
+        console.debug("Customer.Module::addCustomer::Error adding customer", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
@@ -82,7 +82,7 @@ export const addCustomer = async (navigate, customer) => {
 }
 
 export const updateCustomer = async (navigate, customer) => {
-    console.log("Customer.Module::updateCustomer::Updating customer");
+    console.debug("Customer.Module::updateCustomer::Updating customer");
     try {
         const response = await api.post("/customers/update", {
             ...customer,
@@ -91,7 +91,7 @@ export const updateCustomer = async (navigate, customer) => {
 
         return response.data?.customer || {}
     } catch (error) {
-        console.log("Customer.Module::updateCustomer::Error updating customer", error);
+        console.debug("Customer.Module::updateCustomer::Error updating customer", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }

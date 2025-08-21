@@ -69,7 +69,7 @@ export const parseNumber = (val) => {
         if (!val) return 0;
         return typeof val === 'string' ? Number(val.replace(/,/g, '')) || 0 : val;
     } catch (error) {
-        console.log("Error parsing number: ", val, ", ", error);
+        console.error("Error parsing number: ", val, ", ", error);
         return 0;
     }
 };

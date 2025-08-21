@@ -28,7 +28,7 @@ export default function Login() {
                 console.error("Error logging in:", err.status);
                 if (err.status == 404) {
                     try {
-                        console.log("Sign up.....")
+                        console.debug("Sign up.....")
                         const signUpResp = await api.post(`/users/googleAuth/signup`, { token: access_token });
                         persistTokensReceived(signUpResp?.data?.user || undefined, access_token);
                         navigate("/dashboard");

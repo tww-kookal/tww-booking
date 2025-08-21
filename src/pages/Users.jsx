@@ -39,7 +39,7 @@ async function loadUsers() {
         });
         return sortedUsers
     } catch (error) {
-        console.log(error);
+        console.error("Users::loadUsers::Error fetching users", error);
     } // you need to implement GET /users in backend or adjust
 }
 

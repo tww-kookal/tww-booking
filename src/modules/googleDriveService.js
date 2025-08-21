@@ -102,15 +102,15 @@ const fetchFilesInFolder = async (folderId) => {
             }).then((response) => {
                 resolve(response.result.files || []);
             }).catch((err) => {
-                console.log("fetchFilesInFolder::Error authenticating with Google1 ", err);
+                console.debug("fetchFilesInFolder::Error authenticating with Google1 ", err);
                 reject(err);
             });
         }).catch((err) => {
-            console.log("fetchFilesInFolder::Error authenticating with Google2 ", err);
+            console.debug("fetchFilesInFolder::Error authenticating with Google2 ", err);
             reject(err);
         });
     }).catch((err) => {
-        console.log("fetchFilesInFolder::Error authenticating with Google3 ", err);
+        console.debug("fetchFilesInFolder::Error authenticating with Google3 ", err);
         reject(err);
     })
 };

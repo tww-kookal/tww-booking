@@ -6,11 +6,11 @@ import { getUserContext } from "../contexts/constants";
 export default function ProtectedRoute({ children }) {
   //Instead of Receiving Context from the AuthContext Let's do it from constants
   // const { user } = React.useContext(AuthContext);
-  // console.log("ProtectedRoute::user", user)
+  // console.debug("ProtectedRoute::user", user)
 
   const userContext = getUserContext()
   if (!userContext || !userContext.isTokenReceived) {
-    console.log("ProtectedRoute::No Token Received")
+    console.debug("ProtectedRoute::No Token Received")
     return <Navigate to="/login" replace />;
   }
 

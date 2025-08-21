@@ -142,7 +142,7 @@ const User = () => {
     };
 
     const handleCancel = () => {
-        console.log("User::handleCancel::", location.state)
+        console.debug("User::handleCancel::")
         navigate(location.state?.returnTo || '/booking/', {
             state: {
                 ...location.state,

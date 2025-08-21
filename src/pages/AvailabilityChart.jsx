@@ -60,7 +60,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
     };
 
     const onBookingClick = (booking, selectedDate, selectedRoom) => {
-        console.log("Is Injected or Actual ", selectedDate)
+        console.debug("Is Injected or Actual ")
         if (booking.chart_data === 'ACTUAL') {
             getBooking(navigate, booking.booking_id).then(booking => {
                 navigate("/booking", { state: { preloadedBooking: booking } })

@@ -10,13 +10,13 @@ import { getUserContext } from '../contexts/constants';
  * @returns {Promise<Array<Booking>>} A promise that resolves to an array of booking objects.
  */
 export const getAllBookings = async (navigate, startingDate = dayjs().format("YYYY-MM-DD"), loadAttachments = false) => {
-    console.log("Booking.Module::getAllBookings::Fetching all bookings since", startingDate);
+    console.debug("Booking.Module::getAllBookings::Fetching all bookings since", startingDate);
     try {
         const response = await api.get("/booking/listBookingsByCheckInDate/" + startingDate || dayjs().format('YYYY-MM-DD'));
         const sortedBookings = (response.data.bookings || []).sort((a, b) => {
             return a.check_in.localeCompare(b.check_in);
         });
-        console.log("Booking.Module::getAllBookings::Fetched all bookings", sortedBookings.length);
+        console.debug("Booking.Module::getAllBookings::Fetched all bookings", sortedBookings.length);
         return sortedBookings
     } catch (error) {
         console.error("Booking.Module::getAllBookings::Error fetching all bookings", error);
@@ -81,7 +81,6 @@ export const fetchAttachments = async (booking_id, loadAttachments = false) => {
                 { headers: { Authorization: `Bearer ${getUserContext().token}` } }
             );
             let attachmentFiles = await attachments.json();
-            console.log("attachments :: ", attachmentFiles)
             return attachmentFiles.files.map(file => ({
                 file_name: file.name,
                 file_id: file.id,
@@ -104,13 +103,13 @@ export const fetchAttachments = async (booking_id, loadAttachments = false) => {
  * @returns {Promise<<Booking>} A promise that resolves to an array of booking objects.
  */
 export const getBooking = async (navigate, booking_id = 0) => {
-    console.log("Booking.Module::getBooking::Fetching booking with id", booking_id);
+    console.debug("Booking.Module::getBooking::Fetching booking with id", booking_id);
     try {
         const response = await api.get("/booking/byID/" + booking_id);
-        console.log("Booking.Module::getBooking::Fetched booking", response.data?.booking);
+        console.debug("Booking.Module::getBooking::Fetched booking");
         return response.data?.booking
     } catch (error) {
-        console.log("Booking.Module::getBooking::Error fetching booking", error);
+        console.error("Booking.Module::getBooking::Error fetching booking", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
@@ -127,7 +126,7 @@ export const getBooking = async (navigate, booking_id = 0) => {
 export const getAllRooms = async (navigate,) => {
     try {
         const response = await api.get("/rooms/");
-        console.log("Booking.Module::getAllRooms::Fetched all rooms", response.data);
+        console.debug("Booking.Module::getAllRooms::Fetched all rooms");
         return response.data?.rooms || [];
     } catch (error) {
         console.error("Booking.Module::getAllRooms::Error fetching all rooms", error);
@@ -151,7 +150,6 @@ export const getGuestsForDay = async (navigate, startingDate = dayjs().format("Y
         return guestsForDay
     } catch (error) {
         console.error("Booking.Module::getGuestsForDay::Error fetching guests for day", error);
-        console.error("BBBBBBGGGGG :::: ", error?.code)
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
@@ -174,7 +172,7 @@ export const validateBooking = (booking) => {
     const errors = [];
 
     // Check required fields
-    console.log("booking.customer_id", booking.customer_id)
+    console.debug("booking.customer_id", booking.customer_id)
     if (!booking.customer_id && booking.customer_id !== 0) {
         errors.push('Select a Guest / Customer');
     }
@@ -196,7 +194,7 @@ export const validateBooking = (booking) => {
 export const createNewBooking = async (navigate, booking) => {
     try {
         const res = await api.post("/booking/createBooking", booking);
-        console.log("Booking.Module::createNewBooking::Created new booking", res);
+        console.debug("Booking.Module::createNewBooking::Created new booking");
         return res.data?.booking;
     } catch (error) {
         if (error?.code == 'ERR_NETWORK') {
@@ -218,14 +216,14 @@ export const updateBooking = async (navigate, booking) => {
     delete booking.final_price_paid_to_id;
 
     const res = await api.post("/booking/updateBooking", booking);
-    console.log("Booking.Module::updateBooking::Updated booking", res);
+    console.debug("Booking.Module::updateBooking::Updated booking");
     return res.data?.booking;
 }
 
 export const getPaymentsForBooking = async (navigate, booking_id) => {
     try {
         const response = await api.get("/payment/forBookingID/" + booking_id);
-        console.log("Booking.Module::getPaymentsForBooking::Fetched payments for booking", response.data);
+        console.debug("Booking.Module::getPaymentsForBooking::Fetched payments for booking");
         return response.data?.payments || [];
     } catch (error) {
         console.error("Booking.Module::getPaymentsForBooking::Error fetching payments for booking", error);

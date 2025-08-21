@@ -26,7 +26,7 @@ export const persistTokensReceived = (userDetails, access_token) => {
     // sessionStorage.setItem("access_token", token);
     // sessionStorage.setItem("user", JSON.stringify({ username }));
 
-    console.log("persistTokensReceived::Tokens are persisted")
+    console.debug("persistTokensReceived::Tokens are persisted")
 }
 
 export const clearTokens = () => {
@@ -35,7 +35,7 @@ export const clearTokens = () => {
     AUTH_USER = "";
     AUTH_USER_OBJECT = "";
     api.defaults.headers.common["Authorization"] = "";
-    console.log("clearTokens::Tokens are cleared")
+    console.debug("clearTokens::Tokens are cleared")
 }
 
 export const isTokenReceived = () => {

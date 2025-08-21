@@ -8,7 +8,7 @@ export default function Roles() {
   const [role_name, setRoleName] = useState("");
 
   useEffect(() => {
-    console.log("Loading Roles............")
+    console.debug("Loading Roles............")
     loadRoles();
   }, []);
 

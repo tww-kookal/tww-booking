@@ -9,12 +9,12 @@ import api from './apiClient';
  * @returns {Promise<Array<User>>} A promise that resolves to an array of user objects.
  */
 export const getAllUsers = async (navigate) => {
-    console.log("Customer.Module::getAllUsers::Fetching all users");
+    console.debug("Customer.Module::getAllUsers::Fetching all users");
     try {
         const response = await api.get("/users/");
         return response.data?.users || []
     } catch (error) {
-        console.log("User.Module::getAllUsers::Error fetching all users", error);
+        console.debug("User.Module::getAllUsers::Error fetching all users", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
@@ -29,12 +29,12 @@ export const getAllUsers = async (navigate) => {
  * @returns {Promise<User>} A promise that resolves to a user object.
  */
 export const getUserById = async (navigate, user_id) => {
-    console.log("User.Module::getUserById::Fetching user by ID");
+    console.debug("User.Module::getUserById::Fetching user by ID");
     try {
         const response = await api.get("/users/getById/" + user_id);
         return response.data?.user
     } catch (error) {
-        console.log("User.Module::getUserById::Error fetching user by ID", error);
+        console.debug("User.Module::getUserById::Error fetching user by ID", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
@@ -81,7 +81,7 @@ export const validateUser = (user) => {
 
 
 export const addUser = async (navigate, user) => {
-    console.log("User.Module::addUser::Adding user");
+    console.debug("User.Module::addUser::Adding user");
     try {
         const response = await api.post("/users/create", user);
         return response.data?.user
