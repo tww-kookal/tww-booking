@@ -40,12 +40,23 @@ export const getInitials = (name) => {
  * @returns {number} The calculated commission amount.
  */
 export const calculateCommission = (users, source_user_id, amount) => {
+    return (parseNumber(amount) * getCommissionPercent(users, source_user_id, amount) || 0) / 100;
+};
+
+/**
+ * Finds the commission percent based on the source user id.
+ *
+ * @param {Array<User>} users - The array of user objects.
+ * @param {string} source_user_id - The source user id of the booking.
+ * @returns {number} The calculated commission percent.
+ */
+export const getCommissionPercent = (users, source_user_id) => {
     let foundUser = users.find(user => user.user_id == source_user_id)
     if (foundUser){
-        return (parseNumber(amount) * foundUser.booking_commission || 0) / 100;
+        return foundUser.booking_commission || 0;
     }
     return 0;    
-};
+}
 
 /**
  * Parses a value and converts it to a number, removing commas if necessary.

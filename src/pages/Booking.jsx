@@ -4,9 +4,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { DEFAULT_BOOKING } from "../modules/constants";
-import { calculateCommission, parseNumber } from "../modules/common.module";
+import { calculateCommission, getCommissionPercent, parseNumber } from "../modules/common.module";
 import { getAllCustomers } from '../modules/customer.module';
-import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getAllRooms, fetchAttachments } from '../modules/booking.module';
+import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getPaymentsForBooking, getAllRooms, fetchAttachments } from '../modules/booking.module';
 import { getAllUsers } from '../modules/users.module';
 
 import '../css/booking.large.css';
@@ -19,9 +19,8 @@ const Booking = () => {
     const selectedRoom = location.state?.selectedRoom || undefined;
 
     const navigate = useNavigate();
-    const defaultBooking = DEFAULT_BOOKING;
     const [booking, setBooking] = useState({
-        ...defaultBooking,
+        ...DEFAULT_BOOKING,
         check_in: checkInDate,
         check_out: dayjs(checkInDate, 'YYYY-MM-DD').add(1, 'day').format("YYYY-MM-DD"),
         ...(selectedRoom && {
@@ -40,8 +39,9 @@ const Booking = () => {
             fetchAttachments(location.state?.bookingDraft.booking_id, true).then(files => {
                 setBooking(prev => ({
                     ...prev,
-                    attachments: files,
+                    attachments: files
                 }));
+                ;
             });
         }
         if (location.state?.createdCustomer) {
@@ -108,8 +108,25 @@ const Booking = () => {
                 }));
                 console.log("PreLoaded Booking ", booking)
             });
+            getPaymentsForBooking(navigate, preloadedBooking?.booking_id).then(payments => {
+                setBooking(prev => ({
+                    ...prev,
+                    payments: payments,
+                    totalPaid: payments.reduce((acc, p) => acc + parseNumber(p.payment_amount), 0),
+                    balanceToPay: calculateTotalAmount(booking) - parseNumber(payments.reduce((acc, p) => acc + parseNumber(p.payment_amount), 0)),
+                }));
+            });
         }
     }, [preloadedBooking]);
+
+    const calculateTotalAmount = (booking) => {
+        let total_price = (parseNumber(booking.room_price || 0) + parseNumber(booking.food_price || 0) +
+            parseNumber(booking.service_price || 0) + parseNumber(booking.tax_price || 0))
+            -
+            (parseNumber(booking.discount_price) || 0);
+
+        return total_price;
+    }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -132,32 +149,17 @@ const Booking = () => {
             const roomAmount = parseNumber(updated.room_price || 0);
             const food = parseNumber(updated.food_price || 0);
             const campFire = parseNumber(updated.service_price || 0);
-            const advance = parseNumber(updated.advance_payment || 0);
             updated.commission = calculateCommission(users, source, roomAmount);
+            updated.commission_percent = getCommissionPercent(users, source);
             updated.is_commission_settled = false;
-
-            // Balance To Pay = Room + Food + Camp - Advance
-            updated.balance_to_pay = roomAmount + food + campFire - advance;
-            updated.total_price = roomAmount + food + campFire;
-            updated.is_final_price_paid = false;
-            updated.final_price_payment_method = 'GPAY';
-            updated.balance_payment_method = 'GPAY';
 
             updated.tax_percent = 0;
             updated.tax_price = (updated.total_price * updated.tax_percent) / 100;
             updated.discount_price = 0;
-            updated.total_price = updated.total_price + updated.tax_price - updated.discount_price;
 
+            updated.total_price = calculateTotalAmount(updated);
             return updated;
         });
-    };
-
-    const handleAddNew = () => {
-        setBooking({ ...defaultBooking });
-        setCurrentIndex(-1);
-        // Clear file input on form clear
-        const fileInput = document.querySelector('input[type="file"]');
-        if (fileInput) fileInput.value = '';
     };
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -302,11 +304,6 @@ const Booking = () => {
                     </button>
                 </div>
 
-                {/* <div className='form-group'>
-                    <label>Book Date</label>
-                    <input type="date" name="booking_date" value={booking.booking_date} readOnly />
-                </div> */}
-
                 <div className='form-group'>
                     <label>Check In</label>
                     <input type="date" name="check_in" value={booking.check_in} onChange={handleChange} />
@@ -317,22 +314,10 @@ const Booking = () => {
                     <input type="date" name="check_out" value={booking.check_out} onChange={handleChange} />
                 </div>
 
-                {/* <div className='form-group'>
-                    <label>&nbsp;for {booking.number_of_nights} Nights</label>
-                </div> */}
-
                 <div className='form-group'>
                     <label>People</label>
                     <input type="number" name="number_of_people" value={booking.number_of_people} onChange={handleChange} />
                 </div>
-
-
-                {/* <div className='form-group'>
-                    <label>Status</label>
-                    <select name="status" value={booking.status} onChange={handleChange}>
-                        {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                </div> */}
 
                 <div className='form-group'>
                     <label>Amount</label>
@@ -365,24 +350,10 @@ const Booking = () => {
                 </div>
                 <div className='form-group'>
                     <label style={{ fontSize: '1.2rem' }}>Commission</label>
-                    <input type="number" name="commission" value={booking.commission} readOnly />
+                    <label>{booking.commission}</label>
                 </div>
 
                 {/* Optional Fields */}
-                <fieldset>
-                    <legend>Advance</legend>
-                    <div className='form-group'>
-                        <label>Amount</label>
-                        <input type="number" name="advance_payment" value={booking.advance_payment} onChange={handleChange} />
-                    </div>
-                    <div className='form-group'>
-                        <label>Paid To</label>
-                        <select name="advance_paid_to" value={booking.advance_paid_to} onChange={handleChange}>
-                            <option value="">Select User</option>
-                            {users.map(r => <option key={r.user_id} value={r.user_id}>{r.first_name} {r.last_name}</option>)}
-                        </select>
-                    </div>
-                </fieldset>
                 <fieldset>
                     <legend>Services</legend>
                     <div className='form-group'>
@@ -396,22 +367,34 @@ const Booking = () => {
                     </div>
                 </fieldset>
                 <fieldset>
-                    <legend>Balance</legend>
+                    <legend>Payments</legend>
                     <div className='form-group'>
-                        <label>Amount</label>
-                        <input type="number" name="balance_to_pay" value={booking.balance_to_pay} readOnly />
+                        <label>Total</label>
+                        <label>{booking.total_price}</label>
                     </div>
-                    <div className='form-group'>
-                        <label>Paid ?</label>
-                        <input type="checkbox" name="is_balance_paid" value={booking.is_balance_paid} onChange={handleChange} />
-                    </div>
-                    <div className='form-group'>
-                        <label>Paid To</label>
-                        <select name="balance_paid_to" value={booking.balance_paid_to} onChange={handleChange}>
-                            <option value="">Select User</option>
-                            {users.map(r => <option key={r.user_id} value={r.user_id}>{r.first_name} - {r.last_name}</option>)}
-                        </select>
-                    </div>
+                    {booking.payments &&
+                        (booking.payments || []).map(p => (
+                            <div key={p.booking_payments_id} className='form-group'>
+                                <label style={{ fontSize: "1rem" }}>{p.payment_date}</label>
+                                <label style={{ fontSize: "1rem" }}>{p.payment_amount}</label>
+                                <label style={{ fontSize: "1rem" }}>{p.payment_for}</label>
+                            </div>
+                        ))}
+                    {/* when the booking.payments is availble then display hte totalPaid and balanceToPay */ }
+                    {booking.payments && (
+                        <div className='form-group'>
+                            <label>Total Paid</label>
+                            <label>{booking.totalPaid || 0}</label>
+                        </div>
+                    )}
+
+                    {booking.payments && (
+                        <div className='form-group'>
+                            <label>Balance</label>
+                            <label>{booking.total_price - booking.totalPaid}</label>
+                        </div>
+                    )}
+
                 </fieldset>
                 <fieldset>
                     <legend>Remarks</legend>

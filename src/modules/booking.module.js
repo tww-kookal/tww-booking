@@ -207,6 +207,20 @@ export const updateBooking = async (navigate, booking) => {
     return res.data?.booking;
 }
 
+export const getPaymentsForBooking = async (navigate, booking_id) => {
+    try {
+        const response = await api.get("/booking/payments/" + booking_id);
+        console.log("Booking.Module::getPaymentsForBooking::Fetched payments for booking", response.data);
+        return response.data?.payments || [];
+    } catch (error) {
+        console.error("Booking.Module::getPaymentsForBooking::Error fetching payments for booking", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        return []
+    }
+}
+
 export const handleGenerateReceipt = (booking) => {
     // Create a printable receipt
     const receiptWindow = window.open('', '_blank');
