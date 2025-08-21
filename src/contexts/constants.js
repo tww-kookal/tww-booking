@@ -5,6 +5,7 @@ let AUTH_TOKEN = ""
 let AUTH_USER_OBJECT = ""
 let AUTH_USER = ""
 let LOGGED_IN_USER = {}
+let LOGGED_IN_USER_ROLES = []
 
 export const persistTokensReceived = (userDetails, access_token) => {
 
@@ -15,6 +16,7 @@ export const persistTokensReceived = (userDetails, access_token) => {
     AUTH_TOKEN = access_token;
     AUTH_USER = userDetails.username;
     LOGGED_IN_USER = userDetails
+    LOGGED_IN_USER_ROLES = userDetails.roles || []
 
     //Setting to Local Storage
     // localStorage.setItem("access_token", token);
@@ -41,5 +43,18 @@ export const isTokenReceived = () => {
 }
 
 export const getUserContext = () => {
-    return { user: AUTH_USER, user_object: AUTH_USER_OBJECT, token: AUTH_TOKEN, isTokenReceived: TOKEN_RECEIVED }
+    return {
+        user: AUTH_USER,
+        user_object: AUTH_USER_OBJECT,
+        token: AUTH_TOKEN,
+        isTokenReceived: TOKEN_RECEIVED,
+        user_roles: LOGGED_IN_USER_ROLES,
+        user: LOGGED_IN_USER
+    }
+}
+
+
+export const isUserInRoles = (roles) => {
+    //return LOGGED_IN_USER_ROLES.some(role => roles.includes(role))
+    return false;
 }

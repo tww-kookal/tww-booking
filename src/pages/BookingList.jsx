@@ -5,6 +5,7 @@ import '../css/bookingList.large.css';
 import '../css/bookingList.handheld.css';
 import dayjs from 'dayjs';
 import { BOOKING_STATUS } from '../modules/constants';
+import { isUserInRoles } from '../contexts/constants';
 
 const BookingList = ({
     loading,
@@ -87,12 +88,15 @@ const BookingList = ({
                                 )}
                             </div>
                             <div className="card-row">
-                                <span className="card-label">Source:&nbsp;</span> 
+                                <span className="card-label">Source:&nbsp;</span>
                                 <span className="card-value">{booking.source_of_booking || '-'}</span>
                             </div>
                             <div className="card-row">
-                                <span className="card-label">Amount:&nbsp;</span> 
-                                <span className="card-value">₹{booking.room_price || 0}</span>
+                                <span className="card-label">Amount:&nbsp;</span>
+                                <span className="card-value">₹{
+                                    isUserInRoles(['manager', 'owner']) ?
+                                        booking.room_price || 0 : '*****'
+                                }</span>
                             </div>
                             <div className="card-row">
                                 <span className="card-value">{'✔️'} Breakfast</span>
@@ -105,7 +109,7 @@ const BookingList = ({
                 {results.length > itemsPerPage && (
                     <div className="pagination">
                         <button
-                            className="pagination-button"                        
+                            className="pagination-button"
                             onClick={() => handlePageChange('prev')}
                             disabled={currentPage === 1}
                         >

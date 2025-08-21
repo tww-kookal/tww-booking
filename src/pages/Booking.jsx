@@ -8,6 +8,7 @@ import { calculateCommission, getCommissionPercent, parseNumber } from "../modul
 import { getAllCustomers } from '../modules/customer.module';
 import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getPaymentsForBooking, getAllRooms, fetchAttachments } from '../modules/booking.module';
 import { getAllUsers } from '../modules/users.module';
+import { isUserInRoles } from '../contexts/constants';
 
 import '../css/booking.large.css';
 import '../css/booking.handheld.css';
@@ -253,11 +254,13 @@ const Booking = () => {
                 {preloadedBooking && (<>({preloadedBooking.booking_id})</>)}
                 {!preloadedBooking && <>(New)</>}
                 &nbsp;
-                {preloadedBooking && booking && booking.attachments && (
-                    <>
-                        {booking.attachments.map(a => (<a href={a.file_url} target="_blank" rel="noopener noreferrer">📎</a>))}
-                    </>
-                )}
+                {isUserInRoles(['manager', 'owner']) ?
+                    preloadedBooking && booking && booking.attachments && (
+                        <>
+                            {booking.attachments.map(a => (<a href={a.file_url} target="_blank" rel="noopener noreferrer">📎</a>))}
+                        </>
+                    )
+                    : ''}
             </h2>
             {/* <div className='form-group'>
                 <label>Identity Document</label>
@@ -319,10 +322,13 @@ const Booking = () => {
                     <input type="number" name="number_of_people" value={booking.number_of_people} onChange={handleChange} />
                 </div>
 
-                <div className='form-group'>
-                    <label>Amount</label>
-                    <input type="number" name="room_price" value={booking.room_price} onChange={handleChange} />
-                </div>
+                {isUserInRoles(['manager', 'owner']) ?
+                    <div className='form-group'>
+                        <label>Amount</label>
+                        <input type="number" name="room_price" value={booking.room_price} onChange={handleChange} />
+                    </div>
+                    : ''
+                }
 
                 <div className='form-group'>
                     <label>Source</label>
@@ -348,54 +354,61 @@ const Booking = () => {
                         + Update
                     </button>
                 </div>
-                <div className='form-group'>
-                    <label style={{ fontSize: '1.2rem' }}>Commission</label>
-                    <label>{booking.commission}</label>
-                </div>
+                {isUserInRoles(['manager', 'owner']) ?
+                    <div className='form-group'>
+                        <label style={{ fontSize: '1.2rem' }}>Commission</label>
+
+                        <label>{booking.commission}</label>
+                    </div>
+                    : ''
+                }
 
                 {/* Optional Fields */}
-                <fieldset>
-                    <legend>Services</legend>
-                    <div className='form-group'>
-                        <label>Food</label>
-                        <input type="number" name="food_price" value={booking.food_price} onChange={handleChange} />
-                    </div>
+                {isUserInRoles(['manager', 'owner']) ? <>
+                    <fieldset>
+                        <legend>Services</legend>
+                        <div className='form-group'>
+                            <label>Food</label>
+                            <input type="number" name="food_price" value={booking.food_price} onChange={handleChange} />
+                        </div>
 
-                    <div className='form-group'>
-                        <label>Camp Fire</label>
-                        <input type="number" name="service_price" value={booking.service_price} onChange={handleChange} />
-                    </div>
-                </fieldset>
-                <fieldset>
-                    <legend>Payments</legend>
-                    <div className='form-group'>
-                        <label>Total</label>
-                        <label>{booking.total_price}</label>
-                    </div>
-                    {booking.payments &&
-                        (booking.payments || []).map(p => (
-                            <div key={p.booking_payments_id} className='form-group'>
-                                <label style={{ fontSize: "1rem" }}>{p.payment_date}</label>
-                                <label style={{ fontSize: "1rem" }}>{p.payment_amount}</label>
-                                <label style={{ fontSize: "1rem" }}>{p.payment_for}</label>
+                        <div className='form-group'>
+                            <label>Camp Fire</label>
+                            <input type="number" name="service_price" value={booking.service_price} onChange={handleChange} />
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Payments</legend>
+                        <div className='form-group'>
+                            <label>Total</label>
+                            <label>{booking.total_price}</label>
+                        </div>
+                        {booking.payments &&
+                            (booking.payments || []).map(p => (
+                                <div key={p.booking_payments_id} className='form-group'>
+                                    <label style={{ fontSize: "1rem" }}>{p.payment_date}</label>
+                                    <label style={{ fontSize: "1rem" }}>{p.payment_amount}</label>
+                                    <label style={{ fontSize: "1rem" }}>{p.payment_for}</label>
+                                </div>
+                            ))}
+                        {/* when the booking.payments is availble then display hte totalPaid and balanceToPay */}
+                        {booking.payments && (
+                            <div className='form-group'>
+                                <label>Total Paid</label>
+                                <label>{booking.totalPaid || 0}</label>
                             </div>
-                        ))}
-                    {/* when the booking.payments is availble then display hte totalPaid and balanceToPay */ }
-                    {booking.payments && (
-                        <div className='form-group'>
-                            <label>Total Paid</label>
-                            <label>{booking.totalPaid || 0}</label>
-                        </div>
-                    )}
+                        )}
 
-                    {booking.payments && (
-                        <div className='form-group'>
-                            <label>Balance</label>
-                            <label>{booking.total_price - booking.totalPaid}</label>
-                        </div>
-                    )}
+                        {booking.payments && (
+                            <div className='form-group'>
+                                <label>Balance</label>
+                                <label>{booking.total_price - booking.totalPaid}</label>
+                            </div>
+                        )}
 
-                </fieldset>
+                    </fieldset>
+                </>
+                    : ''}
                 <fieldset>
                     <legend>Remarks</legend>
                     <div className='form-group' style={{ width: "100%" }}>
@@ -408,17 +421,21 @@ const Booking = () => {
                     <button type="button" className="button-secondary"
                         onClick={handleCancel}
                         disabled={isFormDisabled}>Cancel</button>
-                    <button
-                        type="button"
-                        className="button-primary"
-                        onClick={handleUpdate}
-                        disabled={isSubmitting || isFormDisabled}
-                    >
-                        {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update' : 'Save'}
-                    </button>
-                    <button type="button" className="button-secondary"
-                        onClick={() => handleGenerateReceipt(booking)}
-                        disabled={isFormDisabled}>Receipt</button>
+                    {isUserInRoles(['manager', 'owner']) ?
+                        <>
+                            <button
+                                type="button"
+                                className="button-primary"
+                                onClick={handleUpdate}
+                                disabled={isSubmitting || isFormDisabled}
+                            >
+                                {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update' : 'Save'}
+                            </button>
+                            <button type="button" className="button-secondary"
+                                onClick={() => handleGenerateReceipt(booking)}
+                                disabled={isFormDisabled}>Receipt</button>
+                        </>
+                        : ''}
                 </div>
             </form>
         </div>

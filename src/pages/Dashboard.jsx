@@ -8,6 +8,8 @@ import '../css/dashboard.large.css';
 import { getStartingCharacters } from '../modules/common.module';
 import { getAllBookings, getGuestsForDay } from '../modules/booking.module';
 import { BOOKING_STATUS } from '../modules/constants';
+import { isUserInRoles } from '../contexts/constants';
+
 
 import dayjs from 'dayjs';
 
@@ -121,10 +123,13 @@ const Dashboard = () => {
         </div>
         <div className="quick-actions">
           <div className="action-buttons">
-            <Link to="/booking" state={{ from: 'dashboard' }} className="action-button create">
-              <span className="icon">+</span>
-              <span>New</span>
-            </Link>
+            {isUserInRoles(['manager', 'owner']) ?
+              <Link to="/booking" state={{ from: 'dashboard' }} className="action-button create">
+                <span className="icon">+</span>
+                <span>New</span>
+              </Link>
+              : ''}
+
             <Link to="/availability" state={{ from: 'dashboard' }} className="action-button find">
               <span className="icon">↻</span>
               <span>Availability</span>

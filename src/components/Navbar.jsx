@@ -2,6 +2,8 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { isUserInRoles } from '../contexts/constants';
+
 import '../css/navbar.large.css';
 import '../css/navbar.handheld.css';
 
@@ -37,9 +39,12 @@ const Navbar = () => {
             <Link to="/search" className={location.pathname === '/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
               Search
             </Link>
-            <Link to="/booking" className={location.pathname.includes('/booking') ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
-              New
-            </Link>
+            {isUserInRoles(['manager', 'owner']) ?
+              <Link to="/booking" className={location.pathname.includes('/booking') ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+                New
+              </Link>
+              : ''}
+
           </div>
         </div>
       )}

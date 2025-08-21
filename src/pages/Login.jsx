@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import api from "../modules/apiClient";
 import { persistTokensReceived } from "../contexts/constants";
-import { FOLDER_ID } from "../modules/config";
 
 import '../css/login.large.css';
 import '../css/login.handheld.css';
