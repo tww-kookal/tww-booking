@@ -237,7 +237,31 @@ export const getPaymentsForBooking = async (navigate, booking_id) => {
 export const handleGenerateReceipt = (booking) => {
     // Create a printable receipt
     const receiptWindow = window.open('', '_blank');
-
+    const paidSoFar = booking.payments.reduce((acc, payment) => acc + ((payment.payment_for == 'refund') ? 0 : payment.payment_amount), 0);
+    const balance = booking.total_price - paidSoFar;
+    const paymentRows = booking.payments && booking.payments.length > 0 ? `
+        <table width="100%">
+            <tr>
+                <td colspan="5"><font style={{ color: 'darkgray' }}><B><big>P A Y M E N T S</big></b></font></td>
+            </tr>
+            <tr>
+                <td width="10%"><b>Date</b></td>
+                <td width="10%"><b>For</b></td>
+                <td width="10%"><b>Type</b></td>
+                <td width="55%"><b>Remarks</b></td>
+                <td width="15%" align="right"><b>Amount</b></td>
+            ${booking.payments.map(payment => `
+                <tr>
+                    <td>${dayjs(payment.payment_date).format('DD-MM-YY')}</td>
+                    <td>${payment.payment_for}</td>
+                    <td>${payment.payment_type}</td>
+                    <td>${payment.remarks}</td>
+                    <td align="right">${payment.payment_amount}</td>
+                </tr>
+            `).join('')}
+            <tr><td colspan="5"><hr /></td></tr>
+        </table>
+    ` : '';
     receiptWindow.document.write(`
             <html>
                 <head>
@@ -263,7 +287,13 @@ export const handleGenerateReceipt = (booking) => {
                                 <br />
                                 <label>Booking ID - <strong>${booking.booking_id}</strong></label>
                                 <br />
-                                <label>Booking Date - ${dayjs(booking.booking_date, 'YYYY-MM-DD').format('MMM DD, YYYY')} </label>                                
+                                <label>Booking Date - ${dayjs(booking.booking_date, 'YYYY-MM-DD').format('MMM DD, YYYY')} </label>
+                                <br />
+                                <label>Check In - ${dayjs(booking.check_in, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</label>
+                                <br />
+                                <label>Check Out - ${dayjs(booking.check_out, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</label>                            
+                                <br />
+                                <label><b>${booking.room_name}</b></label> for <label><b><i>${booking.customer_name}</i></b> (${booking.number_of_nights} nights)  </label>
                             </td>
                             <td align="right">
                                 <img src="./images/westwoodlogo2.png" style={{ width: '50%', height: '50%' }} alt="The Westwood"></img>
@@ -322,15 +352,15 @@ export const handleGenerateReceipt = (booking) => {
                                     <td><label><strong>Payment Breakup</strong></label></td>
                                     <td align="right"><small><font style={{ color: 'darkgray' }}>All prices indicated below are in INR </font></small></td>
                                 </tr>
-                                <tr>
+                                <!--<tr>
                                     <td colspan="2"><font style={{ color: 'darkgray' }}>TARRIF</font></td>
-                                </tr>
+                                </tr> -->
                                 <tr>
-                                    <td><label>
-                                    Property Sell Price<br />
-                                    <font style={{ color: 'darkgray' }}>${1} Room(s) x ${booking.number_of_nights} Night(s)</font>
-                                    </label></td>
-                                    <td align="right"> &nbsp;<br />${booking.total_price} </td>
+                                    <td>
+                                    <!--<label> Property Sell Price<br /></label>-->
+                                    <font style={{ color: 'darkgray' }}>${booking.room_name} for ${booking.number_of_nights} Night(s)</font>
+                                    </td>
+                                    <td align="right"> &nbsp;${booking.total_price} </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
@@ -356,16 +386,7 @@ export const handleGenerateReceipt = (booking) => {
                                     <hr />
                                     </td>
                                 </tr>
-                                <tr>
-                                    <td><label>Effective Property Sell Price</label></td>
-                                    <td align="right"> ${booking.total_price} </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                    <hr />
-                                    </td>
-                                </tr>
-                                <tr>
+                                <!-- <tr>
                                     <td><label>Property Gross Charges </label></td>
                                     <td align="right"> ${booking.total_price} </td>
                                 </tr>
@@ -373,7 +394,7 @@ export const handleGenerateReceipt = (booking) => {
                                     <td colspan="2">
                                     <hr />
                                     </td>
-                                </tr>
+                                </tr> -->
                                 <tr>
                                     <td><label>Agent Commission</label></td>
                                     <td align="right"> ${booking.commission || 0} </td>
@@ -412,9 +433,18 @@ export const handleGenerateReceipt = (booking) => {
                                     </td>
                                 </tr>                                
                                 <tr>
-                                    <td colspan="2"><label><small><font style={{ color: 'darkgray' }}>Service Category - Reservation of property booking</font></small>
-                                    </label></td>
+                                    <td colspan="2">${paymentRows}</td>
                                 </tr>
+                                <tr>
+                                    <td><label>Amount Received</label></td>
+                                    <td align="right"> ${paidSoFar} </td>
+                                </tr>
+                                <tr><td colspan="2"><hr /></td></tr>                                
+                                <tr>
+                                    <td><label>Balance</label></td>
+                                    <td align="right"> ${balance} </td>
+                                </tr>
+                                <tr><td colspan="2"><hr /></td></tr>                                
                                 </table>
                             </center>
                             </td>
@@ -422,43 +452,7 @@ export const handleGenerateReceipt = (booking) => {
                         <tr>
                             <td colspan="2"><hr /></td>
                         </tr>
-                        <tr>
-                            <td colspan="2"><big><stong><u>Booking Details</u></stong></big></td>
-                        </tr>
-                        <tr>
-                            <td style={{ width: '25%' }}>
-                            <big><stong><b>${booking.number_of_nights} </b>night(s) in <i><b>${booking.room_name}</b></i> for <b><i>${booking.number_of_people}</i></b> people</stong></big>
-                            </td>
-                            <td style={{ width: '75%' }}>
-                            <table style={{ width: '100%;' }}>
-                                <tr style={{ width: '100%;' }}>
-                                <td style={{ width: '33%', textAlign: 'center' }}>
-                                    <font style={{ color: 'darkgray' }}><big><stong>Check-In</stong></big></font>
-                                </td>
-                                <td style={{ width: '33%', textAlign: 'center' }}>
-
-                                </td>
-                                <td style={{ width: '33%', textAlign: 'center' }}>
-                                    <font style={{ color: 'darkgray' }}><big><stong>Check-Out</stong></big></font>
-                                </td>
-                                </tr>
-                                <tr>
-                                <td style={{ width: '33%', textAlign: 'center' }}>
-                                    ${dayjs(booking.check_in, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}
-                                </td>
-                                <td style={{ width: '33%', textAlign: 'center' }}>
-                                    <hr style={{ color: 'darkgray' }} />
-                                </td>
-                                <td style={{ width: '33%', textAlign: 'center' }}>
-                                    ${dayjs(booking.check_out, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'11:00 am'}
-                                </td>
-                                </tr>
-                            </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td ><b>Guest Name: </b> ${booking.customer_name} / ${booking.contact_number} </td>
-                            <td ><stong>Identification Submitted: </stong>N/A </td>
+                            <td colspan="2"><stong>Identification Submitted: </stong>N/A </td>
                         </tr>
                         <tr>
                             <td colspan="2"><stong><b>Care Taker can be contacted in the premises at Ph: 98848 55041 / Extn: 701</b></stong></td>
