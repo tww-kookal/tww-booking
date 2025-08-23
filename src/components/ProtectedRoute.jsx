@@ -1,6 +1,5 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { AuthContext } from "../contexts/AuthContext";
 import { getUserContext } from "../contexts/constants";
 
 export default function ProtectedRoute({ children }) {

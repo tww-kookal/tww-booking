@@ -11,8 +11,9 @@ import AvailabilityChart from "./pages/AvailabilityChart";
 import BookingSearch from "./pages/BookingSearch";
 import Booking from "./pages/Booking";
 import Customer from "./pages/Customer";
+import Payments from "./pages/Payments";
+
 import User from "./pages/User";
-import { GOOGLE_APP_CLIENT_ID } from "./modules/config";
 
 export default function App() {
 
@@ -32,6 +33,7 @@ export default function App() {
                 <Route path="/roles" element={<ProtectedRoute><Roles /></ProtectedRoute>} />
                 <Route path="/customers/new" element={<ProtectedRoute><Customer /></ProtectedRoute>} />
                 <Route path="/user/new" element={<ProtectedRoute><User /></ProtectedRoute>} />
+                <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
             </Routes>
         </div>
     );

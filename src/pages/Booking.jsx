@@ -404,7 +404,10 @@ const Booking = () => {
                                 <label>{booking.total_price - booking.totalPaid}</label>
                             </div>
                         )}
-
+                        <button
+                            type="button"
+                            onClick={() => navigate('/payments', { state: { booking: booking, users: users } })}
+                            style={{ padding: '4px 8px' }}>Manage Payments</button>
                     </fieldset>
                 </>
                     : ''}
