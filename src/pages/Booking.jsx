@@ -404,10 +404,14 @@ const Booking = () => {
                                 <label>{booking.total_price - booking.totalPaid}</label>
                             </div>
                         )}
-                        <button
-                            type="button"
-                            onClick={() => navigate('/payments', { state: { booking: booking, users: users } })}
-                            style={{ padding: '4px 8px' }}>Manage Payments</button>
+                        <div className='form-group' style={{ alignItems: "center" }}>
+                            <label></label>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/payments', { state: { returnTo: '/booking', booking: booking, users: users } })}
+                                style={{ padding: '4px 8px' }}>Manage Payments</button>
+                        </div>
+
                     </fieldset>
                 </>
                     : ''}

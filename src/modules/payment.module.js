@@ -32,10 +32,10 @@ export const PAYMENT_TYPE = [{id: 'cash', value: 'Cash'}, {id: 'cc',value: 'Cred
 export const addPayment = async (navigate, payment) => {
     console.debug("Payment.Module::addPayment::Adding payment");
     try {
-        const response = await api.post("/customers/create", customer);
-        return response.data?.customer || {}
+        const response = await api.post("/payment/add", payment);
+        return response.data?.addedPayment || {}
     } catch (error) {
-        console.debug("Customer.Module::addCustomer::Error adding customer", error);
+        console.debug("Payment.Module::addPayment::Error adding payment", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
@@ -46,18 +46,30 @@ export const addPayment = async (navigate, payment) => {
 export const updatePayment = async (navigate, payment) => {
     console.debug("Payment.Module::updatePayment::Updating payment");
     try {
-        const response = await api.post("/customers/update", {
-            ...customer,
-            customer_id: customer.customer_id.toString()
+        const response = await api.post("/payment/update", {
+            ...payment,
+            booking_payments_id: payment.booking_payments_id
         });
-
-        return response.data?.customer || {}
+        return response.data?.payment || {}
     } catch (error) {
-        console.debug("Customer.Module::updateCustomer::Error updating customer", error);
+        console.debug("Payment.Module::updatePayment::Error updating payment", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
+        throw error;
+    }
+}
+
+export const deletePaymentById = async (navigate, payment) => {
+    try {
+        await api.post("/payment/deleteById/" + payment.booking_payments_id.toString());
         return {}
+    } catch (error) {
+        console.debug("Payment.Module::deletePaymentById::Error deleting payment", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        throw error
     }
 }
 
