@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -32,7 +34,11 @@ const Booking = () => {
 
     const [rooms, setRooms] = useState([]);
     const [customers, setCustomers] = useState([]);
+    const [customerOptions, setCustomerOptions] = useState([]);
     const [users, setUsers] = useState([]);
+    const [userOptions, setUserOptions] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [selectedBookingSource, setSelectedBookingSource] = useState(null);
 
     useEffect(() => {
         if (location.state?.bookingDraft) {
@@ -47,8 +53,17 @@ const Booking = () => {
         }
         if (location.state?.createdCustomer) {
             let updateCustomer = location.state?.toUpdateCustomer || true
-            if (!updateCustomer)
+            if (!updateCustomer) {
                 setCustomers(prev => [...prev, location.state.createdCustomer]);
+                setCustomerOptions(prev => [...prev, {
+                    value: location.state.createdCustomer.customer_id,
+                    label: location.state.createdCustomer.customer_name,
+                }]);
+                setSelectedCustomer({
+                    value: location.state.createdCustomer.customer_id,
+                    label: location.state.createdCustomer.customer_name,
+                })
+            }
             setBooking(prev => ({
                 ...prev,
                 customer_id: location.state.createdCustomer.customer_id
@@ -56,8 +71,17 @@ const Booking = () => {
         }
         if (location.state?.createdUser) {
             let updateUser = location.state?.toUpdateUser || true
-            if (!updateUser)
+            if (!updateUser) {
                 setUsers(prev => [...prev, location.state.createdUser]);
+                setUserOptions(prev => [...prev, {
+                    value: location.state.createdUser.user_id,
+                    label: location.state.createdUser.user_name,
+                }]);
+                setSelectedBookingSource({
+                    value: location.state.createdUser?.user_id,
+                    label: location.state.createdUser?.first_name + " " + location.state.createdUser?.last_name + " (" + location.state.createdUser?.booking_commission + "%)",
+                })
+            }
             setBooking(prev => ({
                 ...prev,
                 source_of_booking_id: location.state.createdUser.user_id
@@ -68,6 +92,20 @@ const Booking = () => {
     useEffect(() => {
         getAllUsers(navigate).then(users => {
             setUsers(users);
+            setUserOptions(users.map(u => ({
+                value: u.user_id,
+                label: u.first_name + " " + u.last_name + " (" + u.booking_commission + "%)",
+            })));
+            if (preloadedBooking) {
+                //Get the first name and last name of the found user with user_id as user_id
+                let user = users && users.find(c => c.user_id == preloadedBooking.source_of_booking_id);
+                if (user) {
+                    setSelectedBookingSource({
+                        value: preloadedBooking.source_of_booking_id,
+                        label: user?.first_name + " " + user?.last_name + " (" + user?.booking_commission + "%)",
+                    })
+                }
+            }
         }).catch(err => {
             console.error('Booking::Error fetching users:', err);
             toast.error('Failed to fetch users');
@@ -78,6 +116,21 @@ const Booking = () => {
     useEffect(() => {
         getAllCustomers(navigate).then(customers => {
             setCustomers(customers);
+            setCustomerOptions(customers.map(c => ({
+                value: c.customer_id,
+                label: c.customer_name,
+            })));
+            if (preloadedBooking) {
+                //Get the first name and last name of the found custoemr with user_id as customer id
+                //Get the first name and last name of the found custoemr with user_id as customer id
+                let customer = customers && customers.find(c => c.customer_id == preloadedBooking.customer_id);
+                if (customer) {
+                    setSelectedCustomer({
+                        value: preloadedBooking.customer_id,
+                        label: customer?.customer_name,
+                    })
+                }
+            }
         }).catch(err => {
             console.error('Booking::Error fetching customers:', err);
             toast.error('Failed to fetch customers');
@@ -102,6 +155,7 @@ const Booking = () => {
                 ...preloadedBooking,
                 remarks: preloadedBooking.remarks || '',
             });
+
             fetchAttachments(preloadedBooking?.booking_id, true).then(files => {
                 setBooking(prev => ({
                     ...prev,
@@ -129,8 +183,29 @@ const Booking = () => {
         return total_price;
     }
 
+    const handleCustomerChange = (e) => {
+        setSelectedCustomer(e);
+        handleChange({
+            target: {
+                name: "customer_id",
+                value: e.value,
+            }
+        })
+    }
+
+    const handleBookingSourceChange = (e) => {
+        setSelectedBookingSource(e);
+        handleChange({
+            target: {
+                name: "source_of_booking_id",
+                value: e.value,
+            }
+        })
+    }
+
     const handleChange = (e) => {
         const { name, value } = e.target;
+        console.log("XXX ", name, value)
         setBooking(prev => {
             const updated = {
                 ...prev,
@@ -281,13 +356,21 @@ const Booking = () => {
 
                 <div className='form-group'>
                     <label htmlFor="customer_id">Guest</label>
-                    <select id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
+                    <Select name="customer_id"
+                        value={selectedCustomer}
+                        onChange={handleCustomerChange}
+                        options={customerOptions}
+                        placeholder="Select a guest..."
+                        isSearchable={true}
+                        classNamePrefix="react-select"
+                    />
+                    {/*                     <select isSearchable={true} id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
                         <option value="">Select Customer</option>
                         {customers.map(c => (
                             <option key={c.customer_id} value={c.customer_id}>{c.customer_name} - {c.phone}</option>
                         ))}
                     </select>
-                </div>
+ */}                </div>
                 <div className='form-group' style={{ alignItems: "center" }}>
                     <label></label>
                     <button
@@ -331,11 +414,20 @@ const Booking = () => {
 
                 <div className='form-group'>
                     <label>Source</label>
-                    <select name="source_of_booking_id" value={booking.source_of_booking_id} onChange={handleChange}>
+                    <Select name="source_of_booking_id"
+                        value={selectedBookingSource}
+                        onChange={handleBookingSourceChange}
+                        options={userOptions}
+                        placeholder="Select a referral..."
+                        isSearchable={true}
+                        classNamePrefix="react-select"
+                    />
+
+                    {/*                     <select name="source_of_booking_id" value={booking.source_of_booking_id} onChange={handleChange}>
                         <option value="">Select</option>
                         {users.map(s => <option key={s.user_id} value={s.user_id}>{s.first_name} {s.last_name} ({s.booking_commission || 0}%)</option>)}
                     </select>
-                </div>
+ */}                </div>
                 <div className='form-group' style={{ alignItems: "center" }}>
                     <label></label>
                     <button
@@ -372,7 +464,7 @@ const Booking = () => {
                         </div>
 
                         <div className='form-group'>
-                            <label>Camp Fire</label>
+                            <label>Services</label>
                             <input type="number" name="service_price" value={booking.service_price} onChange={handleChange} />
                         </div>
                     </fieldset>

@@ -29,28 +29,30 @@
     font-size: 1.2rem !important;
   }
 
+  .booking-form-container Select,
   .booking-form-container select,
-  .booking-form-container select option{
+  .booking-form-container select option {
     font-size: 1.2rem !important;
     font-family: inherit;
   }
 
 
   .booking-form-container input:focus,
+  .booking-form-container Select:focus,
   .booking-form-container select:focus,
   .booking-form-container select option:focus,
   .booking-form-container textarea:focus {
     font-size: 1.2rem !important;
   }
 
-  .booking-form-container .form-group{
+  .booking-form-container .form-group {
     display: flex;
     flex-direction: row;
   }
 
   .form-label {
     display: flex;
-    width:100%;
+    width: 100%;
     align-items: flex-end;
     align-content: flex-end;
     margin-bottom: 0.5rem;
@@ -90,6 +92,15 @@
     border-color: #0077cc;
     outline: none;
     font-size: 0.5rem;
+  }
+
+  .form-group .react-select__control {
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
   }
 
   .form-buttons {
