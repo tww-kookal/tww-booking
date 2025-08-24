@@ -239,6 +239,7 @@ export const handleGenerateReceipt = (booking) => {
     const receiptWindow = window.open('', '_blank');
     const paidSoFar = booking.payments.reduce((acc, payment) => acc + ((payment.payment_for == 'refund') ? 0 : payment.payment_amount), 0);
     const balance = booking.total_price - paidSoFar;
+    console.log("customer    ", booking)
     const paymentRows = booking.payments && booking.payments.length > 0 ? `
         <table width="100%">
             <tr>
@@ -293,7 +294,7 @@ export const handleGenerateReceipt = (booking) => {
                                 <br />
                                 <label>Check Out - ${dayjs(booking.check_out, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</label>                            
                                 <br />
-                                <label><b>${booking.room_name}</b></label> for <label><b><i>${booking.customer_name}</i></b> (${booking.number_of_nights} nights)  </label>
+                                <label><b>${booking.room_name}</b></label> for <label><b><i>${booking.customer_name} - ${booking.contact_number}</i></b> (${booking.number_of_nights} nights)  </label>
                             </td>
                             <td align="right">
                                 <img src="./images/westwoodlogo2.png" style={{ width: '50%', height: '50%' }} alt="The Westwood"></img>

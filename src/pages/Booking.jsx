@@ -406,10 +406,12 @@ const Booking = () => {
                         )}
                         <div className='form-group' style={{ alignItems: "center" }}>
                             <label></label>
-                            <button
-                                type="button"
-                                onClick={() => navigate('/payments', { state: { returnTo: '/booking', booking: booking, users: users } })}
-                                style={{ padding: '4px 8px' }}>Manage Payments</button>
+                            {preloadedBooking && preloadedBooking.booking_id && (
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/payments', { state: { returnTo: '/booking', booking: booking, users: users } })}
+                                    style={{ padding: '4px 8px' }}>Manage Payments</button>
+                            )}
                         </div>
 
                     </fieldset>
