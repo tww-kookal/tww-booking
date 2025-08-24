@@ -11,6 +11,7 @@ const BookingList = ({
     loading,
     results,
     paginatedResults,
+    findAttachmentsForBooking,
     itemsPerPage,
     currentPage,
     handlePageChange,
@@ -61,7 +62,7 @@ const BookingList = ({
                             <div className="card-row">
                                 <span className="card-label">Booking ID:&nbsp;</span>
                                 <span className="card-value">{booking.booking_id}&nbsp;</span>
-                                <span className="card-value">{booking.attachments?.length > 0 ? '📎' : ''}&nbsp;</span>
+                                <span className="card-value">{findAttachmentsForBooking(booking.booking_id)?.length > 0 ? '📎' : ''}&nbsp;</span>
 
                             </div>
                             <div className="card-row" >

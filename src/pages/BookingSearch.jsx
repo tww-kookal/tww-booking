@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import BookingList from "./BookingList";
-import { getAllBookings } from "../modules/booking.module";
+import { getAllAttachedBookings, getAllBookings } from "../modules/booking.module";
 
 import '../css/bookingSearch.large.css';
 import '../css/bookingSearch.handheld.css';
@@ -24,6 +24,7 @@ const BookingSearch = () => {
     bookingID: "",
   });
   const [results, setResults] = useState([]);
+  const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Reduced items per page for better mobile view
@@ -42,6 +43,9 @@ const BookingSearch = () => {
         return;
       }
       setResults(allBookings);
+
+      const allAttachments = await getAllAttachedBookings(navigate);
+      setAttachments(allAttachments?.files || []);
       setCurrentPage(1);
     } catch (err) {
       console.error("BookingSearch::FetchBookings::Error fetching data:", err);
@@ -85,6 +89,15 @@ const BookingSearch = () => {
     // fetchBookings( with respective search criteria object)
     fetchFutureBookings(searchCriteria.checkInDate);
   };
+
+  const findAttachmentsForBooking = (booking_id) => {
+    if (!booking_id) {
+      return []
+    }
+    return  attachments.filter(attachment => {
+      return attachment.name == booking_id;
+    })
+  }
 
   const handleViewBooking = (booking) => {
     navigate(`/booking`, {
@@ -197,6 +210,7 @@ const BookingSearch = () => {
         loading={loading}
         results={results}
         paginatedResults={paginatedResults}
+        findAttachmentsForBooking={findAttachmentsForBooking}
         itemsPerPage={itemsPerPage}
         currentPage={currentPage}
         handlePageChange={handlePageChange}

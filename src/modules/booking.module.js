@@ -28,13 +28,22 @@ export const getAllBookings = async (navigate, startingDate = dayjs().format("YY
     }
 }
 
-
 /**
  * Loads the attachments for all booking if available else returns an empty array
  */
 export const getAllBookingsWithAttachments = async (navigate, startingDate = dayjs().format("YYYY-MM-DD"), loadAttachments = false) => {
     let bookings = await getAllBookings(navigate, startingDate, loadAttachments);
-    return await getAttachmentForBookings(bookings, loadAttachments);
+    return await getAttachmentForBookings();
+}
+
+export const getAllAttachedBookings = async (navigate) => {
+    const res = await fetch(
+        `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents`,
+        { headers: { Authorization: `Bearer ${getUserContext().token}` } }
+    );
+    const files = await res.json();
+    console.debug("Booking.Module::getAllAttachedBookings::Fetched all bookings", files);
+    return files;
 }
 
 /**
