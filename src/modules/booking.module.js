@@ -237,7 +237,7 @@ export const getPaymentsForBooking = async (navigate, booking_id) => {
 export const handleGenerateReceipt = (booking) => {
     // Create a printable receipt
     const receiptWindow = window.open('', '_blank');
-    const paidSoFar = booking.payments.reduce((acc, payment) => acc + ((payment.payment_for == 'refund') ? 0 : payment.payment_amount), 0);
+    const paidSoFar = booking.payments ? booking.payments.reduce((acc, payment) => acc + ((payment.payment_for == 'refund') ? 0 : payment.payment_amount), 0) : 0;
     const balance = booking.total_price - paidSoFar;
     const paymentRows = booking.payments && booking.payments.length > 0 ? `
         <table width="100%">
