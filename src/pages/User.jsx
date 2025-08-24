@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { validateUser, addUser, updateUser, getUserById } from '../modules/users.module';
+import {isUserInRoles} from '../contexts/constants';
 
 import '../css/user.large.css';
 import '../css/user.handheld.css';
@@ -189,14 +190,17 @@ const User = () => {
                     <button type="button" className="button-secondary"
                         onClick={handleCancel}
                         disabled={isFormDisabled}>Cancel</button>
-                    <button
-                        type="button"
-                        className="button-primary"
-                        onClick={handleUpdate}
-                        disabled={isSubmitting || isFormDisabled}
-                    >
-                        {isSubmitting ? 'Processing ...' : toUpdateUser ? 'Update' : 'Save'}
-                    </button>
+                    {isUserInRoles(['manager', 'owner']) ?
+                        <button
+                            type="button"
+                            className="button-primary"
+                            onClick={handleUpdate}
+                            disabled={isSubmitting || isFormDisabled}
+                        >
+                            {isSubmitting ? 'Processing ...' : toUpdateUser ? 'Update' : 'Save'}
+                        </button>
+                        : ''
+                    }
                 </div>
             </form>
         </div>
