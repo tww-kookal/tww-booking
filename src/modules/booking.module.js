@@ -239,7 +239,6 @@ export const handleGenerateReceipt = (booking) => {
     const receiptWindow = window.open('', '_blank');
     const paidSoFar = booking.payments.reduce((acc, payment) => acc + ((payment.payment_for == 'refund') ? 0 : payment.payment_amount), 0);
     const balance = booking.total_price - paidSoFar;
-    console.log("customer    ", booking)
     const paymentRows = booking.payments && booking.payments.length > 0 ? `
         <table width="100%">
             <tr>
