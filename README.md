@@ -1,14 +1,32 @@
 # The Westwood Booking System
+## Description
+TWW Booking is a comprehensive React-based booking management system designed for The Westwood. Its primary purpose is to streamline the process of creating, searching, viewing, and updating room bookings for staff, while leveraging Google Sheets as the backend data store and Google Drive for document management.
 
-A React-based booking management system for The Westwood, allowing staff to create, search, view, and update room bookings with Google Sheets integration for data storage.
+## Key Features
 
-## Features
+- Google Authentication: Secure login using Google OAuth, ensuring only authorized staff can access the system.
+- Dashboard: Provides an overview of booking statistics, including total bookings, upcoming bookings, today's check-ins, and check-outs.
+- Booking Management: Enables staff to create new bookings, update existing ones, and search for bookings using various filters.
+- Receipt Generation: Allows users to generate and print receipts for bookings directly from the application.
+- Google Drive Integration: Facilitates document management by allowing users to upload and access files related to bookings.
 
-- **Google Authentication**: Secure login with Google OAuth
-- **Dashboard**: View booking statistics including total bookings, upcoming bookings, today's check-ins, and check-outs
-- **Booking Management**: Create, view, update, and search bookings
-- **Receipt Generation**: Generate printable receipts for bookings
-- **Google Sheets Integration**: Store and retrieve booking data from Google Sheets
+## Architecture & Components
+
+- **App.jsx**: Sets up routing and layout for the app.
+- **Navbar.jsx**: Provides navigation links and handles authentication status.
+- **ProtectedRoute.jsx**: Ensures only authenticated users can access certain routes.
+- **AuthContext.jsx**: Manages user authentication state and provides context to components.
+- **Dashboard.jsx**: Displays booking statistics and quick actions.
+- **Booking.jsx**: Form for creating and editing bookings.
+- **BookingList.jsx**: Shows a list of all bookings with options to view/edit.
+- **BookingSearch.jsx**: Allows searching bookings by various filters.
+- **Customer.jsx**: Manages customer information.
+- **Payments.jsx**: Handles payment records and status.
+- **Documents.jsx**: Integrates with Google Drive for document management.
+- **Roles.jsx**: Manages user roles and permissions.
+- **Rooms.jsx**: Manages room details and availability.
+- **User.jsx/Users.jsx**: User profile and user management.
+- **AvailabilityChart.jsx**: Visualizes room availability.
 
 ## Project Structure
 
@@ -31,141 +49,96 @@ A React-based booking management system for The Westwood, allowing staff to crea
 └── vite.config.js          # Vite configuration
 ```
 
-## Dependencies
 
-- **React**: ^18.2.0
-- **React Router**: ^7.7.1
-- **Axios**: ^1.6.2
-- **GAPI Script**: ^1.2.0
-- **JWT Decode**: ^4.0.0
-- **Vite**: ^4.3.0 (Development)
 
-## Setup Instructions
 
-### Prerequisites
+## User Navigation Flow
+1. **Login**: User lands on the login page and authenticates via Google OAuth.
+2. **Dashboard**: After login, user sees booking statistics and navigation options.
+3. **Booking Management**:
+   - Create new booking via Dashboard or Navbar
+   - Search bookings using filters
+   - View/edit booking details
+   - Generate and print receipts
+4. **Customer Management**: Access customer details and update information.
+5. **Payments**: Manage payments related to bookings.
+6. **Documents**: Upload/view documents via Google Drive integration.
+7. **Rooms/Roles/Users**: Manage rooms, user roles, and user profiles.
 
-- Node.js (v14 or higher)
-- npm or yarn
-- Google Cloud Platform account with Sheets API enabled
-- Google Sheet for storing booking data
-
-### Installation
-
-1. Clone the repository:
-   ```bash
+## Local Development Setup
+1. **Clone the repository**:
+```bash
    git clone <repository-url>
-   cd the-westwood-booking
-   ```
-
-2. Install dependencies:
-   ```bash
+   cd tww-booking
    npm install
-   # or
-   yarn
+    # or
+   yarn install
    ```
-
-3. Configure Google API credentials:
+2. **Configure Google API credentials**:
    - Create a project in Google Cloud Platform
-   - Enable Google Sheets API and Google Drive API
+   - Enable Google Sheets and Drive APIs
    - Create OAuth 2.0 credentials
-   - Update `src/config.js` with your credentials:
-     ```js
-     export const CLIENT_ID = "your-client-id.apps.googleusercontent.com";
-     export const API_KEY = "your-api-key";
-     export const SCOPES = "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets";
-     export const SHEET_ID = "your-google-sheet-id";
-     ```
-
-4. Start the development server:
-   ```bash
-   npm run dev
+   - Update src/modules/config.js with your credentials
+   
+```bash
+export const CLIENT_ID = "your-client-id.apps.googleusercontent.com";
+export const API_KEY = "your-api-key";
+export const SCOPES = "https://www.googleapis.com/auth/drive ";
+```
+3. **Start the development server**:
+```bash
+   npm start
    # or
-   yarn dev
+   yarn start
    ```
-
-5. Build for production:
-   ```bash
+4. **Build for production**:
+```bash
    npm run build
    # or
    yarn build
    ```
+## Deployment to GitHub Pages via GitHub Actions
+1. **Configure GitHub Pages**:
+    - Set the repository's GitHub Pages source to the gh-pages branch.
+2. **Add GitHub Actions workflow**:
+    - Create .github/workflows/deploy.yml with the following:
+```bash
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run build
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+```
 
-## Usage
+3. **Push changes to github**:
+```bash
+   git add .
+   git commit -m "Setup GitHub Pages deployment"
+   git push origin main
+   ```
 
-### Authentication
-
-Users must sign in with Google to access the application. The app requires permissions to access Google Sheets and Drive APIs.
-
-### Dashboard
-
-The dashboard displays booking statistics and provides quick access to create new bookings or search existing ones.
-
-### Creating a Booking
-
-1. Click "New Booking" in the navbar or "Create New Booking" on the dashboard
-2. Fill in the required booking details:
-   - Room Name
-   - Customer Name
-   - Check-in/Check-out Dates
-   - Contact Number
-   - Number of People
-   - Status
-   - Source of Booking
-   - Room Amount
-3. Optional fields include:
-   - Advance Payment
-   - Food
-   - Camp Fire
-   - Remarks
-4. The system automatically calculates:
-   - Number of Nights
-   - Commission (based on booking source)
-   - Balance to Pay
-   - TWW Revenue
-5. Click "Save Booking" to store the booking
-
-### Searching Bookings
-
-1. Click "Search Bookings" in the navbar
-2. Filter bookings by:
-   - Booking Date
-   - Guest Name
-   - Check-in Date
-   - Contact Number
-3. Click "Search" to view matching bookings
-4. Click "View Details" on any booking to view or edit its details
-
-### Generating Receipts
-
-1. Open a booking
-2. Click "Generate Receipt"
-3. A printable receipt will open in a new tab
-
-## Google Sheets Structure
-
-The application expects the following column structure in your Google Sheet:
-
-1. Room Name
-2. Customer Name
-3. Booking Date
-4. Check-in Date
-5. Check-out Date
-6. Contact Number
-7. Number of People
-8. Number of Nights
-9. Status
-10. Source of Booking
-11. Room Amount
-12. Advance Paid
-13. Advance Paid To
-14. Food
-15. Camp Fire
-16. Commission
-17. Balance to Pay
-18. TWW Revenue
-19. Balance Paid To
-20. Remarks
+4. **Access your site**:
+   - Open [https://tww-kookal.github.io/tww-bill-generator/](https://tww-kookal.github.io/tww-bill-generator/) in your browser.
 
 ## License
+```
+MIT License
 
-[Your License Information]
+Let me know if you want further customization or more details for any section.
+```
