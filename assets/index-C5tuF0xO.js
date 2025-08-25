@@ -236,12 +236,12 @@ Content-Transfer-Encoding: base64\r
                                 <!-- <tr>
                                     <td><label>Agent Commission</label></td>
                                     <td align="right"> ${e.commission||0} </td>
-                                </tr> -->
+                                </tr> 
                                 <tr>
                                     <td colspan="2">
                                     <hr />
                                     </td>
-                                </tr>
+                                </tr> -->
                                 <!-- <tr>
                                     <td><label>GST @ 18%</label><br /><font style={{ color: 'darkgray' }}>(Including IGST or (SGST & CGST))</font></td>
                                     <td align="right"> {gst} </td>
