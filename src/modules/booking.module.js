@@ -42,7 +42,7 @@ export const getAllAttachedBookings = async (navigate) => {
         { headers: { Authorization: `Bearer ${getUserContext().token}` } }
     );
     const files = await res.json();
-    console.debug("Booking.Module::getAllAttachedBookings::Fetched all bookings", files);
+    console.debug("Booking.Module::getAllAttachedBookings::Fetched all bookings");
     return files;
 }
 
@@ -60,23 +60,24 @@ export const getAttachmentForBookings = async (bookings, loadAttachments = false
  * Loads the attachments for a booking if available else returns an empty array
  */
 export const fetchAttachments = async (booking_id, loadAttachments = false) => {
-
+    console.debug("Fetch Attachments ");
     const res = await fetch(
         `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents`,
         { headers: { Authorization: `Bearer ${getUserContext().token}` } }
     );
-    const files = await res.json();
-    if (files?.files) {
-        let fileIds = files.files
+    const allAttachments = await res.json();
+    console.debug("Booking.Module::fetchAttachments::Fetched all attachments");
+    if (allAttachments?.files) {
+        let attachmentForBooking = allAttachments.files
             .filter(file => file.name == booking_id)
             .map(file => ({
                 file_name: file.name,
                 file_id: file.id,
             }));
-        if (fileIds && loadAttachments == false && fileIds.length == 1) {
+        if (attachmentForBooking && loadAttachments == false && attachmentForBooking.length > 0) {
             return [{
                 file_name: booking_id,
-                file_id: booking_id,
+                file_id: attachmentForBooking[0].file_id,
                 file_url: booking_id,
                 file_type: booking_id,
                 file_content: booking_id,
@@ -84,26 +85,141 @@ export const fetchAttachments = async (booking_id, loadAttachments = false) => {
             }]
         }
 
-        if (fileIds && fileIds.length == 1 && loadAttachments) {
+        if (attachmentForBooking && attachmentForBooking.length > 0 && loadAttachments) {
             let attachments = await fetch(
-                `https://www.googleapis.com/drive/v3/files?q='${fileIds[0].file_id}'+in+parents&fields=files(id,name,mimeType,webViewLink,webContentLink)`,
+                `https://www.googleapis.com/drive/v3/files?q='${attachmentForBooking[0].file_id}'+in+parents&fields=files(id,name,mimeType,webViewLink,webContentLink)`,
                 { headers: { Authorization: `Bearer ${getUserContext().token}` } }
             );
             let attachmentFiles = await attachments.json();
-            return attachmentFiles.files.map(file => ({
+            let attachmentsForBooking = attachmentFiles.files.map(file => ({
                 file_name: file.name,
                 file_id: file.id,
+                folder_id: attachmentForBooking[0].file_id,
                 file_url: file.webViewLink,
                 file_type: file.mimeType,
                 file_content: file.webContentLink,
                 file_size: file.size,
 
-            }))
+            }));
+            return attachmentsForBooking;
         }
 
     }
     return []
 }
+
+const createParentFolder = async (bookingId) => {
+    const token = getUserContext().token;
+    if (!token) {
+        throw new Error('No authorization token available');
+    }
+
+    const metadata = {
+        name: `${bookingId}`,
+        mimeType: 'application/vnd.google-apps.folder',
+        parents: [FOLDER_ID] // Use your root folder ID or appropriate parent folder
+    };
+
+    try {
+        const response = await fetch('https://www.googleapis.com/drive/v3/files', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(metadata)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error('Failed to create folder: ' + errorText);
+        }
+
+        const data = await response.json();
+        console.debug("Parent folder created ....")
+        return data.id; // Return the folder ID
+    } catch (error) {
+        console.error('Error creating parent folder:', error);
+        throw error;
+    }
+}
+
+export const uploadToDrive = async (file, bookingId, parent_folder_id) => {
+    if (!file) {
+        throw new Error('No file provided for upload');
+    }
+
+    const token = getUserContext().token;
+    if (!token) {
+        throw new Error('No authorization token available');
+    }
+
+    if (parent_folder_id == -999) {
+        console.debug("Create Parent Folder ....")
+        parent_folder_id = await createParentFolder(bookingId)
+    }
+
+    // Create metadata for the file
+    const metadata = {
+        name: file.name,
+        mimeType: file.type,
+        parents: [parent_folder_id] // Replace with your folder ID or use FOLDER_ID constant if available
+    };
+
+    // Prepare the multipart request body
+    const boundary = '-------314159265358979323846';
+    const delimiter = `\r\n--${boundary}\r\n`;
+    const closeDelimiter = `\r\n--${boundary}--`;
+
+    const reader = new FileReader();
+
+    return new Promise((resolve, reject) => {
+        reader.onload = async (e) => {
+            const contentType = file.type || 'application/octet-stream';
+            const base64Data = btoa(
+                new Uint8Array(e.target.result)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+
+            const multipartRequestBody =
+                delimiter +
+                'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+                JSON.stringify(metadata) +
+                delimiter +
+                'Content-Type: ' + contentType + '\r\n' +
+                'Content-Transfer-Encoding: base64\r\n\r\n' +
+                base64Data +
+                closeDelimiter;
+
+            try {
+                const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: new Headers({
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                    }),
+                    body: multipartRequestBody
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error('Upload failed: ' + errorText);
+                }
+
+                const data = await response.json();
+                resolve({
+                    ...data,
+                    parent_folder_id: parent_folder_id,
+                })
+            } catch (error) {
+                reject(error);
+            }
+        };
+        reader.onerror = (error) => reject(error);
+        reader.readAsArrayBuffer(file);
+    });
+};
+
 
 /**
  * Loads all bookings from the server.

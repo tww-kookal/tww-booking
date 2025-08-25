@@ -15,7 +15,7 @@ export default function Login() {
     // 🔑 Single flow: login once and get access token
     const login = useGoogleLogin({
         flow: "implicit", // or "auth-code" if you want to exchange server-side
-        scope: "openid profile email https://www.googleapis.com/auth/drive.readonly",
+        scope: "openid profile email https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive",
         response_type: "id_token token",   // ask for both
         onSuccess: async (tokenResponse) => {
             const { access_token, id_token } = tokenResponse;
@@ -43,7 +43,6 @@ export default function Login() {
         onError: (err) => {
             console.error("Login Failed:", err);
             toast.error("Login failed");
-
         }
     });
 

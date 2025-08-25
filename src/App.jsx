@@ -12,8 +12,8 @@ import BookingSearch from "./pages/BookingSearch";
 import Booking from "./pages/Booking";
 import Customer from "./pages/Customer";
 import Payments from "./pages/Payments";
-
 import User from "./pages/User";
+import Documents from "./pages/Documents";
 
 export default function App() {
 
@@ -34,6 +34,7 @@ export default function App() {
                 <Route path="/customers/new" element={<ProtectedRoute><Customer /></ProtectedRoute>} />
                 <Route path="/user/new" element={<ProtectedRoute><User /></ProtectedRoute>} />
                 <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
+                <Route path="/booking/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
             </Routes>
         </div>
     );

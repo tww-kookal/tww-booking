@@ -149,7 +149,6 @@ const Booking = () => {
     }, [])
 
     useEffect(() => {
-        console.debug("PreLoaded Booking ")
         if (preloadedBooking) {
             setBooking({
                 ...preloadedBooking,
@@ -157,18 +156,19 @@ const Booking = () => {
             });
 
             fetchAttachments(preloadedBooking?.booking_id, true).then(files => {
+                console.debug("Attachment for booking in booking.jsx ")
                 setBooking(prev => ({
                     ...prev,
-                    attachments: files,
+                    attachments: files || [],
                 }));
                 console.debug("PreLoaded Booking ")
             });
             getPaymentsForBooking(navigate, preloadedBooking?.booking_id).then(payments => {
                 setBooking(prev => ({
                     ...prev,
-                    payments: payments,
-                    totalPaid: payments.reduce((acc, p) => acc + parseNumber(p.payment_amount), 0),
-                    balanceToPay: calculateTotalAmount(booking) - parseNumber(payments.reduce((acc, p) => acc + parseNumber(p.payment_amount), 0)),
+                    payments: payments || [],
+                    totalPaid: (payments || []).reduce((acc, p) => acc + parseNumber(p.payment_amount), 0),
+                    balanceToPay: calculateTotalAmount(booking) - parseNumber((payments || []).reduce((acc, p) => acc + parseNumber(p.payment_amount), 0)),
                 }));
             });
         }
@@ -205,7 +205,6 @@ const Booking = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        console.log("XXX ", name, value)
         setBooking(prev => {
             const updated = {
                 ...prev,
@@ -239,7 +238,6 @@ const Booking = () => {
     };
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [uploadedFile, setUploadedFile] = useState(null);
     const [isFormDisabled, setIsFormDisabled] = useState(false);
 
     const handleUpdate = async () => {
@@ -252,21 +250,6 @@ const Booking = () => {
             setIsFormDisabled(false); // Re-enable on error
             setIsSubmitting(false);
             return;
-        }
-
-        // Upload file if one was selected
-        if (uploadedFile) {
-            try {
-                //await uploadToDrive(uploadedFile, booking.bookingID);
-                console.debug('Identity Document uploaded successfully');
-            } catch (error) {
-                console.error('Booking:: Error uploading file:', error);
-                toast.error('Failed to upload Identity Document. Please try again.');
-                return;
-            } finally {
-                setIsSubmitting(false);
-                setIsFormDisabled(false); // Re-enable on error
-            }
         }
 
         try {
@@ -283,6 +266,8 @@ const Booking = () => {
                 }).catch((err) => {
                     console.error('Booking::Error updating booking:', err.response?.data?.detail || err.message);
                     toast.error(`Failed to update booking. ${err.response?.data?.detail || err.message}`);
+                    setIsFormDisabled(false); // Re-enable on error
+                    setIsSubmitting(false);
                 })
             } else {
                 // For new bookings, simply append
@@ -294,9 +279,10 @@ const Booking = () => {
                 }).catch((err) => {
                     console.error('Booking::Error creating booking:', err.response?.data?.detail || err.message);
                     toast.error(`Failed to create booking. ${err.response?.data?.detail || err.message}`);
+                    setIsFormDisabled(false); // Re-enable on error
+                    setIsSubmitting(false);
                 })
             }
-
 
         } catch (error) {
             console.error('Error saving booking:', error);
@@ -313,13 +299,16 @@ const Booking = () => {
             navigate('/search');
         } else {
             // Otherwise go to dashboard
-            navigate('/');
+            navigate('/dashboard');
         }
         // Clear file input on cancel
         const fileInput = document.querySelector('input[type="file"]');
         if (fileInput) fileInput.value = '';
     };
 
+    const handleDocuments = () => {
+        navigate("/booking/documents", { state: { booking: booking, returnTo: '/booking' } })
+    }
     return (
         <div className="booking-form-container">
             <ToastContainer />
@@ -336,14 +325,6 @@ const Booking = () => {
                     )
                     : ''}
             </h2>
-            {/* <div className='form-group'>
-                <label>Identity Document</label>
-                <input className='form-input'
-                    type="file"
-                    onChange={(e) => setUploadedFile(e.target.files[0])}
-                    accept=".pdf,.jpg,.jpeg,.png"
-                />
-            </div> */}
 
             <form onSubmit={e => e.preventDefault()}>
                 <div className='form-group'>
@@ -521,7 +502,7 @@ const Booking = () => {
                     <button type="button" className="button-secondary"
                         onClick={handleCancel}
                         disabled={isFormDisabled}>Cancel</button>
-                    {isUserInRoles(['manager', 'owner']) ?
+                    {isUserInRoles(['manager', 'owner']) && (
                         <>
                             <button
                                 type="button"
@@ -531,11 +512,18 @@ const Booking = () => {
                             >
                                 {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update' : 'Save'}
                             </button>
-                            <button type="button" className="button-secondary"
-                                onClick={() => handleGenerateReceipt(booking)}
-                                disabled={isFormDisabled}>Receipt</button>
+                            {preloadedBooking && preloadedBooking.booking_id && (
+                                <button type="button" className="button-secondary"
+                                    onClick={() => handleGenerateReceipt(booking)}
+                                    disabled={isFormDisabled}>Receipt</button>
+                            )}
+                            {preloadedBooking && preloadedBooking.booking_id && (
+                                <button type="button" className="button-secondary"
+                                    onClick={handleDocuments}
+                                    disabled={isFormDisabled}>Documents</button>
+                            )}
                         </>
-                        : ''}
+                    )}
                 </div>
             </form>
         </div>
