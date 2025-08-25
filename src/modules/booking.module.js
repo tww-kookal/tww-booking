@@ -520,10 +520,10 @@ export const handleGenerateReceipt = (booking) => {
                                     <hr />
                                     </td>
                                 </tr> -->
-                                <tr>
+                                <!-- <tr>
                                     <td><label>Agent Commission</label></td>
                                     <td align="right"> ${booking.commission || 0} </td>
-                                </tr>
+                                </tr> -->
                                 <tr>
                                     <td colspan="2">
                                     <hr />

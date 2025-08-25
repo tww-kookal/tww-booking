@@ -274,7 +274,7 @@ const Booking = () => {
                 // Invoke New Booking 
                 createNewBooking(navigate, booking).then((createdBooking) => {
                     toast.success('Booking saved successfully!');
-                    handleGenerateReceipt(createdBooking);
+                    //handleGenerateReceipt(createdBooking);
                     navigate("/dashboard")
                 }).catch((err) => {
                     console.error('Booking::Error creating booking:', err.response?.data?.detail || err.message);
