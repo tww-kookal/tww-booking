@@ -134,7 +134,7 @@ jobs:
    ```
 
 4. **Access your site**:
-   - Open [https://tww-kookal.github.io/tww-bill-generator/](https://tww-kookal.github.io/tww-bill-generator/) in your browser.
+   - Open [https://tww-kookal.github.io/tww-booking/](https://tww-kookal.github.io/tww-booking/) in your browser.
 
 ## License
 ```
