@@ -1,6 +1,6 @@
 # The Westwood Booking System
 ## Description
-TWW Booking is a comprehensive React-based booking management system designed for The Westwood. Its primary purpose is to streamline the process of creating, searching, viewing, and updating room bookings for staff, while leveraging Google Sheets as the backend data store and Google Drive for document management.
+The Westwood Booking System is a React-based booking management system designed for The Westwood. Its primary purpose is to streamline the process of creating, searching, viewing, and updating room bookings for staff, while leveraging Google Sheets as the backend data store and Google Drive for document management.
 
 ## Key Features
 
@@ -49,8 +49,48 @@ TWW Booking is a comprehensive React-based booking management system designed fo
 └── vite.config.js          # Vite configuration
 ```
 
+## Seamless Connectivity with Python FastAPI Backend (`tww-service`)
 
+The TWW Booking ReactJS frontend is designed for robust, seamless integration with the Python-based FastAPI backend, [`tww-service`](https://github.com/tww-kookal/tww-service). Here’s how this connectivity is achieved in detail:
 
+### 1. API-Driven Communication
+All frontend actions—such as booking rooms, managing customers, processing payments, and generating reports—are performed via RESTful API calls to the FastAPI backend. The backend exposes endpoints for each business function, and the frontend sends HTTP requests (GET, POST, PUT, DELETE) with JSON payloads. Responses are parsed and rendered in real time, ensuring a dynamic and interactive user experience.
+
+### 2. Authentication & Authorization
+- **Google OAuth**: Users authenticate via Google OAuth in the frontend. The resulting token is sent to the backend for verification.
+- **Session Management**: The backend validates tokens, issues JWTs or session cookies, and enforces role-based access control. The frontend includes these tokens in all subsequent requests, ensuring secure access to protected resources.
+- **Role Awareness**: The frontend adapts its UI based on user roles, hiding or showing admin features as appropriate.
+
+### 3. Data Synchronization
+- **Module Mapping**: Each frontend module (Booking, Customer, Payments, Reports) maps directly to backend routers. For example, booking creation triggers a POST to `/api/bookings`, while payment recording uses `/api/payments`.
+- **Live Updates**: The frontend periodically fetches updated data (e.g., room availability, payment status) to keep the UI current. Optimistic UI updates and error handling provide a smooth experience.
+
+### 4. Error Handling
+- **Consistent Feedback**: The backend returns standardized error codes and messages. The frontend interprets these and displays clear notifications, guiding users to resolve issues.
+
+### 5. Environment Configuration
+- **Backend URL**: The frontend’s `.env` files specify the FastAPI backend URL (e.g., `VITE_API_BASE_URL`), allowing easy switching between development, staging, and production.
+- **CORS**: The backend is configured to accept cross-origin requests from the frontend’s domain, enabling secure communication.
+
+### 6. Google Drive Integration
+- **Data Sync**: Actions like booking and payment trigger backend logic that updates Google Drive. The frontend displays sync status and feedback to users.
+
+### 7. Deployment & Scalability
+- **Decoupled Deployment**: The frontend (on GitHub Pages) and backend (on Railway.app or other platforms) are independently deployable. As long as the API base URL is set, the frontend can connect to any backend instance, supporting scalability and maintainability.
+
+### 8. Security Best Practices
+- **HTTPS**: All communication is encrypted via HTTPS.
+- **Token Expiry**: The frontend gracefully handles token expiry, prompting re-authentication as needed.
+
+### 9. Extensibility
+- **Modular Design**: Both frontend and backend are modular, allowing rapid addition of new features and endpoints. The frontend can consume new APIs as they are exposed.
+
+---
+
+**Summary:**
+The ReactJS frontend and FastAPI backend are tightly integrated through a secure, scalable, and modular API architecture. This ensures that user actions in the frontend are instantly reflected in backend operations, with real-time feedback, robust authentication, and seamless data synchronization.
+
+For backend details, see [`tww-service`](https://github.com/tww-kookal/tww-service).
 
 ## User Navigation Flow
 1. **Login**: User lands on the login page and authenticates via Google OAuth.
