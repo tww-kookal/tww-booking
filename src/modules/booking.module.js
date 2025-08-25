@@ -603,7 +603,7 @@ export const handleGenerateReceipt = (booking) => {
                 </body>
             </html>
         `);
-
+    receiptWindow.print();
     receiptWindow.document.close();
 };
 
