@@ -466,7 +466,7 @@ const Booking = () => {
                         {/* when the booking.payments is availble then display hte totalPaid and balanceToPay */}
                         {booking.payments && (
                             <div className='form-group'>
-                                <label>Total Paid</label>
+                                <label>Paid</label>
                                 <label>{booking.totalPaid || 0}</label>
                             </div>
                         )}
