@@ -408,20 +408,20 @@ export const handleGenerateReceipt = (booking) => {
                         <table style={{ borderWidth: 0, width: '100%' }} >
                         <tr style={{ width: '100%' }}>
                             <td style={{ width: '50%' }}>
-                                <big><big><big><big><big><big>Host Receipt</big></big></big></big></big></big>
+                                <big><big><big><big><big><big>Receipt</big></big></big></big></big></big>
                                 <br />
                                 <label>Booking ID - <strong>${booking.booking_id}</strong></label>
                                 <br />
-                                <label>Booking Date - ${dayjs(booking.booking_date, 'YYYY-MM-DD').format('MMM DD, YYYY')} </label>
+                                <label>Booking Date - <strong>${dayjs(booking.booking_date, 'YYYY-MM-DD').format('MMM DD, YYYY')} </strong></label>
                                 <br />
-                                <label>Check In - ${dayjs(booking.check_in, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</label>
+                                <label>Check In - <strong>${dayjs(booking.check_in, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</strong></label>
                                 <br />
-                                <label>Check Out - ${dayjs(booking.check_out, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</label>                            
+                                <label>Check Out - <strong>${dayjs(booking.check_out, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</strong></label>                           
                                 <br />
                                 <label><b>${booking.room_name}</b></label> for <label><b><i>${booking.customer_name} - ${booking.contact_number}</i></b> (${booking.number_of_nights} nights)  </label>
                             </td>
                             <td align="right">
-                                <img src="./images/westwoodlogo2.png" style={{ width: '50%', height: '50%' }} alt="The Westwood"></img>
+                                <img src="./images/westwoodlogo2.png" style= "width: 300px; max-height: 75px; height: auto;" alt="The Westwood"></img>
                                 <br />
                                 Survey No 380, Kookal Main Road,
                                 <br />
@@ -500,7 +500,7 @@ export const handleGenerateReceipt = (booking) => {
                                     <td colspan="2">
                                     <hr />
                                     </td>
-                                </tr> -->
+                                </tr> 
                                 <tr>
                                     <td><label>Voluntary Property Driven
                                     Coupon Discount </label></td>
@@ -510,7 +510,7 @@ export const handleGenerateReceipt = (booking) => {
                                     <td colspan="2">
                                     <hr />
                                     </td>
-                                </tr>
+                                </tr> -->
                                 <!-- <tr>
                                     <td><label>Property Gross Charges </label></td>
                                     <td align="right"> ${booking.total_price} </td>
@@ -550,7 +550,7 @@ export const handleGenerateReceipt = (booking) => {
                                 </tr> -->
                                 <tr>
                                     <td><label>Total</label></td>
-                                    <td align="right"> ${booking.total_price} </td>
+                                    <td align="right"> <b>${booking.total_price}</b> </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
@@ -567,9 +567,9 @@ export const handleGenerateReceipt = (booking) => {
                                 <tr><td colspan="2"><hr /></td></tr>                                
                                 <tr>
                                     <td><label>Balance</label></td>
-                                    <td align="right"> ${balance} </td>
+                                    <td align="right"> <b><i>${balance}</i></b> </td>
                                 </tr>
-                                <tr><td colspan="2"><hr /></td></tr>                                
+                                <!-- <tr><td colspan="2"><hr /></td></tr>                                -->
                                 </table>
                             </center>
                             </td>
