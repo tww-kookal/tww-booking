@@ -69,9 +69,16 @@ const Navbar = () => {
         <Link to="/search" className={location.pathname === '/search' ? 'active' : ''}>
           Search
         </Link>
-        <Link to="/booking" className={location.pathname.includes('/booking') ? 'active' : ''}>
-          New
-        </Link>
+        {isUserInRoles(['manager', 'owner']) ?
+          <Link to="/booking" className={location.pathname.includes('/booking') ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+            New
+          </Link>
+          : ''}
+        {isUserInRoles(['manager', 'owner', 'employee']) ?
+          <Link to="/expenses/search" className={location.pathname === '/expenses/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+            List Expenses
+          </Link>
+          : ''}
       </div>
     </nav>
   );
