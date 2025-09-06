@@ -142,6 +142,10 @@ const Dashboard = () => {
               <span className="icon">↻</span>
               <span>Refresh</span>
             </button>
+            <Link to="/expenses" className="action-button find">
+              <span className="icon">➕</span>
+              <span>Expense</span>
+            </Link>
           </div>
         </div>
       </>

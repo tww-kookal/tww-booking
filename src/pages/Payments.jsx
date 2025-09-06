@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { validatePayment, updatePayment, addPayment, deletePaymentById, PAYMENT_TYPE, PAYMENT_FOR } from '../modules/payment.module';
+import { updatePayment, addPayment, deletePaymentById } from '../modules/payment.module';
+import { PAYMENT_TYPE } from '../modules/constants';
+import { getAllAccountingCategories } from '../modules/expense.module';
+import { getAllCustomers } from '../modules/customer.module';
+import { getUserContext } from '../contexts/constants';
 
 import '../css/payment.large.css';
 import '../css/payment.handheld.css';
@@ -12,19 +17,54 @@ const Payments = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [payments, setPayments] = useState([]);
-    const [users, setUsers] = useState([]);
     const [booking, setBooking] = useState(null);
+    const [accCategoryOptions, setAccCategoryOptions] = useState([]);
+    const [selectedAccCategory, setSelectedAccCategory] = useState();
+    const [selectedPaymentTo, setSelectedPaymentTo] = useState();
+    const [accPartiesOptions, setAccPartiesOptions] = useState([])
 
     useEffect(() => {
-        if (location.state.users && location.state.users.length > 0) {
-            setUsers(location.state.users);
-        }
+        getAllAccountingCategories(navigate).then(accCategories => {
+            setAccCategoryOptions(
+                accCategories
+                    .filter(u => u.acc_category_type === 'credit' || u.acc_category_name.includes('Refund'))
+                    .map(u => ({
+                        value: u.acc_category_id,
+                        label: `[${(u.acc_category_type || '#').charAt(0)}] ${u.acc_category_name}`
+                    })));
+        }).catch(error => {
+            console.error('Payments::Error fetching acc categories:', error);
+        });
+    }, []);
 
+    useEffect(() => {
+        getAllCustomers(navigate).then(customers => {
+            setAccPartiesOptions(customers.map(u => ({
+                value: u.customer_id,
+                label: `${u.customer_name} - ${u.phone}`
+            })));
+
+            let customer = customers.find(u => u.email === getUserContext().user.email);
+            if (!customer) {
+                customer = customers.find(u => u.phone === getUserContext().user.phone);
+            }
+            if (customer) {
+                setSelectedPaymentTo({
+                    value: customer.customer_id,
+                    label: `${customer.customer_name} - ${customer.phone}`
+                });
+                customer = customers.find(u => u.email === 'thewestwood.kookal@gmail.com');
+            }
+        }).catch(error => {
+            console.error('Accounting::Error fetching acc parties:', error);
+        });
+    }, []);
+
+    useEffect(() => {
         if (location.state.booking) {
             setPayments(location.state.booking.payments || []);
             setBooking(location.state.booking);
         }
-
     }, [location.state]);
 
     const handleChange = (index, e) => {
@@ -48,10 +88,19 @@ const Payments = () => {
                 payment_date: dayjs().format('YYYY-MM-DD'),
                 payment_to: 0,
                 payment_for: '',
-                remarks: ''
+                remarks: '',
+                customer_id: booking?.customer_id || 0
             }
         ]);
     };
+
+    const getSelectedAccCategory = (payment_for) => {
+        return accCategoryOptions.find(u => u.value === payment_for);
+    }
+
+    const getSelectePaymentTo = (payment_to) => {
+        return accPartiesOptions.find(u => u.value === payment_to);
+    }
 
     const handleUpdate = async (payment) => {
         try {
@@ -69,6 +118,7 @@ const Payments = () => {
 
     const handleDelete = async (payment) => {
         try {
+            console.debug("Delete Payment ", payment)
             await deletePaymentById(navigate, payment);
             setPayments(payments.filter(p => p.booking_payments_id !== payment.booking_payments_id));
             setBooking({
@@ -128,12 +178,20 @@ const Payments = () => {
                             </div>
                             <div className="form-group">
                                 <label>For</label>
-                                <select name="payment_for" value={payment.payment_for} onChange={(e) => handleChange(index, e)}>
-                                    <option value="">Select Type</option>
-                                    {PAYMENT_FOR && PAYMENT_FOR.map(type => (
-                                        <option key={type.id} value={type.id}>{type.value}</option>
-                                    ))}
-                                </select>
+                                <Select name="payment_for"
+                                    value={getSelectedAccCategory(payment.payment_for)}
+                                    onChange={e => {
+                                        payment.payment_for = e.value;
+                                        setSelectedAccCategory({
+                                            value: e.value,
+                                            label: e.label,
+                                        });
+                                    }}
+                                    options={accCategoryOptions}
+                                    placeholder="Select a payment for..."
+                                    isSearchable={true}
+                                    classNamePrefix="react-select"
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Amount</label>
@@ -149,19 +207,27 @@ const Payments = () => {
                                 <label>Type</label>
                                 <select name="payment_type" value={payment.payment_type} onChange={(e) => handleChange(index, e)}>
                                     <option value="">Select Type</option>
-                                    {PAYMENT_TYPE && PAYMENT_TYPE.map(type => (
+                                    {PAYMENT_TYPE && PAYMENT_TYPE.length > 0 && PAYMENT_TYPE.map(type => (
                                         <option key={type.id} value={type.id}>{type.value}</option>
                                     ))}
                                 </select>
                             </div>
                             <div className="form-group">
                                 <label>Pay To</label>
-                                <select name="payment_to" value={payment.payment_to} onChange={(e) => handleChange(index, e)}>
-                                    <option value={0}>Pay To</option>
-                                    {users && users.map(user => (
-                                        <option key={user.user_id} value={user.user_id}>{user.first_name} {user.last_name}</option>
-                                    ))}
-                                </select>
+                                <Select name="payment_to"
+                                    value={getSelectePaymentTo(payment.payment_to)}
+                                    onChange={e => {
+                                        payment.payment_to = e.value;
+                                        setSelectedPaymentTo({
+                                            value: e.value,
+                                            label: e.label,
+                                        });
+                                    }}
+                                    options={accPartiesOptions}
+                                    placeholder="Select Receiver..."
+                                    isSearchable={true}
+                                    classNamePrefix="react-select"
+                                />
                             </div>
                             <div className="form-group">
                                 <label>Remarks</label>

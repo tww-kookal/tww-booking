@@ -14,6 +14,8 @@ import Customer from "./pages/Customer";
 import Payments from "./pages/Payments";
 import User from "./pages/User";
 import Documents from "./pages/Documents";
+import Expense from "./pages/Expense"
+import ExpenseSearch from "./pages/ExpenseSearch";
 
 export default function App() {
 
@@ -35,6 +37,8 @@ export default function App() {
                 <Route path="/user/new" element={<ProtectedRoute><User /></ProtectedRoute>} />
                 <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
                 <Route path="/booking/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+                <Route path="/expenses" element={<ProtectedRoute><Expense /></ProtectedRoute>} />
+                <Route path="/expenses/search" element={<ProtectedRoute><ExpenseSearch /></ProtectedRoute>} />
             </Routes>
         </div>
     );

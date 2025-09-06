@@ -70,6 +70,7 @@ export const DEFAULT_BOOKING = {
  * @constant {Array<string>} roomOptions - An array of available room options.
  */
 export const roomOptions = ['Cedar', 'Pine', 'Teak', 'Maple', 'Tent'];
+export const PAYMENT_TYPE = [{ id: 'cash', value: 'Cash' }, { id: 'cc', value: 'Credit Card' }, { id: 'dc', value: 'Debit Card' }, { id: 'gpay', value: 'Google Pay' }, { id: 'upi', value: 'UPI' }, { id: 'bank', value: 'Bank' }]
 export const ROOM_NAMES = roomOptions
 /**
  * @constant {object} roomAvailabilityStatusColors - An object mapping booking statuses to their corresponding colors.

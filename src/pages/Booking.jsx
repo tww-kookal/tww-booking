@@ -460,7 +460,7 @@ const Booking = () => {
                                 <div key={p.booking_payments_id} className='form-group'>
                                     <label style={{ fontSize: "1rem" }}>{p.payment_date}</label>
                                     <label style={{ fontSize: "1rem" }}>{p.payment_amount}</label>
-                                    <label style={{ fontSize: "1rem" }}>{p.payment_for}</label>
+                                    <label style={{ fontSize: "1rem" }}>{p.acc_category_name}</label>
                                 </div>
                             ))}
                         {/* when the booking.payments is availble then display hte totalPaid and balanceToPay */}
@@ -474,7 +474,7 @@ const Booking = () => {
                         {booking.payments && (
                             <div className='form-group'>
                                 <label>Balance</label>
-                                <label>{booking.total_price - booking.totalPaid}</label>
+                                <label>{Math.round(booking.total_price - booking.totalPaid, 2)}</label>
                             </div>
                         )}
                         <div className='form-group' style={{ alignItems: "center" }}>

@@ -347,7 +347,7 @@ export const updateBooking = async (navigate, booking) => {
 
 export const getPaymentsForBooking = async (navigate, booking_id) => {
     try {
-        const response = await api.get("/payment/forBookingID/" + booking_id);
+        const response = await api.get("/accounting/payment/forBookingID/" + booking_id);
         console.debug("Booking.Module::getPaymentsForBooking::Fetched payments for booking");
         return response.data?.payments || [];
     } catch (error) {

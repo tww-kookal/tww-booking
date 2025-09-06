@@ -44,7 +44,16 @@ const Navbar = () => {
                 New
               </Link>
               : ''}
-
+            {isUserInRoles(['manager', 'owner', 'employee']) ?
+              <Link to="/expenses" className={location.pathname === ('/expenses') ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+                Add Expense
+              </Link>
+              : ''}
+            {isUserInRoles(['manager', 'owner', 'employee']) ?
+              <Link to="/expenses/search" className={location.pathname === '/expenses/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+                List Expenses
+              </Link>
+              : ''}
           </div>
         </div>
       )}
