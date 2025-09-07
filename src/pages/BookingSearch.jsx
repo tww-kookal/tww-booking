@@ -9,6 +9,13 @@ import { getAllAttachedBookings, getAllBookings } from "../modules/booking.modul
 import '../css/bookingSearch.large.css';
 import '../css/bookingSearch.handheld.css';
 
+import ScrollToTop from '../site/ScrollToTop';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectFade, Autoplay } from 'swiper';
+import '../styles.css'
+import 'swiper/css/effect-fade';
+import 'swiper/css';
+
 const BookingSearch = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -94,7 +101,7 @@ const BookingSearch = () => {
     if (!booking_id) {
       return []
     }
-    return  attachments.filter(attachment => {
+    return attachments.filter(attachment => {
       return attachment.name == booking_id;
     })
   }
@@ -119,103 +126,116 @@ const BookingSearch = () => {
   };
 
   return (
-    <div className="search-booking-container" >
+    <div style={{ backgroundColor: 'black' }}>
+      <ScrollToTop />
+      <Swiper
+        modules={[EffectFade, Autoplay]}
+        effect={'fade'}
+        loop={true}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+        }}
+        className='heroSlider h-[100px] lg:h-[27px]'
+      ></Swiper>
       <ToastContainer />
-      <div className="search-header" >
-        Search Bookings
+      <div className="search-booking-container" >
+        <div className="search-header" >
+          Search Bookings
+        </div>
+
+        <div className="search-form" >
+          <div className="search-field" >
+            <label htmlFor="bookingDate">Booking Date:</label>
+            <input
+              type="date"
+              id="bookingDate"
+              name="bookingDate"
+              value={searchCriteria.bookingDate}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div className="search-field" >
+            <label htmlFor="guestName">Guest Name:</label>
+            <input
+              type="text"
+              id="guestName"
+              name="guestName"
+              placeholder="Enter guest name"
+              value={searchCriteria.guestName}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div className="search-field" >
+            <label htmlFor="checkInDate">Check In Date:</label>
+            <input
+              type="date"
+              id="checkInDate"
+              name="checkInDate"
+              value={searchCriteria.checkInDate}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div className="search-field" >
+            <label htmlFor="contactNumber">Contact Number:</label>
+            <input
+              type="text"
+              id="contactNumber"
+              name="contactNumber"
+              placeholder="Enter contact number"
+              value={searchCriteria.contactNumber}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div className="search-field" >
+            <label htmlFor="bookingID">Booking ID:</label>
+            <input
+              type="text"
+              id="bookingID"
+              name="bookingID"
+              placeholder="Enter booking ID"
+              value={searchCriteria.bookingID}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <button
+            className="search-button"
+            onClick={handleSearch}
+            disabled={loading}
+            style={{ width: '100%' }}
+          >
+            {loading ? (
+              <span className="searching-animation">
+                Searching
+                <span className="dot"></span>
+                <span className="dot"></span>
+                <span className="dot"></span>
+              </span>
+            ) : 'Search'}
+          </button>
+        </div>
+
+        <BookingList
+          loading={loading}
+          results={results}
+          paginatedResults={paginatedResults}
+          findAttachmentsForBooking={findAttachmentsForBooking}
+          itemsPerPage={itemsPerPage}
+          currentPage={currentPage}
+          handlePageChange={handlePageChange}
+          handleViewBooking={handleViewBooking}
+        />
       </div>
-
-      <div className="search-form" >
-        <div className="search-field" >
-          <label htmlFor="bookingDate">Booking Date:</label>
-          <input
-            type="date"
-            id="bookingDate"
-            name="bookingDate"
-            value={searchCriteria.bookingDate}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <div className="search-field" >
-          <label htmlFor="guestName">Guest Name:</label>
-          <input
-            type="text"
-            id="guestName"
-            name="guestName"
-            placeholder="Enter guest name"
-            value={searchCriteria.guestName}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <div className="search-field" >
-          <label htmlFor="checkInDate">Check In Date:</label>
-          <input
-            type="date"
-            id="checkInDate"
-            name="checkInDate"
-            value={searchCriteria.checkInDate}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <div className="search-field" >
-          <label htmlFor="contactNumber">Contact Number:</label>
-          <input
-            type="text"
-            id="contactNumber"
-            name="contactNumber"
-            placeholder="Enter contact number"
-            value={searchCriteria.contactNumber}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <div className="search-field" >
-          <label htmlFor="bookingID">Booking ID:</label>
-          <input
-            type="text"
-            id="bookingID"
-            name="bookingID"
-            placeholder="Enter booking ID"
-            value={searchCriteria.bookingID}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <button
-          className="search-button"
-          onClick={handleSearch}
-          disabled={loading}
-          style={{ width: '100%' }}
-        >
-          {loading ? (
-            <span className="searching-animation">
-              Searching
-              <span className="dot"></span>
-              <span className="dot"></span>
-              <span className="dot"></span>
-            </span>
-          ) : 'Search'}
-        </button>
-      </div>
-
-      <BookingList
-        loading={loading}
-        results={results}
-        paginatedResults={paginatedResults}
-        findAttachmentsForBooking={findAttachmentsForBooking}
-        itemsPerPage={itemsPerPage}
-        currentPage={currentPage}
-        handlePageChange={handlePageChange}
-        handleViewBooking={handleViewBooking}
-      />
     </div>
   );
 };

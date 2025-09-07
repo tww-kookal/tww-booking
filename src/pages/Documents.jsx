@@ -7,6 +7,12 @@ import { uploadToDrive } from '../modules/booking.module';
 
 import '../css/document.large.css';
 import '../css/document.handheld.css';
+import ScrollToTop from '../site/ScrollToTop';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectFade, Autoplay } from 'swiper';
+import '../styles.css'
+import 'swiper/css/effect-fade';
+import 'swiper/css';
 
 const Documents = () => {
     const navigate = useNavigate();
@@ -85,40 +91,53 @@ const Documents = () => {
     };
 
     return (
-        <div className="document-form-container">
+        <div style={{ backgroundColor: 'black' }}>
+            <ScrollToTop />
+            <Swiper
+                modules={[EffectFade, Autoplay]}
+                effect={'fade'}
+                loop={true}
+                autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                }}
+                className='heroSlider h-[100px] lg:h-[27px]'
+            ></Swiper>
             <ToastContainer />
-            <h2>Documents for Booking #{booking?.booking_id}</h2>
-            <div className="documents-list">
-                <fieldset >
-                    <legend>&nbsp;Attachments&nbsp;</legend>
-                    {(booking?.attachments || []).map((attachment, index) => (
-                        <div key={index} className="document-item">
-                            <div className="form-group">
-                                <a href={attachment.file_url} target="_blank" rel="noopener noreferrer">{attachment.file_name}</a>
+            <div className="document-form-container">
+                <h2>Documents for Booking #{booking?.booking_id}</h2>
+                <div className="documents-list">
+                    <fieldset >
+                        <legend>&nbsp;Attachments&nbsp;</legend>
+                        {(booking?.attachments || []).map((attachment, index) => (
+                            <div key={index} className="document-item">
+                                <div className="form-group">
+                                    <a href={attachment.file_url} target="_blank" rel="noopener noreferrer">{attachment.file_name}</a>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                    <fieldset>
-                        <div className="form-buttons">
-                            <button onClick={handleAdd} disabled={isFormDisabled} className="btn-add">Add Document</button>
-                            <button onClick={handleCancel} disabled={isFormDisabled} className="btn-cancel">Cancel</button>
-                        </div>
+                        ))}
+                        <fieldset>
+                            <div className="form-buttons">
+                                <button onClick={handleAdd} disabled={isFormDisabled} className="btn-add">Add Document</button>
+                                <button onClick={handleCancel} disabled={isFormDisabled} className="btn-cancel">Cancel</button>
+                            </div>
+                        </fieldset>
                     </fieldset>
-                </fieldset>
-                {showIdentityAttachment && (
-                    <fieldset>
-                        <div className='form-group'>
-                            <input className='form-input'
-                                type="file"
-                                onChange={(e) => setUploadedFile(e.target.files[0])}
-                                accept=".pdf,.jpg,.jpeg,.png"
-                            />
-                            {uploadedFile && (
-                                <button onClick={handleUpload} disabled={isFormDisabled}>Upload</button>
-                            )}
-                        </div>
-                    </fieldset>
-                )}
+                    {showIdentityAttachment && (
+                        <fieldset>
+                            <div className='form-group'>
+                                <input className='form-input'
+                                    type="file"
+                                    onChange={(e) => setUploadedFile(e.target.files[0])}
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                />
+                                {uploadedFile && (
+                                    <button onClick={handleUpload} disabled={isFormDisabled}>Upload</button>
+                                )}
+                            </div>
+                        </fieldset>
+                    )}
+                </div>
             </div>
         </div>
     );

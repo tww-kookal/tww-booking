@@ -16,15 +16,19 @@ import User from "./pages/User";
 import Documents from "./pages/Documents";
 import Expense from "./pages/Expense"
 import ExpenseSearch from "./pages/ExpenseSearch";
+import Header from "./site/Header";
+import Home from "./site/Home";
+import RoomDetails from "./site/RoomDetails";
+import PageNotFound from "./site/PageNotFound";
 
 export default function App() {
 
     return (
         <div>
-            <Navbar />
+            {/*             <Navbar /> */}
+            <Header />
             <Routes>
-                <Route path="/" element={<Login />} />
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<Home />} />
                 <Route path="/rooms" element={<ProtectedRoute><Rooms /></ProtectedRoute>} />
                 <Route path="/booking" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
@@ -39,6 +43,11 @@ export default function App() {
                 <Route path="/booking/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
                 <Route path="/expenses" element={<ProtectedRoute><Expense /></ProtectedRoute>} />
                 <Route path="/expenses/search" element={<ProtectedRoute><ExpenseSearch /></ProtectedRoute>} />
+
+                <Route path={'/'} element={<Home />} />
+                <Route path={'/room/:id'} element={<RoomDetails />} />
+                <Route path={'*'} element={<PageNotFound />} />
+
             </Routes>
         </div>
     );

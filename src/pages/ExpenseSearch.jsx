@@ -8,6 +8,12 @@ import { getExpensesSince } from "../modules/expense.module";
 
 import '../css/expenseSearch.large.css';
 import '../css/expenseSearch.handheld.css';
+import ScrollToTop from '../site/ScrollToTop';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectFade, Autoplay } from 'swiper';
+import '../styles.css'
+import 'swiper/css/effect-fade';
+import 'swiper/css';
 
 const ExpenseSearch = () => {
   const navigate = useNavigate();
@@ -70,7 +76,7 @@ const ExpenseSearch = () => {
     navigate(`/expenses`, {
       state: {
         preloadedExpense: selectedExpense,
-        from: 'searchExpense'        
+        from: 'searchExpense'
       }
     });
   };
@@ -86,105 +92,119 @@ const ExpenseSearch = () => {
   };
 
   return (
-    <div className="search-expense-container" >
+    <div style={{ backgroundColor: 'black' }}>
+      <ScrollToTop />
+      <Swiper
+        modules={[EffectFade, Autoplay]}
+        effect={'fade'}
+        loop={true}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+        }}
+        className='heroSlider h-[100px] lg:h-[27px]'
+      ></Swiper>
       <ToastContainer />
-      <div className="search-header" >
-        Search Expenses
+      <div className="search-expense-container" >
+        <ToastContainer />
+        <div className="search-header" >
+          Search Expenses
+        </div>
+
+        <div className="search-form" >
+          <div className="search-field" >
+            <label htmlFor="expenseDate">Expense Date:</label>
+            <input
+              type="date"
+              id="expenseDate"
+              name="expenseDate"
+              value={searchCriteria.expenseDate}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div className="search-field" >
+            <label htmlFor="paidBy">Paid By:</label>
+            <input
+              type="text"
+              id="paidBy"
+              name="paidBy"
+              placeholder="Enter paid by"
+              value={searchCriteria.paidBy}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div className="search-field" >
+            <label htmlFor="acc_category_id">Account Category:</label>
+            <input
+              type="text"
+              id="acc_category_id"
+              name="acc_category_id"
+              placeholder="Enter account category"
+              value={searchCriteria.acc_category_id}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div className="search-field" >
+            <label htmlFor="receivedBy">Received By:</label>
+            <input
+              type="text"
+              id="receivedBy"
+              name="receivedBy"
+              placeholder="Enter received by"
+              value={searchCriteria.receivedBy}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div className="search-field" >
+            <label htmlFor="receivedForBookingId">Received For Booking ID:</label>
+            <input
+              type="text"
+              id="receivedForBookingId"
+              name="receivedForBookingId"
+              placeholder="Enter received for booking ID"
+              value={searchCriteria.receivedForBookingId}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <button
+            className="search-button"
+            onClick={handleSearch}
+            disabled={loading}
+            style={{ width: '100%' }}
+          >
+            {loading ? (
+              <span className="searching-animation">
+                Searching
+                <span className="dot"></span>
+                <span className="dot"></span>
+                <span className="dot"></span>
+              </span>
+            ) : 'Search'}
+          </button>
+        </div>
+
+        <ExpenseList
+          loading={loading}
+          expenses={expenses}
+          paginatedExpenses={paginatedExpenses}
+          itemsPerPage={itemsPerPage}
+          currentPage={currentPage}
+          handlePageChange={handlePageChange}
+          handleViewExpense={handleViewExpense}
+          totalDebit={totalDebit}
+          totalCredit={totalCredit}
+        />
       </div>
-
-      <div className="search-form" >
-        <div className="search-field" >
-          <label htmlFor="expenseDate">Expense Date:</label>
-          <input
-            type="date"
-            id="expenseDate"
-            name="expenseDate"
-            value={searchCriteria.expenseDate}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <div className="search-field" >
-          <label htmlFor="paidBy">Paid By:</label>
-          <input
-            type="text"
-            id="paidBy"
-            name="paidBy"
-            placeholder="Enter paid by"
-            value={searchCriteria.paidBy}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <div className="search-field" >
-          <label htmlFor="acc_category_id">Account Category:</label>
-          <input
-            type="text"
-            id="acc_category_id"
-            name="acc_category_id"
-            placeholder="Enter account category"
-            value={searchCriteria.acc_category_id}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <div className="search-field" >
-          <label htmlFor="receivedBy">Received By:</label>
-          <input
-            type="text"
-            id="receivedBy"
-            name="receivedBy"
-            placeholder="Enter received by"
-            value={searchCriteria.receivedBy}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <div className="search-field" >
-          <label htmlFor="receivedForBookingId">Received For Booking ID:</label>
-          <input
-            type="text"
-            id="receivedForBookingId"
-            name="receivedForBookingId"
-            placeholder="Enter received for booking ID"
-            value={searchCriteria.receivedForBookingId}
-            onChange={handleInputChange}
-            style={{ width: '100%' }}
-          />
-        </div>
-
-        <button
-          className="search-button"
-          onClick={handleSearch}
-          disabled={loading}
-          style={{ width: '100%' }}
-        >
-          {loading ? (
-            <span className="searching-animation">
-              Searching
-              <span className="dot"></span>
-              <span className="dot"></span>
-              <span className="dot"></span>
-            </span>
-          ) : 'Search'}
-        </button>
-      </div>
-
-      <ExpenseList
-        loading={loading}
-        expenses={expenses}
-        paginatedExpenses={paginatedExpenses}
-        itemsPerPage={itemsPerPage}
-        currentPage={currentPage}
-        handlePageChange={handlePageChange}
-        handleViewExpense={handleViewExpense}
-        totalDebit={totalDebit}
-        totalCredit={totalCredit}
-      />
     </div>
   );
 };

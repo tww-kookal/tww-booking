@@ -1,4 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import ScrollToTop from '../site/ScrollToTop';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectFade, Autoplay } from 'swiper';
+import 'swiper/css/effect-fade';
+import 'swiper/css';
 import { ToastContainer, toast } from 'react-toastify';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.css';
@@ -176,18 +181,31 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
     );
 
     return (
-        <div className="room-chart-container">
-            <ToastContainer />
-            <div className='form-search'>
-                <label>Start Date: &nbsp;</label>
-                <input
-                    type="date"
-                    value={startDate.format("YYYY-MM-DD")}
-                    onChange={handleDateChange}
-                />
-            </div>
-            <div className="room-chart" style={{ width: '100%' }} >
-                {renderCards()}
+        <div style={{ backgroundColor: 'black' }}>
+            <ScrollToTop />
+            <Swiper
+                modules={[EffectFade, Autoplay]}
+                effect={'fade'}
+                loop={true}
+                autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                }}
+                className='heroSlider h-[100px] lg:h-[27px]'
+            ></Swiper>
+            <div className="room-chart-container">
+                <ToastContainer />
+                <div className='form-search'>
+                    <label>Start Date: &nbsp;</label>
+                    <input
+                        type="date"
+                        value={startDate.format("YYYY-MM-DD")}
+                        onChange={handleDateChange}
+                    />
+                </div>
+                <div className="room-chart" style={{ width: '100%' }} >
+                    {renderCards()}
+                </div>
             </div>
         </div>
     );

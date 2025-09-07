@@ -15,6 +15,13 @@ import { isUserInRoles } from '../contexts/constants';
 import '../css/booking.large.css';
 import '../css/booking.handheld.css';
 
+import ScrollToTop from '../site/ScrollToTop';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectFade, Autoplay } from 'swiper';
+import '../styles.css'
+import 'swiper/css/effect-fade';
+import 'swiper/css';
+
 const Booking = () => {
     const location = useLocation();
     const preloadedBooking = location.state?.preloadedBooking;
@@ -310,222 +317,235 @@ const Booking = () => {
         navigate("/booking/documents", { state: { booking: booking, returnTo: '/booking' } })
     }
     return (
-        <div className="booking-form-container">
+        <div style={{ backgroundColor: 'black' }}>
+            <ScrollToTop />
+            <Swiper
+                modules={[EffectFade, Autoplay]}
+                effect={'fade'}
+                loop={true}
+                autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                }}
+                className='heroSlider h-[100px] lg:h-[27px]'
+            ></Swiper>
             <ToastContainer />
-            <h2>
-                Booking&nbsp;
-                {preloadedBooking && (<>({preloadedBooking.booking_id})</>)}
-                {!preloadedBooking && <>(New)</>}
-                &nbsp;
-                {isUserInRoles(['manager', 'owner']) ?
-                    preloadedBooking && booking && booking.attachments && (
-                        <>
-                            {booking.attachments.map(a => (<a href={a.file_url} target="_blank" rel="noopener noreferrer">📎</a>))}
-                        </>
-                    )
-                    : ''}
-            </h2>
+            <div className="booking-form-container">
+                <h2>
+                    Booking&nbsp;
+                    {preloadedBooking && (<>({preloadedBooking.booking_id})</>)}
+                    {!preloadedBooking && <>(New)</>}
+                    &nbsp;
+                    {isUserInRoles(['manager', 'owner']) ?
+                        preloadedBooking && booking && booking.attachments && (
+                            <>
+                                {booking.attachments.map(a => (<a href={a.file_url} target="_blank" rel="noopener noreferrer">📎</a>))}
+                            </>
+                        )
+                        : ''}
+                </h2>
 
-            <form onSubmit={e => e.preventDefault()}>
-                <div className='form-group'>
-                    <label>Room</label>
-                    <select name="room_id" value={booking.room_id} onChange={handleChange}>
-                        <option value="">Select Room</option>
-                        {rooms.map(r => <option key={r.room_id} value={r.room_id}>{r.room_name}</option>)}
-                    </select>
-                </div>
+                <form onSubmit={e => e.preventDefault()}>
+                    <div className='form-group'>
+                        <label>Room</label>
+                        <select name="room_id" value={booking.room_id} onChange={handleChange}>
+                            <option value="">Select Room</option>
+                            {rooms.map(r => <option key={r.room_id} value={r.room_id}>{r.room_name}</option>)}
+                        </select>
+                    </div>
 
-                <div className='form-group'>
-                    <label htmlFor="customer_id">Guest</label>
-                    <Select name="customer_id"
-                        value={selectedCustomer}
-                        onChange={handleCustomerChange}
-                        options={customerOptions}
-                        placeholder="Select a guest..."
-                        isSearchable={true}
-                        classNamePrefix="react-select"
-                    />
-                    {/*                     <select isSearchable={true} id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
+                    <div className='form-group'>
+                        <label htmlFor="customer_id">Guest</label>
+                        <Select name="customer_id"
+                            value={selectedCustomer}
+                            onChange={handleCustomerChange}
+                            options={customerOptions}
+                            placeholder="Select a guest..."
+                            isSearchable={true}
+                            classNamePrefix="react-select"
+                        />
+                        {/*                     <select isSearchable={true} id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
                         <option value="">Select Customer</option>
                         {customers.map(c => (
                             <option key={c.customer_id} value={c.customer_id}>{c.customer_name} - {c.phone}</option>
                         ))}
                     </select>
  */}                </div>
-                <div className='form-group' style={{ alignItems: "center" }}>
-                    <label></label>
-                    <button
-                        type="button"
-                        onClick={() => navigate('/customers/new', { state: { returnTo: '/booking', bookingDraft: booking } })}
-                        style={{ padding: '4px 8px' }}
-                    >
-                        + New
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => navigate('/customers/new', { state: { returnTo: '/booking', bookingDraft: booking, customer_id: booking.customer_id } })}
-                        style={{ padding: '4px 8px' }}
-                    >
-                        + Update
-                    </button>
-                </div>
-
-                <div className='form-group'>
-                    <label>Check In</label>
-                    <input type="date" name="check_in" value={booking.check_in} onChange={handleChange} />
-                </div>
-
-                <div className='form-group'>
-                    <label>Check Out</label>
-                    <input type="date" name="check_out" value={booking.check_out} onChange={handleChange} />
-                </div>
-
-                <div className='form-group'>
-                    <label>People</label>
-                    <input type="number" name="number_of_people" value={booking.number_of_people} onChange={handleChange} />
-                </div>
-
-                {isUserInRoles(['manager', 'owner']) ?
-                    <div className='form-group'>
-                        <label>Amount</label>
-                        <input type="number" name="room_price" value={booking.room_price} onChange={handleChange} />
+                    <div className='form-group' style={{ alignItems: "center" }}>
+                        <label></label>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/customers/new', { state: { returnTo: '/booking', bookingDraft: booking } })}
+                            style={{ padding: '4px 8px' }}
+                        >
+                            + New
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/customers/new', { state: { returnTo: '/booking', bookingDraft: booking, customer_id: booking.customer_id } })}
+                            style={{ padding: '4px 8px' }}
+                        >
+                            + Update
+                        </button>
                     </div>
-                    : ''
-                }
 
-                <div className='form-group'>
-                    <label>Source</label>
-                    <Select name="source_of_booking_id"
-                        value={selectedBookingSource}
-                        onChange={handleBookingSourceChange}
-                        options={userOptions}
-                        placeholder="Select a referral..."
-                        isSearchable={true}
-                        classNamePrefix="react-select"
-                    />
+                    <div className='form-group'>
+                        <label>Check In</label>
+                        <input type="date" name="check_in" value={booking.check_in} onChange={handleChange} />
+                    </div>
 
-                    {/*                     <select name="source_of_booking_id" value={booking.source_of_booking_id} onChange={handleChange}>
+                    <div className='form-group'>
+                        <label>Check Out</label>
+                        <input type="date" name="check_out" value={booking.check_out} onChange={handleChange} />
+                    </div>
+
+                    <div className='form-group'>
+                        <label>People</label>
+                        <input type="number" name="number_of_people" value={booking.number_of_people} onChange={handleChange} />
+                    </div>
+
+                    {isUserInRoles(['manager', 'owner']) ?
+                        <div className='form-group'>
+                            <label>Amount</label>
+                            <input type="number" name="room_price" value={booking.room_price} onChange={handleChange} />
+                        </div>
+                        : ''
+                    }
+
+                    <div className='form-group'>
+                        <label>Source</label>
+                        <Select name="source_of_booking_id"
+                            value={selectedBookingSource}
+                            onChange={handleBookingSourceChange}
+                            options={userOptions}
+                            placeholder="Select a referral..."
+                            isSearchable={true}
+                            classNamePrefix="react-select"
+                        />
+
+                        {/*                     <select name="source_of_booking_id" value={booking.source_of_booking_id} onChange={handleChange}>
                         <option value="">Select</option>
                         {users.map(s => <option key={s.user_id} value={s.user_id}>{s.first_name} {s.last_name} ({s.booking_commission || 0}%)</option>)}
                     </select>
  */}                </div>
-                <div className='form-group' style={{ alignItems: "center" }}>
-                    <label></label>
-                    <button
-                        type="button"
-                        onClick={() => navigate('/user/new', { state: { returnTo: '/booking', bookingDraft: booking } })}
-                        style={{ padding: '4px 8px' }}
-                    >
-                        + New
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => navigate('/user/new', { state: { returnTo: '/booking', bookingDraft: booking, user_id: booking.source_of_booking_id } })}
-                        style={{ padding: '4px 8px' }}
-                    >
-                        + Update
-                    </button>
-                </div>
-                {isUserInRoles(['manager', 'owner']) ?
-                    <div className='form-group'>
-                        <label style={{ fontSize: '1.2rem' }}>Commission</label>
-
-                        <label>{booking.commission}</label>
+                    <div className='form-group' style={{ alignItems: "center" }}>
+                        <label></label>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/user/new', { state: { returnTo: '/booking', bookingDraft: booking } })}
+                            style={{ padding: '4px 8px' }}
+                        >
+                            + New
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/user/new', { state: { returnTo: '/booking', bookingDraft: booking, user_id: booking.source_of_booking_id } })}
+                            style={{ padding: '4px 8px' }}
+                        >
+                            + Update
+                        </button>
                     </div>
-                    : ''
-                }
-
-                {/* Optional Fields */}
-                {isUserInRoles(['manager', 'owner']) ? <>
-                    <fieldset>
-                        <legend>Services</legend>
+                    {isUserInRoles(['manager', 'owner']) ?
                         <div className='form-group'>
-                            <label>Food</label>
-                            <input type="number" name="food_price" value={booking.food_price} onChange={handleChange} />
+                            <label style={{ fontSize: '1.2rem' }}>Commission</label>
+
+                            <label>{booking.commission}</label>
                         </div>
+                        : ''
+                    }
 
-                        <div className='form-group'>
-                            <label>Services</label>
-                            <input type="number" name="service_price" value={booking.service_price} onChange={handleChange} />
+                    {/* Optional Fields */}
+                    {isUserInRoles(['manager', 'owner']) ? <>
+                        <fieldset>
+                            <legend>Services</legend>
+                            <div className='form-group'>
+                                <label>Food</label>
+                                <input type="number" name="food_price" value={booking.food_price} onChange={handleChange} />
+                            </div>
+
+                            <div className='form-group'>
+                                <label>Services</label>
+                                <input type="number" name="service_price" value={booking.service_price} onChange={handleChange} />
+                            </div>
+                        </fieldset>
+                        <fieldset>
+                            <legend>Payments</legend>
+                            <div className='form-group'>
+                                <label>Total</label>
+                                <label>{booking.total_price}</label>
+                            </div>
+                            {booking.payments &&
+                                (booking.payments || []).map(p => (
+                                    <div key={p.booking_payments_id} className='form-group'>
+                                        <label style={{ fontSize: "1rem" }}>{p.payment_date}</label>
+                                        <label style={{ fontSize: "1rem" }}>{p.payment_amount}</label>
+                                        <label style={{ fontSize: "1rem" }}>{p.acc_category_name}</label>
+                                    </div>
+                                ))}
+                            {/* when the booking.payments is availble then display hte totalPaid and balanceToPay */}
+                            {booking.payments && (
+                                <div className='form-group'>
+                                    <label>Paid</label>
+                                    <label>{booking.totalPaid || 0}</label>
+                                </div>
+                            )}
+
+                            {booking.payments && (
+                                <div className='form-group'>
+                                    <label>Balance</label>
+                                    <label>{Math.round(booking.total_price - booking.totalPaid, 2)}</label>
+                                </div>
+                            )}
+                            <div className='form-group' style={{ alignItems: "center" }}>
+                                <label></label>
+                                {preloadedBooking && preloadedBooking.booking_id && (
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate('/payments', { state: { returnTo: '/booking', booking: booking, users: users } })}
+                                        style={{ padding: '4px 8px' }}>Manage Payments</button>
+                                )}
+                            </div>
+
+                        </fieldset>
+                    </>
+                        : ''}
+                    <fieldset>
+                        <legend>Remarks</legend>
+                        <div className='form-group' style={{ width: "100%" }}>
+                            <textarea style={{ width: "100%" }} name="remarks" value={booking.remarks || ''} onChange={handleChange} rows={3} />
                         </div>
                     </fieldset>
-                    <fieldset>
-                        <legend>Payments</legend>
-                        <div className='form-group'>
-                            <label>Total</label>
-                            <label>{booking.total_price}</label>
-                        </div>
-                        {booking.payments &&
-                            (booking.payments || []).map(p => (
-                                <div key={p.booking_payments_id} className='form-group'>
-                                    <label style={{ fontSize: "1rem" }}>{p.payment_date}</label>
-                                    <label style={{ fontSize: "1rem" }}>{p.payment_amount}</label>
-                                    <label style={{ fontSize: "1rem" }}>{p.acc_category_name}</label>
-                                </div>
-                            ))}
-                        {/* when the booking.payments is availble then display hte totalPaid and balanceToPay */}
-                        {booking.payments && (
-                            <div className='form-group'>
-                                <label>Paid</label>
-                                <label>{booking.totalPaid || 0}</label>
-                            </div>
-                        )}
 
-                        {booking.payments && (
-                            <div className='form-group'>
-                                <label>Balance</label>
-                                <label>{Math.round(booking.total_price - booking.totalPaid, 2)}</label>
-                            </div>
-                        )}
-                        <div className='form-group' style={{ alignItems: "center" }}>
-                            <label></label>
-                            {preloadedBooking && preloadedBooking.booking_id && (
+                    {/* Buttons */}
+                    <div className="form-buttons">
+                        <button type="button" className="button-secondary"
+                            onClick={handleCancel}
+                            disabled={isFormDisabled}>Cancel</button>
+                        {isUserInRoles(['manager', 'owner']) && (
+                            <>
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/payments', { state: { returnTo: '/booking', booking: booking, users: users } })}
-                                    style={{ padding: '4px 8px' }}>Manage Payments</button>
-                            )}
-                        </div>
-
-                    </fieldset>
-                </>
-                    : ''}
-                <fieldset>
-                    <legend>Remarks</legend>
-                    <div className='form-group' style={{ width: "100%" }}>
-                        <textarea style={{ width: "100%" }} name="remarks" value={booking.remarks || ''} onChange={handleChange} rows={3} />
+                                    className="button-primary"
+                                    onClick={handleUpdate}
+                                    disabled={isSubmitting || isFormDisabled}
+                                >
+                                    {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update' : 'Save'}
+                                </button>
+                                {preloadedBooking && preloadedBooking.booking_id && (
+                                    <button type="button" className="button-secondary"
+                                        onClick={() => handleGenerateReceipt(booking)}
+                                        disabled={isFormDisabled}>Receipt</button>
+                                )}
+                                {preloadedBooking && preloadedBooking.booking_id && (
+                                    <button type="button" className="button-secondary"
+                                        onClick={handleDocuments}
+                                        disabled={isFormDisabled}>Documents</button>
+                                )}
+                            </>
+                        )}
                     </div>
-                </fieldset>
-
-                {/* Buttons */}
-                <div className="form-buttons">
-                    <button type="button" className="button-secondary"
-                        onClick={handleCancel}
-                        disabled={isFormDisabled}>Cancel</button>
-                    {isUserInRoles(['manager', 'owner']) && (
-                        <>
-                            <button
-                                type="button"
-                                className="button-primary"
-                                onClick={handleUpdate}
-                                disabled={isSubmitting || isFormDisabled}
-                            >
-                                {isSubmitting ? 'Saving...' : preloadedBooking ? 'Update' : 'Save'}
-                            </button>
-                            {preloadedBooking && preloadedBooking.booking_id && (
-                                <button type="button" className="button-secondary"
-                                    onClick={() => handleGenerateReceipt(booking)}
-                                    disabled={isFormDisabled}>Receipt</button>
-                            )}
-                            {preloadedBooking && preloadedBooking.booking_id && (
-                                <button type="button" className="button-secondary"
-                                    onClick={handleDocuments}
-                                    disabled={isFormDisabled}>Documents</button>
-                            )}
-                        </>
-                    )}
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     );
 };

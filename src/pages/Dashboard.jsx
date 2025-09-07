@@ -9,9 +9,14 @@ import { getStartingCharacters } from '../modules/common.module';
 import { getAllBookings, getGuestsForDay } from '../modules/booking.module';
 import { BOOKING_STATUS } from '../modules/constants';
 import { isUserInRoles } from '../contexts/constants';
-
-
 import dayjs from 'dayjs';
+
+import ScrollToTop from '../site/ScrollToTop';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectFade, Autoplay } from 'swiper';
+import '../styles.css'
+import 'swiper/css/effect-fade';
+import 'swiper/css';
 
 const Dashboard = () => {
   const [todayCheckIns, setTodayCheckIns] = useState(0);
@@ -77,9 +82,21 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
+    <div style={{ backgroundColor: 'black' }}>
+      <ScrollToTop />
+      <Swiper
+        modules={[EffectFade, Autoplay]}
+        effect={'fade'}
+        loop={true}
+        autoplay={{
+          delay: 3000,
+          disableOnInteraction: false,
+        }}
+        className='heroSlider h-[100px] lg:h-[27px]'
+      ></Swiper>
       <ToastContainer />
-      <>
+
+      <div className="dashboard-container">
         <div className="stats-grid">
           <div className="stat-card">
             <Link to="/availability" state={{ exactStartDate: true }} className="action-button search">
@@ -148,7 +165,7 @@ const Dashboard = () => {
             </Link>
           </div>
         </div>
-      </>
+      </div>
     </div>
   )
 };

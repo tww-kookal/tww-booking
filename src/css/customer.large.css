@@ -3,11 +3,10 @@
   /* Adjusted for screens more than 1000 pixels */
 
   .customer-form-container {
-    max-width: 90%;
-    width: 90%;
-    margin: 0 auto;
-    margin: 2rem auto;
-    padding: 2rem;
+    max-width: 100%;
+    width: 100%;
+    margin: 2.5rem auto;
+    padding: 0.2rem;
     background-color: #f7f9fc;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
@@ -19,6 +18,10 @@
     text-align: center;
     margin-bottom: 1.5rem;
     color: #333;
+  }
+
+  .customer-form-container .form-group{
+    flex-direction: row;
   }
 
   .form-group {

@@ -43,14 +43,15 @@ export const isTokenReceived = () => {
 }
 
 export const getUserContext = () => {
-    return {
+    const user =  {
         user: AUTH_USER,
         user_object: AUTH_USER_OBJECT,
         token: AUTH_TOKEN,
         isTokenReceived: TOKEN_RECEIVED,
         user_roles: LOGGED_IN_USER_ROLES,
-        user: LOGGED_IN_USER
+        logged_in_user: LOGGED_IN_USER,
     }
+    return user;
 }
 
 

@@ -4,10 +4,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { validateCustomer, updateCustomer, addCustomer, getCustomerById } from '../modules/customer.module';
-import {isUserInRoles} from '../contexts/constants';
+import { isUserInRoles } from '../contexts/constants';
 
 import '../css/customer.large.css';
 import '../css/customer.handheld.css';
+import ScrollToTop from '../site/ScrollToTop';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectFade, Autoplay } from 'swiper';
+import '../styles.css'
+import 'swiper/css/effect-fade';
+import 'swiper/css';
 
 const Customer = () => {
     const { id } = useParams();
@@ -154,55 +160,69 @@ const Customer = () => {
     };
 
     return (
-        <div className="customer-form-container">
+        <div style={{ backgroundColor: 'black' }}>
+            <ScrollToTop />
+            <Swiper
+                modules={[EffectFade, Autoplay]}
+                effect={'fade'}
+                loop={true}
+                autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                }}
+                className='heroSlider h-[100px] lg:h-[27px]'
+            ></Swiper>
             <ToastContainer />
-            <h2>{toUpdateCustomer ? "Update" : "Create"} Customer
-                {toUpdateCustomer ?
-                    <i> ({customer.customer_id})</i>
-                    : ""}
-            </h2>
-            <form onSubmit={e => e.preventDefault()}>
-                <div className='form-group'>
-                    <label>Name</label>
-                    <input type="text" name="customer_name" value={customer.customer_name} onChange={handleChange} />
-                </div>
+            <div className="customer-form-container">
+                <ToastContainer />
+                <h2>{toUpdateCustomer ? "Update" : "Create"} Customer
+                    {toUpdateCustomer ?
+                        <i> ({customer.customer_id})</i>
+                        : ""}
+                </h2>
+                <form onSubmit={e => e.preventDefault()}>
+                    <div className='form-group'>
+                        <label>Name</label>
+                        <input type="text" name="customer_name" value={customer.customer_name} onChange={handleChange} />
+                    </div>
 
-                <div className='form-group'>
-                    <label>Phone</label>
-                    <input type="tel" name="phone" value={customer.phone} onChange={handleChange} />
-                </div>
+                    <div className='form-group'>
+                        <label>Phone</label>
+                        <input type="tel" name="phone" value={customer.phone} onChange={handleChange} />
+                    </div>
 
-                <div className='form-group'>
-                    <label>EMail</label>
-                    <input type="email" name="email" value={customer.email} onChange={handleChange} />
-                </div>
-                <div className='form-group'>
-                    <label>Area</label>
-                    <input type="text" name="area" value={customer.area} onChange={handleChange} />
-                </div>
-                <div className='form-group'>
-                    <label>City</label>
-                    <input type="text" name="city" value={customer.city} onChange={handleChange} />
-                </div>
+                    <div className='form-group'>
+                        <label>EMail</label>
+                        <input type="email" name="email" value={customer.email} onChange={handleChange} />
+                    </div>
+                    <div className='form-group'>
+                        <label>Area</label>
+                        <input type="text" name="area" value={customer.area} onChange={handleChange} />
+                    </div>
+                    <div className='form-group'>
+                        <label>City</label>
+                        <input type="text" name="city" value={customer.city} onChange={handleChange} />
+                    </div>
 
-                {/* Buttons */}
-                <div className="form-buttons">
-                    <button type="button" className="button-secondary"
-                        onClick={handleCancel}
-                        disabled={isFormDisabled}>Cancel</button>
-                    {isUserInRoles(['manager', 'owner']) ?
-                        <button
-                            type="button"
-                            className="button-primary"
-                            onClick={handleUpdate}
-                            disabled={isSubmitting || isFormDisabled}
-                        >
-                            {isSubmitting ? 'Processing ...' : toUpdateCustomer ? 'Update' : 'Save'}
-                        </button>
-                        : ''
-                    }
-                </div>
-            </form>
+                    {/* Buttons */}
+                    <div className="form-buttons">
+                        <button type="button" className="button-secondary"
+                            onClick={handleCancel}
+                            disabled={isFormDisabled}>Cancel</button>
+                        {isUserInRoles(['manager', 'owner']) ?
+                            <button
+                                type="button"
+                                className="button-primary"
+                                onClick={handleUpdate}
+                                disabled={isSubmitting || isFormDisabled}
+                            >
+                                {isSubmitting ? 'Processing ...' : toUpdateCustomer ? 'Update' : 'Save'}
+                            </button>
+                            : ''
+                        }
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };

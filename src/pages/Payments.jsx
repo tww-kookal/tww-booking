@@ -12,6 +12,12 @@ import { getUserContext } from '../contexts/constants';
 
 import '../css/payment.large.css';
 import '../css/payment.handheld.css';
+import ScrollToTop from '../site/ScrollToTop';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectFade, Autoplay } from 'swiper';
+import '../styles.css'
+import 'swiper/css/effect-fade';
+import 'swiper/css';
 
 const Payments = () => {
     const navigate = useNavigate();
@@ -159,104 +165,117 @@ const Payments = () => {
     };
 
     return (
-        <div className="payment-form-container">
+        <div style={{ backgroundColor: 'black' }}>
+            <ScrollToTop />
+            <Swiper
+                modules={[EffectFade, Autoplay]}
+                effect={'fade'}
+                loop={true}
+                autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                }}
+                className='heroSlider h-[100px] lg:h-[27px]'
+            ></Swiper>
             <ToastContainer />
-            <h2>Payments for Booking #{booking?.booking_id}</h2>
-            <div className="payments-list">
-                {payments.map((payment, index) => (
-                    <fieldset key={payment.booking_payments_id}>
-                        <legend>&nbsp;ID: {payment.booking_payments_id === -999 ? 'NEW' : payment.booking_payments_id}&nbsp;</legend>
-                        <div key={payment.booking_payments_id} className="payment-item">
-                            <div className="form-group">
-                                <label>Date</label>
-                                <input
-                                    type="date"
-                                    name="payment_date"
-                                    value={dayjs(payment.payment_date).format('YYYY-MM-DD')}
-                                    onChange={(e) => handleChange(index, e)}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>For</label>
-                                <Select name="payment_for"
-                                    value={getSelectedAccCategory(payment.payment_for)}
-                                    onChange={e => {
-                                        payment.payment_for = e.value;
-                                        setSelectedAccCategory({
-                                            value: e.value,
-                                            label: e.label,
-                                        });
-                                    }}
-                                    options={accCategoryOptions}
-                                    placeholder="Select a payment for..."
-                                    isSearchable={true}
-                                    classNamePrefix="react-select"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Amount</label>
-                                <input
-                                    type="number"
-                                    name="payment_amount"
-                                    placeholder="Amount"
-                                    value={payment.payment_amount}
-                                    onChange={(e) => handleChange(index, e)}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Type</label>
-                                <select name="payment_type" value={payment.payment_type} onChange={(e) => handleChange(index, e)}>
-                                    <option value="">Select Type</option>
-                                    {PAYMENT_TYPE && PAYMENT_TYPE.length > 0 && PAYMENT_TYPE.map(type => (
-                                        <option key={type.id} value={type.id}>{type.value}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label>Pay To</label>
-                                <Select name="payment_to"
-                                    value={getSelectePaymentTo(payment.payment_to)}
-                                    onChange={e => {
-                                        payment.payment_to = e.value;
-                                        setSelectedPaymentTo({
-                                            value: e.value,
-                                            label: e.label,
-                                        });
-                                    }}
-                                    options={accPartiesOptions}
-                                    placeholder="Select Receiver..."
-                                    isSearchable={true}
-                                    classNamePrefix="react-select"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>Remarks</label>
-                                <input
-                                    type="text"
-                                    name="remarks"
-                                    placeholder="Remarks"
-                                    value={payment.remarks}
-                                    onChange={(e) => handleChange(index, e)}
-                                />
-                            </div>
-                            {(payment.booking_payments_id === -999) ?
-                                <div className="form-buttons">
-                                    <button onClick={() => handleRemove(payment)} className="btn-delete">Remove</button>
-                                    <button onClick={() => handleAddNew(payment)} className="btn-update">Add New</button>
+            <div className="payment-form-container">
+                <h2>Payments for Booking #{booking?.booking_id}</h2>
+                <div className="payments-list">
+                    {payments.map((payment, index) => (
+                        <fieldset key={payment.booking_payments_id}>
+                            <legend>&nbsp;ID: {payment.booking_payments_id === -999 ? 'NEW' : payment.booking_payments_id}&nbsp;</legend>
+                            <div key={payment.booking_payments_id} className="payment-item">
+                                <div className="form-group">
+                                    <label>Date</label>
+                                    <input
+                                        type="date"
+                                        name="payment_date"
+                                        value={dayjs(payment.payment_date).format('YYYY-MM-DD')}
+                                        onChange={(e) => handleChange(index, e)}
+                                    />
                                 </div>
-                                :
-                                <div className="form-buttons">
-                                    <button onClick={() => handleDelete(payment)} className="btn-delete">Delete</button>
-                                    <button onClick={() => handleUpdate(payment)} className="btn-update">Update</button>
+                                <div className="form-group">
+                                    <label>For</label>
+                                    <Select name="payment_for"
+                                        value={getSelectedAccCategory(payment.payment_for)}
+                                        onChange={e => {
+                                            payment.payment_for = e.value;
+                                            setSelectedAccCategory({
+                                                value: e.value,
+                                                label: e.label,
+                                            });
+                                        }}
+                                        options={accCategoryOptions}
+                                        placeholder="Select a payment for..."
+                                        isSearchable={true}
+                                        classNamePrefix="react-select"
+                                    />
                                 </div>
-                            }
-                        </div>
-                    </fieldset>
-                ))}
-            </div>
-            <div className="form-buttons">
-                <button onClick={handleAdd} className="btn-add">Add Payment</button>
-                <button onClick={handleCancel} className="btn-cancel">Cancel</button>
+                                <div className="form-group">
+                                    <label>Amount</label>
+                                    <input
+                                        type="number"
+                                        name="payment_amount"
+                                        placeholder="Amount"
+                                        value={payment.payment_amount}
+                                        onChange={(e) => handleChange(index, e)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Type</label>
+                                    <select name="payment_type" value={payment.payment_type} onChange={(e) => handleChange(index, e)}>
+                                        <option value="">Select Type</option>
+                                        {PAYMENT_TYPE && PAYMENT_TYPE.length > 0 && PAYMENT_TYPE.map(type => (
+                                            <option key={type.id} value={type.id}>{type.value}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label>Pay To</label>
+                                    <Select name="payment_to"
+                                        value={getSelectePaymentTo(payment.payment_to)}
+                                        onChange={e => {
+                                            payment.payment_to = e.value;
+                                            setSelectedPaymentTo({
+                                                value: e.value,
+                                                label: e.label,
+                                            });
+                                        }}
+                                        options={accPartiesOptions}
+                                        placeholder="Select Receiver..."
+                                        isSearchable={true}
+                                        classNamePrefix="react-select"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Remarks</label>
+                                    <input
+                                        type="text"
+                                        name="remarks"
+                                        placeholder="Remarks"
+                                        value={payment.remarks}
+                                        onChange={(e) => handleChange(index, e)}
+                                    />
+                                </div>
+                                {(payment.booking_payments_id === -999) ?
+                                    <div className="form-buttons">
+                                        <button onClick={() => handleRemove(payment)} className="btn-delete">Remove</button>
+                                        <button onClick={() => handleAddNew(payment)} className="btn-update">Add New</button>
+                                    </div>
+                                    :
+                                    <div className="form-buttons">
+                                        <button onClick={() => handleDelete(payment)} className="btn-delete">Delete</button>
+                                        <button onClick={() => handleUpdate(payment)} className="btn-update">Update</button>
+                                    </div>
+                                }
+                            </div>
+                        </fieldset>
+                    ))}
+                </div>
+                <div className="form-buttons">
+                    <button onClick={handleAdd} className="btn-add">Add Payment</button>
+                    <button onClick={handleCancel} className="btn-cancel">Cancel</button>
+                </div>
             </div>
         </div>
     );
