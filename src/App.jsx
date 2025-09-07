@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Login from "./pages/login";
+import LoginV2 from "./pages/LoginV2";
 import Rooms from "./pages/Rooms";
 import Users from "./pages/Users";
 import Roles from "./pages/Roles";
@@ -28,7 +28,7 @@ export default function App() {
             {/*             <Navbar /> */}
             <Header />
             <Routes>
-                <Route path="/login" element={<Home />} />
+                <Route path="/login" element={<LoginV2 />} />
                 <Route path="/rooms" element={<ProtectedRoute><Rooms /></ProtectedRoute>} />
                 <Route path="/booking" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

@@ -22,20 +22,38 @@ export const kidsList = [
 export const sliderData = [
     {
         id: 1,
-        title: 'Your Luxury Hotel For Vacation',
+        title: 'Your Convenient Homestay',
         bg: images.Slider1,
         btnNext: 'See our rooms',
     },
     {
         id: 2,
-        title: 'Feel Relax & Enjoy Your Luxuriousness',
+        title: 'Feel Relax & Enjoy Your Comfort',
         bg: images.Slider2,
         btnNext: 'See our rooms',
     },
     {
         id: 3,
-        title: 'Your Luxury Hotel For Vacation',
+        title: 'Your Other Home amidst the hills',
         bg: images.Slider3,
+        btnNext: 'See our rooms',
+    },
+    {
+        id: 4,
+        title: 'Your Other Home amidst the hills',
+        bg: images.Slider4,
+        btnNext: 'See our rooms',
+    },
+    {
+        id: 5,
+        title: 'Your Other Home amidst the hills',
+        bg: images.Slider5,
+        btnNext: 'See our rooms',
+    },
+    {
+        id: 6,
+        title: 'Your Other Home amidst the hills',
+        bg: images.Slider6,
         btnNext: 'See our rooms',
     },
 ]

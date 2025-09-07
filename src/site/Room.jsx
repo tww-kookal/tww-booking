@@ -6,7 +6,7 @@ const Room = ({ room }) => {
   const { id, name, image, size, maxPerson, description, price } = room ?? {};
 
   return (
-    <div className='bg-white shadow-2xl min-h-[500px] group'>
+    <div className='bg-white shadow-2xl min-h-[400px] group'>
 
       <div className='overflow-hidden'>
         <img src={image} alt="img" className='group-hover:scale-110 transition-all duration-300 w-full' />
@@ -23,7 +23,7 @@ const Room = ({ room }) => {
             </div>
             <div className='flex gap-x-1'>
               <div>Size</div>
-              <div>{size}m2</div>
+              <div>{size}sqft</div>
             </div>
           </div>
 
@@ -53,13 +53,13 @@ const Room = ({ room }) => {
 
 
       {/* button */}
-      <Link
+{/*       <Link
         to={`/room/${id}`}
         className="btn btn-secondary btn-sm max-w-[240px] mx-auto duration-300"
       >
-        Book now from ${price}
+        Book now from ₹{price}
       </Link>
-
+ */}
     </div>
   );
 
