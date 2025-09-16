@@ -375,13 +375,13 @@ export const handleGenerateReceipt = (booking) => {
                 <td width="10%"><b>Type</b></td>
                 <td width="55%"><b>Remarks</b></td>
                 <td width="15%" align="right"><b>Amount</b></td>
-            ${booking.payments.map(payment => `
+            ${booking.payments.map(payment => `                
                 <tr>
                     <td>${dayjs(payment.payment_date).format('DD-MM-YY')}</td>
-                    <td>${payment.payment_for}</td>
+                    <td>${payment.acc_category_name}</td>
                     <td>${payment.payment_type}</td>
                     <td>${payment.remarks}</td>
-                    <td align="right">${payment.payment_amount}</td>
+                    <td align="right">${Math.round(payment.payment_amount)}</td>
                 </tr>
             `).join('')}
             <tr><td colspan="5"><hr /></td></tr>
@@ -416,7 +416,7 @@ export const handleGenerateReceipt = (booking) => {
                                 <br />
                                 <label>Check In - <strong>${dayjs(booking.check_in, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</strong></label>
                                 <br />
-                                <label>Check Out - <strong>${dayjs(booking.check_out, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</strong></label>                           
+                                <label>Check Out - <strong>${dayjs(booking.check_out, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'11:00 am'}</strong></label>                           
                                 <br />
                                 <label><b>${booking.room_name}</b></label> for <label><b><i>${booking.customer_name} - ${booking.contact_number}</i></b> (${booking.number_of_nights} nights)  </label>
                             </td>
@@ -456,7 +456,7 @@ export const handleGenerateReceipt = (booking) => {
                             </td>
                         </tr>
  -->                        <tr>
-                            <td colspan="2"><label><strong>Total amount payable for this booking is INR ${booking.total_price}/- as per
+                            <td colspan="2"><label><strong>Total amount payable for this booking is INR ${Math.round(booking.total_price)}/- as per
                             the details below.</strong></label></td>
                         </tr>
                         <tr>
@@ -485,7 +485,7 @@ export const handleGenerateReceipt = (booking) => {
                                     <!--<label> Property Sell Price<br /></label>-->
                                     <font style={{ color: 'darkgray' }}>${booking.room_name} for ${booking.number_of_nights} Night(s)</font>
                                     </td>
-                                    <td align="right"> &nbsp;${booking.total_price} </td>
+                                    <td align="right"> &nbsp;${Math.round(booking.total_price)} </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
@@ -550,7 +550,7 @@ export const handleGenerateReceipt = (booking) => {
                                 </tr> -->
                                 <tr>
                                     <td><label>Total</label></td>
-                                    <td align="right"> <b>${booking.total_price}</b> </td>
+                                    <td align="right"> <b>${Math.round(booking.total_price)}</b> </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
@@ -562,12 +562,12 @@ export const handleGenerateReceipt = (booking) => {
                                 </tr>
                                 <tr>
                                     <td><label>Amount Received</label></td>
-                                    <td align="right"> ${paidSoFar} </td>
+                                    <td align="right"> ${Math.round(paidSoFar)} </td>
                                 </tr>
                                 <tr><td colspan="2"><hr /></td></tr>                                
                                 <tr>
                                     <td><label>Balance</label></td>
-                                    <td align="right"> <b><i>${balance}</i></b> </td>
+                                    <td align="right"> <b><i>${Math.round(balance)}</i></b> </td>
                                 </tr>
                                 <!-- <tr><td colspan="2"><hr /></td></tr>                                -->
                                 </table>
@@ -584,7 +584,7 @@ export const handleGenerateReceipt = (booking) => {
                         </tr>
                         <tr><td colspan="2"><hr /></td></tr>
                         <tr>
-                            <td colspan="2"><stong>Complimentary Breakfast is available for all days of the stay.  Pets are not allowed in the premises.</stong></td>
+                            <td colspan="2"><stong>Complimentary Breakfast is available for all days of the stay.  <b>Pets are not allowed in the premises.</b></stong></td>
                         </tr>
                         <tr><td colspan="2"><hr /></td></tr>
                         <tr>
