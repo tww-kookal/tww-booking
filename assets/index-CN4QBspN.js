@@ -89,13 +89,13 @@ Content-Transfer-Encoding: base64\r
                 <td width="10%"><b>Type</b></td>
                 <td width="55%"><b>Remarks</b></td>
                 <td width="15%" align="right"><b>Amount</b></td>
-            ${e.payments.map(i=>`
+            ${e.payments.map(i=>`                
                 <tr>
                     <td>${Q(i.payment_date).format("DD-MM-YY")}</td>
-                    <td>${i.payment_for}</td>
+                    <td>${i.acc_category_name}</td>
                     <td>${i.payment_type}</td>
                     <td>${i.remarks}</td>
-                    <td align="right">${i.payment_amount}</td>
+                    <td align="right">${Math.round(i.payment_amount)}</td>
                 </tr>
             `).join("")}
             <tr><td colspan="5"><hr /></td></tr>
@@ -129,7 +129,7 @@ Content-Transfer-Encoding: base64\r
                                 <br />
                                 <label>Check In - <strong>${Q(e.check_in,"YYYY-MM-DD").format("MMM DD, YYYY")} - 01:00 pm</strong></label>
                                 <br />
-                                <label>Check Out - <strong>${Q(e.check_out,"YYYY-MM-DD").format("MMM DD, YYYY")} - 01:00 pm</strong></label>                           
+                                <label>Check Out - <strong>${Q(e.check_out,"YYYY-MM-DD").format("MMM DD, YYYY")} - 11:00 am</strong></label>                           
                                 <br />
                                 <label><b>${e.room_name}</b></label> for <label><b><i>${e.customer_name} - ${e.contact_number}</i></b> (${e.number_of_nights} nights)  </label>
                             </td>
@@ -169,7 +169,7 @@ Content-Transfer-Encoding: base64\r
                             </td>
                         </tr>
  -->                        <tr>
-                            <td colspan="2"><label><strong>Total amount payable for this booking is INR ${e.total_price}/- as per
+                            <td colspan="2"><label><strong>Total amount payable for this booking is INR ${Math.round(e.total_price)}/- as per
                             the details below.</strong></label></td>
                         </tr>
                         <tr>
@@ -198,7 +198,7 @@ Content-Transfer-Encoding: base64\r
                                     <!--<label> Property Sell Price<br /></label>-->
                                     <font style={{ color: 'darkgray' }}>${e.room_name} for ${e.number_of_nights} Night(s)</font>
                                     </td>
-                                    <td align="right"> &nbsp;${e.total_price} </td>
+                                    <td align="right"> &nbsp;${Math.round(e.total_price)} </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
@@ -263,7 +263,7 @@ Content-Transfer-Encoding: base64\r
                                 </tr> -->
                                 <tr>
                                     <td><label>Total</label></td>
-                                    <td align="right"> <b>${e.total_price}</b> </td>
+                                    <td align="right"> <b>${Math.round(e.total_price)}</b> </td>
                                 </tr>
                                 <tr>
                                     <td colspan="2">
@@ -275,12 +275,12 @@ Content-Transfer-Encoding: base64\r
                                 </tr>
                                 <tr>
                                     <td><label>Amount Received</label></td>
-                                    <td align="right"> ${n} </td>
+                                    <td align="right"> ${Math.round(n)} </td>
                                 </tr>
                                 <tr><td colspan="2"><hr /></td></tr>                                
                                 <tr>
                                     <td><label>Balance</label></td>
-                                    <td align="right"> <b><i>${r}</i></b> </td>
+                                    <td align="right"> <b><i>${Math.round(r)}</i></b> </td>
                                 </tr>
                                 <!-- <tr><td colspan="2"><hr /></td></tr>                                -->
                                 </table>
@@ -297,7 +297,7 @@ Content-Transfer-Encoding: base64\r
                         </tr>
                         <tr><td colspan="2"><hr /></td></tr>
                         <tr>
-                            <td colspan="2"><stong>Complimentary Breakfast is available for all days of the stay.  Pets are not allowed in the premises.</stong></td>
+                            <td colspan="2"><stong>Complimentary Breakfast is available for all days of the stay.  <b>Pets are not allowed in the premises.</b></stong></td>
                         </tr>
                         <tr><td colspan="2"><hr /></td></tr>
                         <tr>
