@@ -390,7 +390,7 @@ export const handleGenerateReceipt = (booking) => {
     receiptWindow.document.write(`
             <html>
                 <head>
-                    <title>Booking Receipt - ${booking.customer_name}</title>
+                    <title>Booking Receipt - ${booking.customer_name} ${booking.room_name}</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
                         .receipt { max-width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; }
