@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import api from './apiClient';
 import { FOLDER_ID } from '../modules/config';
 import { getUserContext } from '../contexts/constants';
+import html2canvas from 'html2canvas';
 
 /**
  * Loads all bookings from the server.
@@ -402,208 +403,311 @@ export const handleGenerateReceipt = (booking) => {
                         .total { font-weight: bold; }
                         @media print { .no-print { display: none; } }
                     </style>
+                    <script>
+                        function downloadAsImage() {
+                            const content = document.getElementById('booking_receipt_content');
+                            html2canvas(content).then(canvas => {
+                                const image = canvas.toDataURL('image/png');
+                                const a = document.createElement('a');
+                                a.href = image;
+                                a.download = 'Booking Receipt - ${booking.customer_name} ${booking.room_name}.png';
+                                a.click();
+                            });
+                        }
+                    </script>
                 </head>
                 <body>
-                    <div ref={contentRef} style={{ width: '97%', padding: '20px', marginTop: '20px', border: '1px solid #ccc' }}>
-                        <table style={{ borderWidth: 0, width: '100%' }} >
-                        <tr style={{ width: '100%' }}>
-                            <td style={{ width: '50%' }}>
-                                <big><big><big><big><big><big>Receipt</big></big></big></big></big></big>
-                                <br />
-                                <label>Booking ID - <strong>${booking.booking_id}</strong></label>
-                                <br />
-                                <label>Booking Date - <strong>${dayjs(booking.booking_date, 'YYYY-MM-DD').format('MMM DD, YYYY')} </strong></label>
-                                <br />
-                                <label>Check In - <strong>${dayjs(booking.check_in, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</strong></label>
-                                <br />
-                                <label>Check Out - <strong>${dayjs(booking.check_out, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'11:00 am'}</strong></label>                           
-                                <br />
-                                <label><b>${booking.room_name}</b></label> for <label><b><i>${booking.customer_name} - ${booking.contact_number}</i></b> (${booking.number_of_nights} nights)  </label>
-                            </td>
-                            <td align="right">
-                                <img src="./images/westwoodlogo2.png" style= "width: 300px; max-height: 75px; height: auto;" alt="The Westwood"></img>
-                                <br />
-                                Survey No 380, Kookal Main Road,
-                                <br />
-                                Kookal, Kodaikanal, Tamilnadu
-                                <br />
-                                thewestwood.kookal@gmail.com
-                                <br />
-                                https://www.thewestwood.in/
-                                <br />
-                                For Bookings: 98848 55014
-                                <br />
-                                Care Taker: 98848 55041
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                            <hr />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2"><label><strong>Dear ${booking.customer_name},</strong></label></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2"><label>The Westwood has received a booking at our property as per the details below.
-                            Kindly carry this e-voucher while check in.</label></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2"><label>&nbsp;</label></td>
-                        </tr>
-<!--                         <tr>
-                            <td colspan="2"><label>For your reference, Booking ID is <strong>${booking.booking_id}.</strong></label>
-                            </td>
-                        </tr>
- -->                        <tr>
-                            <td colspan="2"><label><strong>Total amount payable for this booking is INR ${Math.round(booking.total_price)}/- as per
-                            the details below.</strong></label></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2"><label>Kindly consider this e-voucher for booking confirmation with the following
-                            inclusions and services.</label></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                            <hr />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                            <center>
-                                <table width="98%">
+                    <div id ="booking_receipt_content" ref = {contentRef} style ={{
+                            position: 'relative', // 🔑 Needed for absolute child centering\
+                            display: 'grid',
+                            width: '100%'
 
-                                <tr>
-                                    <td><label><strong>Payment Breakup</strong></label></td>
-                                    <td align="right"><small><font style={{ color: 'darkgray' }}>All prices indicated below are in INR </font></small></td>
-                                </tr>
-                                <!--<tr>
-                                    <td colspan="2"><font style={{ color: 'darkgray' }}>TARRIF</font></td>
-                                </tr> -->
-                                <tr>
-                                    <td>
-                                    <!--<label> Property Sell Price<br /></label>-->
-                                    <font style={{ color: 'darkgray' }}>${booking.room_name} for ${booking.number_of_nights} Night(s)</font>
+                    }}>
+                        <div id="booking_receipt_content_inner" style == {{
+                            position: 'absolute',
+                            width: '90%'
+                        }}>
+                            <table style={{ borderWidth: 0, border: 0, width: '100%', align: 'center' }} >
+                                <tr colspan = "2"><td>&nbsp;</td></tr>
+                                <tr style={{ width: '100%'}}>
+                                    <td style={{ width: '20%'}}>
+                                        &nbsp;
                                     </td>
-                                    <td align="right"> &nbsp;${Math.round(booking.total_price)} </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                    <hr />
+                                    <td style={{ width: '80%'}}>
+                                        <table style={{ borderWidth: 0, border: 0, width: '100%', align: 'center' }} >
+                                        <tr style={{ width: '100%', verticalAlign: 'bottom', textAlign: 'left' }}>
+                                            <td style={{ width: '50%', verticalAlign: 'bottom', textAlign: 'left' }}>
+                                                <big><big><big><big><big><big>Receipt</big></big></big></big></big></big>
+                                            </td>
+                                            <td align="right">
+                                                <img src="./images/westwoodlogo2.png" style= "width: 300px; max-height: 75px; height: auto;" alt="The Westwood"></img>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ width: '100%', verticalAlign: 'bottom', textAlign: 'left' }}>
+                                            <td style={{ width: '50%', verticalAlign: 'bottom', textAlign: 'left' }}>
+                                                <br />
+                                                <label>Booking ID - <strong>${booking.booking_id}</strong></label>
+                                                <br />
+                                                <label>Booking Date - <strong>${dayjs(booking.booking_date, 'YYYY-MM-DD').format('MMM DD, YYYY')} </strong></label>
+                                                <br />
+                                                <label>Check In - <strong>${dayjs(booking.check_in, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'01:00 pm'}</strong></label>
+                                                <br />
+                                                <label>Check Out - <strong>${dayjs(booking.check_out, 'YYYY-MM-DD').format('MMM DD, YYYY')} - ${'11:00 am'}</strong></label>                           
+                                                <br />
+                                                <label><b>${booking.room_name}</b></label> for <label><b><i>${booking.customer_name} - ${booking.contact_number}</i></b> (${booking.number_of_nights} nights)  </label>
+                                            </td>
+                                            <td align="right">
+                                                <br />
+                                                Survey No 380, Kookal Main Road,
+                                                <br />
+                                                Kookal, Kodaikanal, Tamilnadu
+                                                <br />
+                                                thewestwood.kookal@gmail.com
+                                                <br />
+                                                https://www.thewestwood.in/
+                                                <br />
+                                                For Bookings: 98848 55014
+                                                <br />
+                                                Care Taker: 98848 55041
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="2">
+                                            <hr />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><label><strong>Dear ${booking.customer_name},</strong></label></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><label>The Westwood has received a booking at our property as per the details below.
+                                            Kindly carry this e-voucher while check in.</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><label>&nbsp;</label></td>
+                                        </tr>
+                <!--                         <tr>
+                                            <td colspan="2"><label>For your reference, Booking ID is <strong>${booking.booking_id}.</strong></label>
+                                            </td>
+                                        </tr>
+                -->                        <tr>
+                                            <td colspan="2"><label><strong>Total amount payable for this booking is INR ${Math.round(booking.total_price)}/- as per
+                                            the details below.</strong></label></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><label>Kindly consider this e-voucher for booking confirmation with the following
+                                            inclusions and services.</label></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                            <hr />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                            <center>
+                                                <table width="98%">
+
+                                                <tr>
+                                                    <td><label><strong>Payment Breakup</strong></label></td>
+                                                    <td align="right"><small><font style={{ color: 'darkgray' }}>All prices indicated below are in INR </font></small></td>
+                                                </tr>
+                                                <!--<tr>
+                                                    <td colspan="2"><font style={{ color: 'darkgray' }}>TARRIF</font></td>
+                                                </tr> -->
+                                                <tr>
+                                                    <td>
+                                                    <!--<label> Property Sell Price<br /></label>-->
+                                                    <font style={{ color: 'darkgray' }}>${booking.room_name} for ${booking.number_of_nights} Night(s)</font>
+                                                    </td>
+                                                    <td align="right"> &nbsp;${Math.round(booking.total_price)} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                    <hr />
+                                                    </td>
+                                                </tr>
+                                                <!-- <tr>
+                                                    <td><label>Extra Adult / Child Charges</label></td>
+                                                    <td align="right"> {formData.extraChildren} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                    <hr />
+                                                    </td>
+                                                </tr> 
+                                                <tr>
+                                                    <td><label>Voluntary Property Driven
+                                                    Coupon Discount </label></td>
+                                                    <td align="right"> ${booking.discount || 0} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                    <hr />
+                                                    </td>
+                                                </tr> -->
+                                                <!-- <tr>
+                                                    <td><label>Property Gross Charges </label></td>
+                                                    <td align="right"> ${booking.total_price} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                    <hr />
+                                                    </td>
+                                                </tr> -->
+                                                <!-- <tr>
+                                                    <td><label>Agent Commission</label></td>
+                                                    <td align="right"> ${booking.commission || 0} </td>
+                                                </tr> 
+                                                <tr>
+                                                    <td colspan="2">
+                                                    <hr />
+                                                    </td>
+                                                </tr> -->
+                                                <!-- <tr>
+                                                    <td><label>GST @ 18%</label><br /><font style={{ color: 'darkgray' }}>(Including IGST or (SGST & CGST))</font></td>
+                                                    <td align="right"> {gst} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                    <hr />
+                                                    </td>
+                                                </tr> 
+                                                <tr>
+                                                    <td><label>Property discount including tax considered in
+                                                    coupon promotion</label></td>
+                                                    <td align="right"> {formData.propertyDiscount} </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                    <hr />
+                                                    </td>
+                                                </tr> -->
+                                                <tr>
+                                                    <td><label>Total</label></td>
+                                                    <td align="right"> <b>${Math.round(booking.total_price)}</b> </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2">
+                                                    <hr />
+                                                    </td>
+                                                </tr>                                
+                                                <tr>
+                                                    <td colspan="2">${paymentRows}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><label>Amount Received</label></td>
+                                                    <td align="right"> ${Math.round(paidSoFar)} </td>
+                                                </tr>
+                                                <tr><td colspan="2"><hr /></td></tr>                                
+                                                <tr>
+                                                    <td><label>Balance</label></td>
+                                                    <td align="right"> <b><i>${Math.round(balance)}</i></b> </td>
+                                                </tr>
+                                                <!-- <tr><td colspan="2"><hr /></td></tr>                                -->
+                                                </table>
+                                            </center>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><hr /></td>
+                                        </tr>
+                                            <td colspan="2"><stong>Identification Submitted: </stong>N/A </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2"><stong><b>Care Taker can be contacted in the premises at Ph: 98848 55041 / Extn: 701</b></stong></td>
+                                        </tr>
+                                        <tr><td colspan="2"><hr /></td></tr>
+                                        <tr>
+                                            <td colspan="2"><stong>Complimentary Breakfast is available for all days of the stay.  <b>Pets are not allowed in the premises.</b></stong></td>
+                                        </tr>
+                                        <tr><td colspan="2"><hr /></td></tr>
+                                        <tr>
+                                            <td colspan="2">Thank you for choosing The Westwood!, We hope you have a great stay with us.</td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">For any inquiries, please contact us.</td>
+                                        </tr>
+                                        </table>                                        
                                     </td>
                                 </tr>
-                                <!-- <tr>
-                                    <td><label>Extra Adult / Child Charges</label></td>
-                                    <td align="right"> {formData.extraChildren} </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                    <hr />
-                                    </td>
-                                </tr> 
-                                <tr>
-                                    <td><label>Voluntary Property Driven
-                                    Coupon Discount </label></td>
-                                    <td align="right"> ${booking.discount || 0} </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                    <hr />
-                                    </td>
-                                </tr> -->
-                                <!-- <tr>
-                                    <td><label>Property Gross Charges </label></td>
-                                    <td align="right"> ${booking.total_price} </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                    <hr />
-                                    </td>
-                                </tr> -->
-                                <!-- <tr>
-                                    <td><label>Agent Commission</label></td>
-                                    <td align="right"> ${booking.commission || 0} </td>
-                                </tr> 
-                                <tr>
-                                    <td colspan="2">
-                                    <hr />
-                                    </td>
-                                </tr> -->
-                                <!-- <tr>
-                                    <td><label>GST @ 18%</label><br /><font style={{ color: 'darkgray' }}>(Including IGST or (SGST & CGST))</font></td>
-                                    <td align="right"> {gst} </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                    <hr />
-                                    </td>
-                                </tr> 
-                                <tr>
-                                    <td><label>Property discount including tax considered in
-                                    coupon promotion</label></td>
-                                    <td align="right"> {formData.propertyDiscount} </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                    <hr />
-                                    </td>
-                                </tr> -->
-                                <tr>
-                                    <td><label>Total</label></td>
-                                    <td align="right"> <b>${Math.round(booking.total_price)}</b> </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2">
-                                    <hr />
-                                    </td>
-                                </tr>                                
-                                <tr>
-                                    <td colspan="2">${paymentRows}</td>
-                                </tr>
-                                <tr>
-                                    <td><label>Amount Received</label></td>
-                                    <td align="right"> ${Math.round(paidSoFar)} </td>
-                                </tr>
-                                <tr><td colspan="2"><hr /></td></tr>                                
-                                <tr>
-                                    <td><label>Balance</label></td>
-                                    <td align="right"> <b><i>${Math.round(balance)}</i></b> </td>
-                                </tr>
-                                <!-- <tr><td colspan="2"><hr /></td></tr>                                -->
-                                </table>
-                            </center>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2"><hr /></td>
-                        </tr>
-                            <td colspan="2"><stong>Identification Submitted: </stong>N/A </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2"><stong><b>Care Taker can be contacted in the premises at Ph: 98848 55041 / Extn: 701</b></stong></td>
-                        </tr>
-                        <tr><td colspan="2"><hr /></td></tr>
-                        <tr>
-                            <td colspan="2"><stong>Complimentary Breakfast is available for all days of the stay.  <b>Pets are not allowed in the premises.</b></stong></td>
-                        </tr>
-                        <tr><td colspan="2"><hr /></td></tr>
-                        <tr>
-                            <td colspan="2">Thank you for choosing The Westwood!, We hope you have a great stay with us.</td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">For any inquiries, please contact us.</td>
-                        </tr>
-                        </table>
-                    </div>                        
+                            </table>
+                        </div>    
+                    </div>                    
                     <div class="no-print" style={{width: '100%'}}>
                         <table style={{ borderWidth: 0, width: '100%' }} ><tr><td>
                             <button onclick="window.print()">Print Receipt</button>
+                            <button id="download-png-btn" onclick="downloadAsImage()">Download as PNG</button>
+                            <button id="download-jpg-btn" onclick="downloadAsImage()">Download as JPEG</button>
+                            <button id="download-svg-btn" ">Download as SVG</button>
                         </td></tr></table>
                     </div>
                 </body>
             </html>
         `);
-    receiptWindow.print();
+    const script = receiptWindow.document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+    script.onload = function () {
+        // Now html2canvas is available
+        const btn = receiptWindow.document.getElementById('download-png-btn');
+        btn.onclick = function () {
+            const receiptDiv = receiptWindow.document.querySelector('div[ref]');
+            if (receiptDiv) {
+                html2canvas(receiptDiv, {
+                    width: 900, //receiptDiv.offsetWidth
+                    height: 1200, //receiptDiv.offsetHeight
+                    backgroundColor: '#fff',
+                    scale: 1 // for higher resolution
+                }).then(canvas => {
+                    const link = receiptWindow.document.createElement('a');
+                    link.download = `Booking Receipt - ${booking.customer_name} ${booking.room_name}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            }
+        };
+
+        const jpgbtn = receiptWindow.document.getElementById('download-jpg-btn');
+        jpgbtn.onclick = function () {
+            //const receiptDiv = receiptWindow.document.querySelector('div[ref]');
+            const receiptDiv = receiptWindow.document.getElementById('booking_receipt_content');
+            if (receiptDiv) {
+                html2canvas(receiptDiv, {
+                    width: 900, //receiptDiv.offsetWidth
+                    height: 1123, //receiptDiv.offsetHeight // 1123 is the height of the receipt div
+                    backgroundColor: '#fff',
+                    scale: 1 // for higher resolution
+                }).then(canvas => {
+                    const link = receiptWindow.document.createElement('a');
+                    link.download = `Booking Receipt - ${booking.customer_name} ${booking.room_name}.jpg`;
+                    link.href = canvas.toDataURL('image/jpeg');
+                    link.click();
+                });
+            }
+        };
+
+        const svgbtn = receiptWindow.document.getElementById('download-svg-btn');
+        svgbtn.onclick = function () {
+            console.log('download svg btn clicked');
+             //const receiptDiv = receiptWindow.document.querySelector('div[ref]');
+             const receiptDiv = receiptWindow.document.getElementById('booking_receipt_content');
+            if (receiptDiv) {
+                const svgElement = document.getElementById('booking_receipt_content');
+                const serializer = new XMLSerializer();
+                const svgString = serializer.serializeToString(svgElement);
+                const blob = new Blob([svgString], {type: 'image/svg+xml'});
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'receipt.svg';
+                link.click();            
+            }
+        };
+
+        jpgbtn.click();
+        
+    };
+    receiptWindow.document.head.appendChild(script);
     receiptWindow.document.close();
 };
 
