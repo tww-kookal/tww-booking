@@ -365,6 +365,12 @@ export const handleGenerateReceipt = (booking) => {
     const receiptWindow = window.open('', '_blank');
     const paidSoFar = booking.payments ? booking.payments.reduce((acc, payment) => acc + ((payment.payment_for == 'refund') ? 0 : payment.payment_amount), 0) : 0;
     const balance = booking.total_price - paidSoFar;
+    const watermarkImages = ["./images/0.jpg", "./images/1.jpg", "./images/2.jpg", "./images/3.jpg", "./images/4.jpg", "./images/5.jpg", "./images/6.png"];    
+
+    // Pick a random one on each render
+    const watermarkImage =
+        watermarkImages[Math.floor(Math.random() * watermarkImages.length)];
+    console.log("watermarkImage", watermarkImage)
     const paymentRows = booking.payments && booking.payments.length > 0 ? `
         <table width="100%">
             <tr>
@@ -391,7 +397,7 @@ export const handleGenerateReceipt = (booking) => {
     receiptWindow.document.write(`
             <html>
                 <head>
-                    <title>Booking Receipt - ${booking.customer_name} ${booking.room_name}</title>
+                    <title>Booking Receipt - ${booking.customer_name} - ${booking.room_name}</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
                         .receipt { max-width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; }
@@ -402,6 +408,8 @@ export const handleGenerateReceipt = (booking) => {
                         .financial-summary { margin-top: 30px; border-top: 2px solid #333; padding-top: 20px; }
                         .total { font-weight: bold; }
                         @media print { .no-print { display: none; } }
+                        .watermark-layer {opacity: 0.8; position: absolute; width: 100%; height: 100%; z-index: 0; scale: 0.57; top: 15%; left: -300;  }
+                        .watermark-image {opacity: 0.3; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
                     </style>
                     <script>
                         function downloadAsImage() {
@@ -410,7 +418,7 @@ export const handleGenerateReceipt = (booking) => {
                                 const image = canvas.toDataURL('image/png');
                                 const a = document.createElement('a');
                                 a.href = image;
-                                a.download = 'Booking Receipt - ${booking.customer_name} ${booking.room_name}.png';
+                                a.download = 'Booking Receipt - ${booking.customer_name} - ${booking.room_name}.png';
                                 a.click();
                             });
                         }
@@ -418,14 +426,21 @@ export const handleGenerateReceipt = (booking) => {
                 </head>
                 <body>
                     <div id ="booking_receipt_content" ref = {contentRef} style ={{
-                            position: 'relative', // 🔑 Needed for absolute child centering\
+                            position: 'relative', 
                             display: 'grid',
                             width: '100%'
 
                     }}>
+                        <!-- Watermark overlay -->
+                        <div class = "watermark-layer">
+                            <img src='${watermarkImage}'
+                                class = "watermark-image" alt="The Westwood"/>
+                        </div>
+
                         <div id="booking_receipt_content_inner" style == {{
                             position: 'absolute',
-                            width: '90%'
+                            width: '90%',
+                            zIndex: 1
                         }}>
                             <table style={{ borderWidth: 0, border: 0, width: '100%', align: 'center' }} >
                                 <tr colspan = "2"><td>&nbsp;</td></tr>
@@ -637,10 +652,10 @@ export const handleGenerateReceipt = (booking) => {
                     </div>                    
                     <div class="no-print" style={{width: '100%'}}>
                         <table style={{ borderWidth: 0, width: '100%' }} ><tr><td>
-                            <button onclick="window.print()">Print Receipt</button>
-                            <button id="download-png-btn" onclick="downloadAsImage()">Download as PNG</button>
                             <button id="download-jpg-btn" onclick="downloadAsImage()">Download as JPEG</button>
+                            <button id="download-png-btn" onclick="downloadAsImage()">Download as PNG</button>
                             <button id="download-svg-btn" ">Download as SVG</button>
+                            <button onclick="window.print()">Print Receipt</button>
                         </td></tr></table>
                     </div>
                 </body>
@@ -661,7 +676,7 @@ export const handleGenerateReceipt = (booking) => {
                     scale: 1 // for higher resolution
                 }).then(canvas => {
                     const link = receiptWindow.document.createElement('a');
-                    link.download = `Booking Receipt - ${booking.customer_name} ${booking.room_name}.png`;
+                    link.download = `Booking Receipt - ${booking.customer_name} - ${booking.room_name}.png`;
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                 });
@@ -680,7 +695,7 @@ export const handleGenerateReceipt = (booking) => {
                     scale: 1 // for higher resolution
                 }).then(canvas => {
                     const link = receiptWindow.document.createElement('a');
-                    link.download = `Booking Receipt - ${booking.customer_name} ${booking.room_name}.jpg`;
+                    link.download = `Booking Receipt - ${booking.customer_name} - ${booking.room_name}.jpg`;
                     link.href = canvas.toDataURL('image/jpeg');
                     link.click();
                 });
@@ -690,22 +705,22 @@ export const handleGenerateReceipt = (booking) => {
         const svgbtn = receiptWindow.document.getElementById('download-svg-btn');
         svgbtn.onclick = function () {
             console.log('download svg btn clicked');
-             //const receiptDiv = receiptWindow.document.querySelector('div[ref]');
-             const receiptDiv = receiptWindow.document.getElementById('booking_receipt_content');
+            //const receiptDiv = receiptWindow.document.querySelector('div[ref]');
+            const receiptDiv = receiptWindow.document.getElementById('booking_receipt_content');
             if (receiptDiv) {
                 const svgElement = document.getElementById('booking_receipt_content');
                 const serializer = new XMLSerializer();
                 const svgString = serializer.serializeToString(svgElement);
-                const blob = new Blob([svgString], {type: 'image/svg+xml'});
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.download = 'receipt.svg';
-                link.click();            
+                link.click();
             }
         };
 
         jpgbtn.click();
-        
+
     };
     receiptWindow.document.head.appendChild(script);
     receiptWindow.document.close();
