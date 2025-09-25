@@ -203,7 +203,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                         onChange={handleDateChange}
                     />
                 </div>
-                <div className="room-chart" style={{ width: '100%' }} >
+                <div className="room-chart" style={{ width: '100%' , maxHeight: '80vh', overflowY: 'auto' }} >
                     {renderCards()}
                 </div>
             </div>
