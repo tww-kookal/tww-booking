@@ -22,7 +22,12 @@
         margin-bottom: 1px;
         font-weight: bold;
     }
-
+    .room-chart-header {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
     .room-chart-date {
         font-size: 1rem;
         font-weight: bold;

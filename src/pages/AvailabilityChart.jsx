@@ -83,7 +83,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
     const renderCards = () => (
         <div className="room-chartlist">
             {/* Header Card */}
-            <div className="room-chart-rooms-horizontal">
+            <div className="room-chart-rooms-horizontal room-chart-header">
                 <div className="room-chart-date">
                     Date
                 </div>

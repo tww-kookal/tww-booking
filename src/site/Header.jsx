@@ -7,9 +7,6 @@ import { useGoogleLogin } from "@react-oauth/google";
 import api from "../modules/apiClient";
 import { clearTokens, getUserContext, isTokenReceived, isUserInRoles, persistTokensReceived } from "../contexts/constants";
 
-import '../css/login.large.css';
-import '../css/login.handheld.css';
-
 const Header = () => {
 
   const resetRoomFilterData = () => {
@@ -76,7 +73,7 @@ const Header = () => {
       ${header ? 'bg-gray-600 py-2 shadow-lg' : 'bg-gray-400 py-2'}`}
     >
 
-      <div className='container mx-auto flex flex-col lg:flex-row items-center lg:justify-between gap-y-6 lg:gap-y-0'>
+      <div className='container mx-auto flex flex-col lg:flex-row items-center lg:justify-between gap-y-6 lg:gap-y-0'>      
 
         {/* Nav */}
         <nav className={`${header ? 'text-primary' : 'text-secondary'}
