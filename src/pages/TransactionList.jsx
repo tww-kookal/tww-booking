@@ -2,10 +2,10 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../css/expenseList.large.css';
-import '../css/expenseList.handheld.css';
+import '../css/transactionList.large.css';
+import '../css/transactionList.handheld.css';
 
-const ExpenseList = ({
+const TransactionList = ({
     loading,
     expenses,
     paginatedExpenses,
@@ -16,20 +16,20 @@ const ExpenseList = ({
     totalDebit,
     totalCredit,
 }) => (
-    <div className="results-section responsive-expense-list">
+    <div className="results-section responsive-transaction-list">
         <ToastContainer />
         {loading ? (
-            <div className="loading-indicator">Loading expenses...</div>
+            <div className="loading-indicator">Loading transactions...</div>
         ) : expenses.length > 0 ? (
             <div className="table-container">
                 <h3>
-                    Expenses Found ({expenses.length})  |  Total Debit - ₹{totalDebit}  |  Total Credit - ₹{totalCredit}
+                    Transactions Found ({expenses.length})  |  Total Debit - ₹{totalDebit}  |  Total Credit - ₹{totalCredit}
                 </h3>
                 <div className="card-list">
                     {paginatedExpenses.map((expense, index) => (
                         <div
                             key={index}
-                            className="expense-card"
+                            className="transaction-card"
                             onClick={() => handleViewExpense(expense)}
                             style={{
                                 background:
@@ -91,9 +91,9 @@ const ExpenseList = ({
                 )}
             </div>
         ) : (
-            <div className="no-results">No expenses found. Try adjusting your search criteria.</div>
+            <div className="no-results">No Transactions found. Try adjusting your search criteria.</div>
         )}
     </div>
 );
 
-export default ExpenseList;
+export default TransactionList;

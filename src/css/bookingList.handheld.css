@@ -3,13 +3,17 @@
   /* Adjusted for screens less than 1000 pixels */
 
   .booking-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: left;
     width: calc(95%);
     /* One cards per row */
     box-sizing: border-box;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.339);
-    margin-bottom: 0.2rem;
+    margin: 0.1rem auto;
     font-size: 1.2rem;
     padding: 1rem;
     cursor: pointer;
@@ -30,9 +34,10 @@
 
   .loading-indicator {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    flex-wrap: wrap;
     align-items: center;
-    width: 100%;
+    gap: 1rem;
   }
 
   .table-container h3 {

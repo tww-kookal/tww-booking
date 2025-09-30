@@ -14,8 +14,8 @@ import Customer from "./pages/Customer";
 import Payments from "./pages/Payments";
 import User from "./pages/User";
 import Documents from "./pages/Documents";
-import Expense from "./pages/Expense"
-import ExpenseSearch from "./pages/ExpenseSearch";
+import Transaction from "./pages/Transaction"
+import TransactionSearch from "./pages/TransactionSearch";
 import Header from "./site/Header";
 import Home from "./site/Home";
 import RoomDetails from "./site/RoomDetails";
@@ -33,7 +33,7 @@ export default function App() {
                 <Route path="/booking" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/availability" element={<ProtectedRoute><AvailabilityChart /></ProtectedRoute>} />
-                <Route path="/search" element={<ProtectedRoute><BookingSearch /></ProtectedRoute>} />
+                <Route path="/booking/search" element={<ProtectedRoute><BookingSearch /></ProtectedRoute>} />
                 <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
                 <Route path="/user" element={<ProtectedRoute><User /></ProtectedRoute>} />
                 <Route path="/roles" element={<ProtectedRoute><Roles /></ProtectedRoute>} />
@@ -41,8 +41,8 @@ export default function App() {
                 <Route path="/user/new" element={<ProtectedRoute><User /></ProtectedRoute>} />
                 <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
                 <Route path="/booking/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
-                <Route path="/expenses" element={<ProtectedRoute><Expense /></ProtectedRoute>} />
-                <Route path="/expenses/search" element={<ProtectedRoute><ExpenseSearch /></ProtectedRoute>} />
+                <Route path="/transactions" element={<ProtectedRoute><Transaction /></ProtectedRoute>} />
+                <Route path="/transactions/search" element={<ProtectedRoute><TransactionSearch /></ProtectedRoute>} />
 
                 <Route path={'/'} element={<Home />} />
                 <Route path={'/room/:id'} element={<RoomDetails />} />

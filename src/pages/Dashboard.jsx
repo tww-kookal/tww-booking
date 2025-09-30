@@ -132,7 +132,7 @@ const Dashboard = () => {
             <p className="stat-value">{guestsForDay}</p>
           </div>
           <div className="stat-card">
-            <Link to="/search" className="action-button search">
+            <Link to="/booking/search" className="action-button search">
               <h3>Upcoming Bookings</h3>
             </Link>
             <p className="stat-value">{upcomingBookings}</p>
@@ -151,7 +151,7 @@ const Dashboard = () => {
               <span className="icon">↻</span>
               <span>Availability</span>
             </Link>
-            <Link to="/search" className="action-button find">
+            <Link to="/booking/search" className="action-button find">
               <span className="icon">🔍</span>
               <span>Search</span>
             </Link>

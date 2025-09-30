@@ -15,6 +15,10 @@ const Header = () => {
   const navigate = useNavigate();
   const [header, setHeader] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isBookingOpen, setBookingOpen] = useState(false);
+  const [isExpensesOpen, setExpensesOpen] = useState(false);
+  const [isRevenueOpen, setRevenueOpen] = useState(false);
+  const [isTransactionsOpen, setTransactionsOpen] = useState(false);
 
   useEffect(() => {
     window.addEventListener('scroll', () =>
@@ -73,7 +77,7 @@ const Header = () => {
       ${header ? 'bg-gray-600 py-2 shadow-lg' : 'bg-gray-400 py-2'}`}
     >
 
-      <div className='container mx-auto flex flex-col lg:flex-row items-center lg:justify-between gap-y-6 lg:gap-y-0'>      
+      <div className='container mx-auto flex flex-col lg:flex-row items-center lg:justify-between gap-y-6 lg:gap-y-0'>
 
         {/* Nav */}
         <nav className={`${header ? 'text-primary' : 'text-secondary'}
@@ -99,73 +103,129 @@ const Header = () => {
                 <Link to='/' className='transition hover:text-accent' key='/' onClick={() => toggleMenu()}>
                   Home
                 </Link>
-                <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''} onClick={() => toggleMenu()}>
-                  Dashboard
-                </Link>
-                <Link to="/availability" className={location.pathname === '/availability' ? 'active' : ''} onClick={() => toggleMenu()}>
-                  Availability
-                </Link>
-                <Link to="/search" className={location.pathname === '/search' ? 'active' : ''} onClick={() => toggleMenu()}>
-                  Search
-                </Link>
-                {isUserInRoles(['manager', 'owner']) ?
-                  <Link to="/booking" className={location.pathname.includes('/booking') ? 'active' : ''} onClick={() => toggleMenu()}>
-                    New
-                  </Link>
-                  : ''}
-                {isUserInRoles(['manager', 'owner', 'employee']) ?
-                  <Link to="/expenses" className={location.pathname === ('/expenses') ? 'active' : ''} onClick={() => toggleMenu()}>
-                    Add Expense
-                  </Link>
-                  : ''}
-                {isUserInRoles(['manager', 'owner', 'employee']) ?
-                  <Link to="/expenses/search" className={location.pathname === '/expenses/search' ? 'active' : ''} onClick={() => toggleMenu()}>
-                    Expenses
-                  </Link>
-                  : ''}
+                {isUserInRoles(['manager', 'owner', 'employee']) &&
+                  <>
+                    <Link to="/dashboard" className={location.pathname === '/dashboard' ? 'active' : ''} onClick={() => toggleMenu()}>
+                      Dashboard
+                    </Link>
+                    <Link to="/availability" className={location.pathname === '/availability' ? 'active' : ''} onClick={() => toggleMenu()}>
+                      Availability
+                    </Link>
+                  </>
+                }
+
+                {/* Booking */}
+                {isUserInRoles(['manager', 'owner', 'employee']) &&
+                  <>
+                    <div className='font-bold'>Booking</div>
+                    <Link to="/booking/search" className={`ml-4 ${location.pathname === '/booking/search' ? 'active' : ''}`} onClick={() => toggleMenu()}>
+                      Search
+                    </Link>
+                    {isUserInRoles(['manager', 'owner']) &&
+                      <Link to="/booking" className={`ml-4 ${location.pathname.includes('/booking') ? 'active' : ''}`} onClick={() => toggleMenu()}>
+                        New
+                      </Link>
+                    }
+                  </>
+                }
+
+                {/* Expenses */}
+{/*                 {isUserInRoles(['manager', 'owner', 'employee']) &&
+                  <>
+                    <div className='font-bold'>Expenses</div>
+                    <Link to="/transactions/search" className={`ml-4 ${location.pathname === '/transactions/search' ? 'active' : ''}`} onClick={() => toggleMenu()}>
+                      Search
+                    </Link>
+                    <Link to="/transactions" className={`ml-4 ${location.pathname === '/expenses' ? 'active' : ''}`} onClick={() => toggleMenu()}>
+                      New
+                    </Link>
+                  </>
+                }
+ */}
+                {/* Transactions */}
+                {isUserInRoles(['manager', 'owner']) &&
+                  <>
+                    <div className='font-bold'>Transactions</div>
+                    <Link to="/transactions/search" className={`ml-4 ${location.pathname === '/transactions/search' ? 'active' : ''}`} onClick={() => toggleMenu()}>
+                      Search
+                    </Link>
+                    <Link to="/transactions" className={`ml-4 ${location.pathname === '/transactions/new' ? 'active' : ''}`} onClick={() => toggleMenu()}>
+                      New
+                    </Link>
+                  </>
+                }
+
                 {isTokenReceived() == false
                   ?
                   <Link className={location.pathname === '/signin' ? 'active' : ''} onClick={() => { toggleMenu(); login(); }}>
                     Sign in
                   </Link>
-                  : ''}
+                  :
+                  <Link to="/" onClick={() => { toggleMenu(); logout() }} className='transition hover:text-accent' key='/signin'>
+                    SignOut-[{getUserContext().logged_in_user.first_name}]
+                  </Link>
+                }
               </div>
             </div>
           )}
 
           {/* Always visible links on large screens */}
-          <div className="navbar-links-large">
-            <Link to='/' className='transition hover:text-accent' key='/' >
+          <div className="hidden lg:flex items-center gap-x-8">
+            <Link to='/' className='transition hover:text-accent' key='/'>
               Home
             </Link>
-            {isTokenReceived()
-              ?
-              <Link to="/dashboard" className='transition hover:text-accent' key='/dashboard'>
-                Dashboard
-              </Link>
-              : ''}
-            {isTokenReceived()
-              ?
-              <Link to="/availability" className='transition hover:text-accent' key='/availability'>
-                Availability
-              </Link>
-              : ''}
-            {isTokenReceived()
-              ?
-              <Link to="/search" className='transition hover:text-accent' key='/search'>
-                Search
-              </Link>
-              : ''}
-            {isUserInRoles(['manager', 'owner']) ?
-              <Link to="/booking" className='transition hover:text-accent' key='/booking'>
-                New
-              </Link>
-              : ''}
-            {isUserInRoles(['manager', 'owner', 'employee']) ?
-              <Link to="/expenses/search" className='transition hover:text-accent' key='/expenses/search'>
-                Expenses
-              </Link>
-              : ''}
+            {isUserInRoles(['manager', 'owner', 'employee']) &&
+              <>
+                <Link to="/dashboard" className='transition hover:text-accent' key='/dashboard'>
+                  Dashboard
+                </Link>
+                <Link to="/availability" className='transition hover:text-accent' key='/availability'>
+                  Availability
+                </Link>
+              </>
+            }
+
+            {/* Booking Dropdown */}
+            {isUserInRoles(['manager', 'owner', 'employee']) &&
+              <div className="relative" onMouseEnter={() => setBookingOpen(true)} onMouseLeave={() => setBookingOpen(false)}>
+                <button className='transition hover:text-accent'>Booking</button>
+                {isBookingOpen && (
+                  <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-32" onMouseEnter={() => setBookingOpen(true)} onMouseLeave={() => setBookingOpen(false)}>
+                    <Link to="/booking/search" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Search</Link>
+                    <Link to="/booking" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>
+                      New
+                    </Link>
+                  </div>
+                )}
+              </div>
+            }
+
+            {/* Expenses Dropdown */}
+{/*             {isUserInRoles(['manager', 'owner', 'employee']) &&
+              <div className="relative" onMouseEnter={() => setExpensesOpen(true)} onMouseLeave={() => setExpensesOpen(false)}>
+                <button className='transition hover:text-accent'>Expenses</button>
+                {isExpensesOpen && (
+                  <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-32" onMouseEnter={() => setExpensesOpen(true)} onMouseLeave={() => setExpensesOpen(false)}>
+                    <Link to="/transactions/search" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Search</Link>
+                    <Link to="/transactions" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>New</Link>
+                  </div>
+                )}
+              </div>
+            }
+ */}
+            {/* Transactions Dropdown */}
+            {isUserInRoles(['manager', 'owner']) &&
+              <div className="relative" onMouseEnter={() => setTransactionsOpen(true)} onMouseLeave={() => setTransactionsOpen(false)}>
+                <button className='transition hover:text-accent'>Transactions</button>
+                {isTransactionsOpen && (
+                  <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-32" onMouseEnter={() => setTransactionsOpen(true)} onMouseLeave={() => setTransactionsOpen(false)}>
+                    <Link to="/transactions/search" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Search</Link>
+                    <Link to="/transactions" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>New</Link>
+                  </div>
+                )}
+              </div>
+            }
+
             {isTokenReceived()
               ?
               <Link to="/" onClick={() => logout()} className='transition hover:text-accent' key='/signin'>

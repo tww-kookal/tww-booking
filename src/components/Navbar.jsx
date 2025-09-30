@@ -36,7 +36,7 @@ const Navbar = () => {
             <Link to="/availability" className={location.pathname === '/availability' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
               Availability
             </Link>
-            <Link to="/search" className={location.pathname === '/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+            <Link to="/booking/search" className={location.pathname === '/booking/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
               Search
             </Link>
             {isUserInRoles(['manager', 'owner']) ?
@@ -66,7 +66,7 @@ const Navbar = () => {
         <Link to="/availability" className={location.pathname === '/availability' ? 'active' : ''}>
           Availability
         </Link>
-        <Link to="/search" className={location.pathname === '/search' ? 'active' : ''}>
+        <Link to="/booking/search" className={location.pathname === '/booking/search' ? 'active' : ''}>
           Search
         </Link>
         {isUserInRoles(['manager', 'owner']) ?

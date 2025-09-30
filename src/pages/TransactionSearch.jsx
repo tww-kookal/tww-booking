@@ -3,11 +3,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
-import ExpenseList from "./ExpenseList";
+import TransactionList from "./TransactionList";
 import { getExpensesSince } from "../modules/expense.module";
 
-import '../css/expenseSearch.large.css';
-import '../css/expenseSearch.handheld.css';
+import '../css/transactionSearch.large.css';
+import '../css/transactionSearch.handheld.css';
 import ScrollToTop from '../site/ScrollToTop';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectFade, Autoplay } from 'swiper';
@@ -15,7 +15,7 @@ import '../styles.css'
 import 'swiper/css/effect-fade';
 import 'swiper/css';
 
-const ExpenseSearch = () => {
+const TransactionSearch = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -73,7 +73,7 @@ const ExpenseSearch = () => {
   };
 
   const handleViewExpense = (selectedExpense) => {
-    navigate(`/expenses`, {
+    navigate(`/transactions`, {
       state: {
         preloadedExpense: selectedExpense,
         from: 'searchExpense'
@@ -105,10 +105,10 @@ const ExpenseSearch = () => {
         className='heroSlider h-[100px] lg:h-[27px]'
       ></Swiper>
       <ToastContainer />
-      <div className="search-expense-container" >
+      <div className="search-transaction-container" >
         <ToastContainer />
         <div className="search-header" >
-          Search Expenses
+          Search Transactions
         </div>
 
         <div className="search-form" >
@@ -193,7 +193,7 @@ const ExpenseSearch = () => {
           </button>
         </div>
 
-        <ExpenseList
+        <TransactionList
           loading={loading}
           expenses={expenses}
           paginatedExpenses={paginatedExpenses}
@@ -209,4 +209,4 @@ const ExpenseSearch = () => {
   );
 };
 
-export default ExpenseSearch;
+export default TransactionSearch;

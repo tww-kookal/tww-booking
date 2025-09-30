@@ -1,27 +1,30 @@
-/* Mobile view */
-@media (max-width: 999px) {
-  /* Adjusted for screens less than 1000 pixels */
+/* Desktop view */
+@media (min-width: 1000px) {
+  /* Adjusted for screens more than 1000 pixels */
 
-  .expense-card {
-    width: calc(95%);
-    /* One cards per row */
+  .transaction-card {
+    width: calc(33% - 0.5rem);
+    /* Three cards per row */
     box-sizing: border-box;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.339);
-    margin-bottom: 0.2rem;
-    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
     padding: 1rem;
     cursor: pointer;
     transition: box-shadow 0.2s;
   }
 
-  .cancelled-expense {
+  .cancelled-transaction {
     background: #ffe0b2;
     color: #e65100;
   }
 
   .results-section {
+    max-width: 95%;
+    width: 100%;
+    margin: 0 auto;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -36,7 +39,7 @@
   }
 
   .table-container h3 {
-    font-size: 1rem;
+    font-size: 'clamp(1.1rem, 2vw, 1.7rem)'
   }
 
   .card-list {
@@ -44,7 +47,6 @@
     flex: auto;
     flex-wrap: wrap;
     gap: 1rem;
-    width: 100%;
     justify-content: flex-start;
     /* Distribute items evenly */
   }
@@ -70,7 +72,6 @@
 
   /* Pagination Styles */
   .pagination {
-    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -102,5 +103,5 @@
     color: #999;
     margin-top: 20px;
   }
-  
+
 }

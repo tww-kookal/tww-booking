@@ -303,7 +303,7 @@ const Booking = () => {
     const handleCancel = () => {
         // If we came from the search page, go back to search
         if (location.state?.from === 'search') {
-            navigate('/search');
+            navigate('/booking/search');
         } else {
             // Otherwise go to dashboard
             navigate('/dashboard');

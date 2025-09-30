@@ -9,8 +9,8 @@ import { getAllBookings } from '../modules/booking.module';
 import { getAllCustomers } from '../modules/customer.module';
 import { isUserInRoles, getUserContext } from '../contexts/constants';
 
-import '../css/expense.large.css';
-import '../css/expense.handheld.css';
+import '../css/transaction.large.css';
+import '../css/transaction.handheld.css';
 import ScrollToTop from '../site/ScrollToTop';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectFade, Autoplay } from 'swiper';
@@ -20,7 +20,7 @@ import 'swiper/css';
 
 import { PAYMENT_TYPE } from '../modules/constants';
 
-const Expense = () => {
+const Transaction = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -197,7 +197,7 @@ const Expense = () => {
             ></Swiper>
             <ToastContainer />
             <div className="accounting-form-container">
-                <h2>{isUpdatingExpense ? 'Update Expense' : 'Add Expense'}</h2>
+                <h2>{isUpdatingExpense ? 'Update Transaction' : 'Add Transaction'}</h2>
                 <form onSubmit={e => e.preventDefault()}>
                     <div className='form-group'>
                         <label htmlFor="acc_category_id">Category</label>
@@ -334,4 +334,4 @@ const Expense = () => {
     );
 };
 
-export default Expense;
+export default Transaction;
