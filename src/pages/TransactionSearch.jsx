@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import TransactionList from "./TransactionList";
-import { getExpensesSince } from "../modules/expense.module";
+import { getTransactionsSince } from "../modules/accounting.module";
 
 import '../css/transactionSearch.large.css';
 import '../css/transactionSearch.handheld.css';
@@ -20,14 +20,14 @@ const TransactionSearch = () => {
   const location = useLocation();
 
   const [searchCriteria, setSearchCriteria] = useState({
-    expenseDate: dayjs().add(-1, 'day').format('YYYY-MM-DD'),
+    transactionDate: dayjs().add(-1, 'day').format('YYYY-MM-DD'),
     paidBy: 0,
     acc_category_id: 0,
     receivedBy: 0,
     receivedForBookingId: 0,
 
   });
-  const [expenses, setExpenses] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
 
@@ -40,55 +40,55 @@ const TransactionSearch = () => {
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fetchExpenses = async (expensesSince = dayjs().add(-1, 'day').format('YYYY-MM-DD')) => {
+  const fetchTransactions = async (transactionsSince = dayjs().add(-1, 'day').format('YYYY-MM-DD')) => {
     setLoading(true);
     try {
-      const allExpenses = await getExpensesSince(navigate, expensesSince);
-      if (!allExpenses || allExpenses.length <= 0) {
-        setExpenses([]);
+      const allTransactions = await getTransactionsSince(navigate, transactionsSince);
+      if (!allTransactions || allTransactions.length <= 0) {
+        setTransactions([]);
         return;
       }
-      setExpenses(allExpenses);
+      setTransactions(allTransactions);
       //round of to two digits and comma seperated as currency
-      const debit = allExpenses.filter(expense => expense.acc_category_type === 'debit').reduce((acc, expense) => acc + expense.acc_entry_amount, 0);
+      const debit = allTransactions.filter(transaction => transaction.acc_category_type === 'debit').reduce((acc, transaction) => acc + transaction.acc_entry_amount, 0);
       setTotalDebit(Number(debit.toFixed(2)).toLocaleString());
-      const credit = allExpenses.filter(expense => expense.acc_category_type === 'credit').reduce((acc, expense) => acc + expense.acc_entry_amount, 0);
+      const credit = allTransactions.filter(transaction => transaction.acc_category_type === 'credit').reduce((acc, transaction) => acc + transaction.acc_entry_amount, 0);
       setTotalCredit(Number(credit.toFixed(2)).toLocaleString());
       setCurrentPage(1);
     } catch (err) {
-      console.error("ExpenseSearch::FetchExpenses::Error fetching data:", err);
-      toast.error("Failed to fetch expenses. Please try again.");
-      setExpenses([]);
+      console.error("TransactionSearch::FetchTransactions::Error fetching data:", err);
+      toast.error("Failed to fetch transactions. Please try again.");
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchExpenses();
+    fetchTransactions();
   }, []);
 
   const handleSearch = () => {
-    fetchExpenses(searchCriteria.expenseDate);
+    fetchTransactions(searchCriteria.transactionDate);
   };
 
-  const handleViewExpense = (selectedExpense) => {
+  const handleViewTransaction = (selectedTransaction) => {
     navigate(`/transactions`, {
       state: {
-        preloadedExpense: selectedExpense,
-        from: 'searchExpense'
+        preloadedTransaction: selectedTransaction,
+        from: 'searchTransaction'
       }
     });
   };
 
-  const paginatedExpenses = expenses.slice(
+  const paginatedTransactions = transactions.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   const handlePageChange = (direction) => {
     if (direction === "prev" && currentPage > 1) setCurrentPage(currentPage - 1);
-    if (direction === "next" && currentPage < Math.ceil(expenses.length / itemsPerPage)) setCurrentPage(currentPage + 1);
+    if (direction === "next" && currentPage < Math.ceil(transactions.length / itemsPerPage)) setCurrentPage(currentPage + 1);
   };
 
   return (
@@ -113,12 +113,12 @@ const TransactionSearch = () => {
 
         <div className="search-form" >
           <div className="search-field" >
-            <label htmlFor="expenseDate">Expense Date:</label>
+            <label htmlFor="transactionDate">Transaction Date:</label>
             <input
               type="date"
-              id="expenseDate"
-              name="expenseDate"
-              value={searchCriteria.expenseDate}
+              id="transactionDate"
+              name="transactionDate"
+              value={searchCriteria.transactionDate}
               onChange={handleInputChange}
               style={{ width: '100%' }}
             />
@@ -195,12 +195,12 @@ const TransactionSearch = () => {
 
         <TransactionList
           loading={loading}
-          expenses={expenses}
-          paginatedExpenses={paginatedExpenses}
+          transactions={transactions}
+          paginatedTransactions={paginatedTransactions}
           itemsPerPage={itemsPerPage}
           currentPage={currentPage}
           handlePageChange={handlePageChange}
-          handleViewExpense={handleViewExpense}
+          handleViewTransaction={handleViewTransaction}
           totalDebit={totalDebit}
           totalCredit={totalCredit}
         />

@@ -1,5 +1,4 @@
 
-import dayjs from 'dayjs';
 import api from './apiClient';
 import { getUserContext } from '../contexts/constants';
 /**
@@ -41,18 +40,18 @@ const transformPaymentV1toV2 = (payment) => {
     }
 }
 
-const transformExpenseV2toV1 = (payment) => {
+const transformTransactionV2toV1 = (transaction) => {
     return {
-        ...payment,
-        booking_payments_id: payment.acc_entry_id,
-        booking_id: payment.received_for_booking_id,
-        payment_type: payment.payment_type,
-        payment_amount: payment.acc_entry_amount,
-        payment_date: payment.acc_entry_date,
-        payment_to: payment.received_by,
-        payment_for: payment.acc_category_id,
-        payment_added_by: payment.created_by,
-        remarks: payment.acc_entry_description,
+        ...transaction,
+        booking_payments_id: transaction.acc_entry_id,
+        booking_id: transaction.received_for_booking_id,
+        payment_type: transaction.payment_type,
+        payment_amount: transaction.acc_entry_amount,
+        payment_date: transaction.acc_entry_date,
+        payment_to: transaction.received_by,
+        payment_for: transaction.acc_category_id,
+        payment_added_by: transaction.created_by,
+        remarks: transaction.acc_entry_description,
     }
 }
 
@@ -61,9 +60,9 @@ export const addPayment = async (navigate, payment) => {
     try {
         const paymentV2 = transformPaymentV1toV2(payment);
         console.log("Payments::ModuleV2:: after ", paymentV2);
-        const response = await api.post("/accounting/expense/add", paymentV2);
-        const addedExpense = transformExpenseV2toV1(response.data?.createdExpense);
-        return addedExpense || {}
+        const response = await api.post("/accounting/transaction/add", paymentV2);
+        const addedTransaction = transformTransactionV2toV1(response.data?.createdTransaction);
+        return addedTransaction || {}
     } catch (error) {
         console.error("Payment.Module::addPayment::Error adding payment", error);
         if (error?.code == 'ERR_NETWORK') {
@@ -81,9 +80,9 @@ export const updatePayment = async (navigate, payment) => {
             acc_entry_id: payment.booking_payments_id,
             paid_by: payment.paid_by
         }
-        const response = await api.post("/accounting/expense/update", paymentV2);
-        const updatedExpense = transformExpenseV2toV1(response.data?.updatedExpense);
-        return updatedExpense || {}
+        const response = await api.post("/accounting/transaction/update", paymentV2);
+        const updatedTransaction = transformTransactionV2toV1(response.data?.updatedTransaction);
+        return updatedTransaction || {}
     } catch (error) {
         console.debug("Payment.Module::updatePayment::Error updating payment", error);
         if (error?.code == 'ERR_NETWORK') {
@@ -95,7 +94,7 @@ export const updatePayment = async (navigate, payment) => {
 
 export const deletePaymentById = async (navigate, payment) => {
     try {
-        await api.post("/accounting/expense/deleteById/" + payment.acc_entry_id);
+        await api.post("/accounting/transaction/deleteById/" + payment.acc_entry_id);
         return {}
     } catch (error) {
         console.debug("Payment.Module::deletePaymentById::Error deleting payment", error);

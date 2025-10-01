@@ -16,8 +16,6 @@ const Header = () => {
   const [header, setHeader] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBookingOpen, setBookingOpen] = useState(false);
-  const [isExpensesOpen, setExpensesOpen] = useState(false);
-  const [isRevenueOpen, setRevenueOpen] = useState(false);
   const [isTransactionsOpen, setTransactionsOpen] = useState(false);
 
   useEffect(() => {
@@ -129,19 +127,6 @@ const Header = () => {
                   </>
                 }
 
-                {/* Expenses */}
-{/*                 {isUserInRoles(['manager', 'owner', 'employee']) &&
-                  <>
-                    <div className='font-bold'>Expenses</div>
-                    <Link to="/transactions/search" className={`ml-4 ${location.pathname === '/transactions/search' ? 'active' : ''}`} onClick={() => toggleMenu()}>
-                      Search
-                    </Link>
-                    <Link to="/transactions" className={`ml-4 ${location.pathname === '/expenses' ? 'active' : ''}`} onClick={() => toggleMenu()}>
-                      New
-                    </Link>
-                  </>
-                }
- */}
                 {/* Transactions */}
                 {isUserInRoles(['manager', 'owner']) &&
                   <>
@@ -200,19 +185,6 @@ const Header = () => {
               </div>
             }
 
-            {/* Expenses Dropdown */}
-{/*             {isUserInRoles(['manager', 'owner', 'employee']) &&
-              <div className="relative" onMouseEnter={() => setExpensesOpen(true)} onMouseLeave={() => setExpensesOpen(false)}>
-                <button className='transition hover:text-accent'>Expenses</button>
-                {isExpensesOpen && (
-                  <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-32" onMouseEnter={() => setExpensesOpen(true)} onMouseLeave={() => setExpensesOpen(false)}>
-                    <Link to="/transactions/search" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Search</Link>
-                    <Link to="/transactions" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>New</Link>
-                  </div>
-                )}
-              </div>
-            }
- */}
             {/* Transactions Dropdown */}
             {isUserInRoles(['manager', 'owner']) &&
               <div className="relative" onMouseEnter={() => setTransactionsOpen(true)} onMouseLeave={() => setTransactionsOpen(false)}>

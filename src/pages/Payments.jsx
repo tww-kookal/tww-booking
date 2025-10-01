@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { updatePayment, addPayment, deletePaymentById } from '../modules/payment.module';
 import { PAYMENT_TYPE } from '../modules/constants';
-import { getAllAccountingCategories } from '../modules/expense.module';
+import { getAllAccountingCategories } from '../modules/accounting.module';
 import { getAllCustomers } from '../modules/customer.module';
 import { getUserContext } from '../contexts/constants';
 

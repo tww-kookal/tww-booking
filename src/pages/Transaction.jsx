@@ -4,7 +4,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { getAllAccountingCategories, validateExpense, createExpense, updateExpense } from '../modules/expense.module';
+import { getAllAccountingCategories, validateTransaction, createTransaction, updateTransaction } from '../modules/accounting.module';
 import { getAllBookings } from '../modules/booking.module';
 import { getAllCustomers } from '../modules/customer.module';
 import { isUserInRoles, getUserContext } from '../contexts/constants';
@@ -25,7 +25,6 @@ const Transaction = () => {
     const location = useLocation();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFormDisabled, setIsFormDisabled] = useState(false);
-    const [isUpdating, setIsUpdating] = useState(false);
     const [accCategoryOptions, setAccCategoryOptions] = useState([]);
     const [accPartiesOptions, setAccPartiesOptions] = useState([])
     const [bookingOptions, setBookingOptions] = useState([]);
@@ -34,9 +33,9 @@ const Transaction = () => {
     const [selectedTxnBy, setSelectedTxnBy] = useState();
     const [selectedReceivedBy, setSelectedReceivedBy] = useState();
     const [selectedReceivedForBooking, setSelectedReceivedForBooking] = useState();
-    const [isUpdatingExpense, setIsUpdatingExpense] = useState(false);
+    const [isUpdatingTransaction, setIsUpdatingTransaction] = useState(false);
     const [allCustomers, setAllCustomers] = useState([]);
-    const [expense, setExpense] = useState({
+    const [transaction, setTransaction] = useState({
         acc_entry_id: '',
         acc_category_id: '',
         acc_entry_amount: 0,
@@ -91,29 +90,29 @@ const Transaction = () => {
     }, []);
 
     useEffect(() => {
-        if (location.state && location.state.preloadedExpense) {
-            const preloadedExpense = location.state.preloadedExpense
-            setIsUpdatingExpense(true);
-            setExpense(preloadedExpense || {});
+        if (location.state && location.state.preloadedTransaction) {
+            const preloadedTransaction = location.state.preloadedTransaction
+            setIsUpdatingTransaction(true);
+            setTransaction(preloadedTransaction || {});
             setSelectedAccCategory({
-                value: preloadedExpense.acc_category_id,
-                label: `[${(preloadedExpense.acc_category_type || '#').charAt(0)}] ${preloadedExpense.acc_category_name}`
+                value: preloadedTransaction.acc_category_id,
+                label: `[${(preloadedTransaction.acc_category_type || '#').charAt(0)}] ${preloadedTransaction.acc_category_name}`
             });
             setSelectedPaidBy({
-                value: preloadedExpense.paid_by,
-                label: `${preloadedExpense.paid_by_customer_name} - ${preloadedExpense.paid_by_customer_phone}`
+                value: preloadedTransaction.paid_by,
+                label: `${preloadedTransaction.paid_by_customer_name} - ${preloadedTransaction.paid_by_customer_phone}`
             });
             setSelectedTxnBy({
-                value: preloadedExpense.txn_by,
-                label: `${preloadedExpense.txn_by_customer_name} - ${preloadedExpense.txn_by_customer_phone}`
+                value: preloadedTransaction.txn_by,
+                label: `${preloadedTransaction.txn_by_customer_name} - ${preloadedTransaction.txn_by_customer_phone}`
             });
             setSelectedReceivedBy({
-                value: preloadedExpense.received_by,
-                label: `${preloadedExpense.received_by_customer_name} - ${preloadedExpense.received_by_customer_phone}`
+                value: preloadedTransaction.received_by,
+                label: `${preloadedTransaction.received_by_customer_name} - ${preloadedTransaction.received_by_customer_phone}`
             });
             setSelectedReceivedForBooking({
-                value: preloadedExpense.received_for_booking_id,
-                label: `${preloadedExpense.room_name} - ${preloadedExpense.booking_customer_name} - [${preloadedExpense.received_for_booking_id}] `
+                value: preloadedTransaction.received_for_booking_id,
+                label: `${preloadedTransaction.room_name} - ${preloadedTransaction.booking_customer_name} - [${preloadedTransaction.received_for_booking_id}] `
             });
         } else {
             //find customer based on user_id from usercontext
@@ -126,20 +125,20 @@ const Transaction = () => {
                     value: customer.customer_id,
                     label: `${customer.customer_name} - ${customer.phone}`
                 });
-                setExpense(prev => ({ ...prev, txn_by: customer.customer_id }));
-                customer = customers.find(u => u.email === 'thewestwood.kookal@gmail.com');
+                setTransaction(prev => ({ ...prev, txn_by: customer.customer_id }));
+                customer = allCustomers.find(u => u.email === 'thewestwood.kookal@gmail.com');
                 setSelectedTxnBy({
                     value: customer.customer_id,
                     label: `${customer.customer_name} - ${customer.phone}`
                 });
-                setExpense(prev => ({ ...prev, paid_by: customer.customer_id }));
+                setTransaction(prev => ({ ...prev, paid_by: customer.customer_id }));
             }
         }
     }, [location.state])
 
     const handleCancel = () => {
-        if (location.state?.from === 'searchExpense') {
-            navigate('/expenses/search');
+        if (location.state?.from === 'searchTransaction') {
+            navigate('/transactions/search');
         } else {
             // Otherwise go to dashboard
             navigate('/dashboard');
@@ -147,33 +146,31 @@ const Transaction = () => {
     }
 
     const handleUpdate = async () => {
-        const validated = validateExpense(expense)
+        const validated = validateTransaction(transaction)
         if (validated !== 'ALL_GOOD') {
             toast.error(validated);
             return
         }
-        setExpense(prev => ({ ...prev, acc_entry_amount: Number(expense.acc_entry_amount) }));
-        console.log("Expense ", expense)
-
+        setTransaction(prev => ({ ...prev, acc_entry_amount: Number(transaction.acc_entry_amount) }));
         try {
-            if (isUpdatingExpense) {
-                await updateExpense(expense);
-                toast.success('Expense updated successfully');
+            if (isUpdatingTransaction) {
+                await updateTransaction(transaction);
+                toast.success('Transaction updated successfully');
             } else {
-                await createExpense(expense);
-                toast.success('Expense created successfully');
+                await createTransaction(transaction);
+                toast.success('Transaction created successfully');
             }
             navigate('/dashboard');
         } catch (error) {
-            console.error('Accounting::Error adding/editing expense:', error);
-            toast.error('Unable to add/edit expense');
+            console.error('Accounting::Error adding/editing transaction:', error);
+            toast.error('Unable to add/edit transaction');
         }
     }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        setExpense(prev => {
+        setTransaction(prev => {
             const updated = {
                 ...prev,
                 [name]: value,
@@ -197,14 +194,14 @@ const Transaction = () => {
             ></Swiper>
             <ToastContainer />
             <div className="accounting-form-container">
-                <h2>{isUpdatingExpense ? 'Update Transaction' : 'Add Transaction'}</h2>
+                <h2>{isUpdatingTransaction ? 'Update Transaction' : 'Add Transaction'}</h2>
                 <form onSubmit={e => e.preventDefault()}>
                     <div className='form-group'>
                         <label htmlFor="acc_category_id">Category</label>
                         <Select name="acc_category_id"
                             value={selectedAccCategory}
                             onChange={e => {
-                                setExpense(prev => ({ ...prev, acc_category_id: e.value }));
+                                setTransaction(prev => ({ ...prev, acc_category_id: e.value }));
                                 setSelectedAccCategory({
                                     value: e.value,
                                     label: e.label,
@@ -218,17 +215,17 @@ const Transaction = () => {
                     </div>
                     <div className='form-group'>
                         <label>Amount</label>
-                        <input type="number" name="acc_entry_amount" value={expense.acc_entry_amount} onChange={handleChange} />
+                        <input type="number" name="acc_entry_amount" value={transaction.acc_entry_amount} onChange={handleChange} />
                     </div>
 
                     <div className='form-group'>
                         <label>Description</label>
-                        <input type="text" name="acc_entry_description" value={expense.acc_entry_description} onChange={handleChange} />
+                        <input type="text" name="acc_entry_description" value={transaction.acc_entry_description} onChange={handleChange} />
                     </div>
 
                     <div className='form-group'>
                         <label>Txn Date</label>
-                        <input type="date" name="acc_entry_date" value={expense.acc_entry_date} onChange={handleChange} />
+                        <input type="date" name="acc_entry_date" value={transaction.acc_entry_date} onChange={handleChange} />
                     </div>
 
                     <div className='form-group'>
@@ -236,7 +233,7 @@ const Transaction = () => {
                         <Select name="txn_by"
                             value={selectedTxnBy}
                             onChange={e => {
-                                setExpense(prev => ({ ...prev, txn_by: e.value }));
+                                setTransaction(prev => ({ ...prev, txn_by: e.value }));
                                 setSelectedTxnBy({
                                     value: e.value,
                                     label: e.label,
@@ -254,7 +251,7 @@ const Transaction = () => {
                         <Select name="paid_by"
                             value={selectedPaidBy}
                             onChange={e => {
-                                setExpense(prev => ({ ...prev, paid_by: e.value }));
+                                setTransaction(prev => ({ ...prev, paid_by: e.value }));
                                 setSelectedPaidBy({
                                     value: e.value,
                                     label: e.label,
@@ -272,7 +269,7 @@ const Transaction = () => {
                         <Select name="received_by"
                             value={selectedReceivedBy}
                             onChange={e => {
-                                setExpense(prev => ({ ...prev, received_by: e.value }));
+                                setTransaction(prev => ({ ...prev, received_by: e.value }));
                                 setSelectedReceivedBy({
                                     value: e.value,
                                     label: e.label,
@@ -287,7 +284,7 @@ const Transaction = () => {
 
                     <div className='form-group'>
                         <label htmlFor="received_by">Mode</label>
-                        <select name="payment_type" value={expense.payment_type} onChange={handleChange}>
+                        <select name="payment_type" value={transaction.payment_type} onChange={handleChange}>
                             <option value="">Select Mode</option>
                             {PAYMENT_TYPE.map(r => <option key={r.id} value={r.id}>{r.value}</option>)}
                         </select>
@@ -298,7 +295,7 @@ const Transaction = () => {
                         <Select name="received_for_booking_id"
                             value={selectedReceivedForBooking}
                             onChange={e => {
-                                setExpense(prev => ({ ...prev, received_for_booking_id: e.value }));
+                                setTransaction(prev => ({ ...prev, received_for_booking_id: e.value }));
                                 setSelectedReceivedForBooking({
                                     value: e.value,
                                     label: e.label,
@@ -323,7 +320,7 @@ const Transaction = () => {
                                 onClick={handleUpdate}
                                 disabled={isSubmitting || isFormDisabled}
                             >
-                                {isSubmitting ? 'Processing ...' : isUpdatingExpense ? 'Update' : 'Save'}
+                                {isSubmitting ? 'Processing ...' : isUpdatingTransaction ? 'Update' : 'Save'}
                             </button>
                             : ''
                         }

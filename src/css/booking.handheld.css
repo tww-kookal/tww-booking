@@ -110,6 +110,7 @@
 
   .form-buttons {
     display: flex;
+    flex-direction: column;
     justify-content: stretch;
     margin-top: 0.5rem;
     gap: 10px;

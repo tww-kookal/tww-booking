@@ -45,13 +45,13 @@ const Navbar = () => {
               </Link>
               : ''}
             {isUserInRoles(['manager', 'owner', 'employee']) ?
-              <Link to="/expenses" className={location.pathname === ('/expenses') ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
-                Add Expense
+              <Link to="/transactions" className={location.pathname === ('/transactions') ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+                Add Transaction
               </Link>
               : ''}
             {isUserInRoles(['manager', 'owner', 'employee']) ?
-              <Link to="/expenses/search" className={location.pathname === '/expenses/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
-                List Expenses
+              <Link to="/transactions/search" className={location.pathname === '/transactions/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+                List Transactions
               </Link>
               : ''}
           </div>
@@ -75,8 +75,8 @@ const Navbar = () => {
           </Link>
           : ''}
         {isUserInRoles(['manager', 'owner', 'employee']) ?
-          <Link to="/expenses/search" className={location.pathname === '/expenses/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
-            List Expenses
+          <Link to="/transactions/search" className={location.pathname === '/transactions/search' ? 'active' : ''} onClick={() => setIsMenuOpen(false)}>
+            List Transactions
           </Link>
           : ''}
       </div>
