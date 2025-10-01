@@ -113,10 +113,11 @@ export const prepareChartData = (bookings, dateSet, memoizedDates) => {
         }));
 
     const allData = [];
+    const today = dayjs(dayjs().format("YYYY-MM-DD"), "YYYY-MM-DD");
     for (const date of memoizedDates) {
         for (const room of roomOptions) {
             const booking = chartData.find((b) => dayjs(b.check_in, "YYYY-MM-DD").isSame(date) && b.room_name === room);
-            if (!booking && dayjs(date, "YYYY-MM-DD").isBefore(dayjs())) {
+            if (!booking && dayjs(date, "YYYY-MM-DD").isBefore(today)) {
                 // If no booking exists for this room on this date and its a past date, add a default booking with Closed status
                 allData.push({
                     ...DEFAULT_BOOKING,

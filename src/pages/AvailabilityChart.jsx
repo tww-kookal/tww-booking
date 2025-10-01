@@ -155,7 +155,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                         if (bookingActual) {
                             bgColor = getStatusColorForActual(bookingActual);
                             displayText = `${getStartingCharacters(bookingActual.customer_name)}
-                    ${bookingActual.number_of_people ? `(🧑‍💼${bookingActual.number_of_people})` : ''} `;
+                                ${bookingActual.number_of_people ? `(🧑‍💼${bookingActual.number_of_people})` : ''} `;
                         } else if (bookingInjected) {
                             bgColor = getStatusColor(bookingInjected);
                             displayText = getDisplayText(bookingInjected);
@@ -203,7 +203,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                         onChange={handleDateChange}
                     />
                 </div>
-                <div className="room-chart" style={{ width: '100%' , maxHeight: '80vh', overflowY: 'auto' }} >
+                <div className="room-chart" style={{ width: '100%', maxHeight: '80vh', overflowY: 'auto' }} >
                     {renderCards()}
                 </div>
             </div>
