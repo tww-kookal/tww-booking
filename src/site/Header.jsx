@@ -173,7 +173,7 @@ const Header = () => {
             {/* Booking Dropdown */}
             {isUserInRoles(['manager', 'owner', 'employee']) &&
               <div className="relative" onMouseEnter={() => setBookingOpen(true)} onMouseLeave={() => setBookingOpen(false)}>
-                <button className='transition hover:text-accent'>Booking</button>
+                <button className='transition hover:text-accent'>BOOKING</button>
                 {isBookingOpen && (
                   <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-32" onMouseEnter={() => setBookingOpen(true)} onMouseLeave={() => setBookingOpen(false)}>
                     <Link to="/booking/search" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Search</Link>
@@ -188,7 +188,7 @@ const Header = () => {
             {/* Transactions Dropdown */}
             {isUserInRoles(['manager', 'owner']) &&
               <div className="relative" onMouseEnter={() => setTransactionsOpen(true)} onMouseLeave={() => setTransactionsOpen(false)}>
-                <button className='transition hover:text-accent'>Transactions</button>
+                <button className='transition hover:text-accent'>TRANSACTIONS</button>
                 {isTransactionsOpen && (
                   <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-32" onMouseEnter={() => setTransactionsOpen(true)} onMouseLeave={() => setTransactionsOpen(false)}>
                     <Link to="/transactions/search" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Search</Link>
