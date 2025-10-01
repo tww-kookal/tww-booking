@@ -57,7 +57,9 @@
     margin-bottom: 5px;
   }
 
-  .search-field input {
+  .search-field input 
+  .search-field Select 
+  {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;

@@ -283,7 +283,7 @@ const Transaction = () => {
                     </div>
 
                     <div className='form-group'>
-                        <label htmlFor="received_by">Mode</label>
+                        <label htmlFor="payment_type">Mode</label>
                         <select name="payment_type" value={transaction.payment_type} onChange={handleChange}>
                             <option value="">Select Mode</option>
                             {PAYMENT_TYPE.map(r => <option key={r.id} value={r.id}>{r.value}</option>)}

@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
+import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import TransactionList from "./TransactionList";
-import { getTransactionsSince } from "../modules/accounting.module";
-
+import { getAllAccountingCategories, getTransactionsSince } from '../modules/accounting.module';
+import { getAllCustomers } from '../modules/customer.module';
 import '../css/transactionSearch.large.css';
 import '../css/transactionSearch.handheld.css';
 import ScrollToTop from '../site/ScrollToTop';
@@ -22,6 +23,7 @@ const TransactionSearch = () => {
   const [searchCriteria, setSearchCriteria] = useState({
     transactionDate: dayjs().add(-1, 'day').format('YYYY-MM-DD'),
     paidBy: 0,
+    txn_by: 0,
     acc_category_id: 0,
     receivedBy: 0,
     receivedForBookingId: 0,
@@ -31,9 +33,40 @@ const TransactionSearch = () => {
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
 
+  const [allCustomers, setAllCustomers] = useState([]);
+  const [accCategoryOptions, setAccCategoryOptions] = useState([]);
+  const [accPartiesOptions, setAccPartiesOptions] = useState([])
+  const [selectedAccCategory, setSelectedAccCategory] = useState();
+  const [selectedPaidBy, setSelectedPaidBy] = useState();
+  const [selectedTxnBy, setSelectedTxnBy] = useState();
+  const [selectedReceivedBy, setSelectedReceivedBy] = useState();
+
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5; // Reduced items per page for better mobile view
+
+  useEffect(() => {
+    getAllAccountingCategories(navigate).then(accCategories => {
+      setAccCategoryOptions(accCategories.map(u => ({
+        value: u.acc_category_id,
+        label: `[${(u.acc_category_type || '#').charAt(0)}] ${u.acc_category_name}`
+      })));
+    }).catch(error => {
+      console.error('Accounting::Error fetching acc categories:', error);
+    });
+  }, []);
+
+  useEffect(() => {
+    getAllCustomers(navigate).then(customers => {
+      setAllCustomers(customers);
+      setAccPartiesOptions(customers.map(u => ({
+        value: u.customer_id,
+        label: `${u.customer_name} - ${u.phone}`
+      })));
+    }).catch(error => {
+      console.error('Accounting::Error fetching acc parties:', error);
+    });
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -113,7 +146,7 @@ const TransactionSearch = () => {
 
         <div className="search-form" >
           <div className="search-field" >
-            <label htmlFor="transactionDate">Transaction Date:</label>
+            <label htmlFor="transactionDate">Transactions Since:</label>
             <input
               type="date"
               id="transactionDate"
@@ -126,46 +159,85 @@ const TransactionSearch = () => {
 
           <div className="search-field" >
             <label htmlFor="paidBy">Paid By:</label>
-            <input
-              type="text"
-              id="paidBy"
-              name="paidBy"
-              placeholder="Enter paid by"
-              value={searchCriteria.paidBy}
-              onChange={handleInputChange}
-              style={{ width: '100%' }}
+            <Select name="paidBy"
+              isDisabled={true}
+              value={selectedPaidBy}
+              onChange={e => {
+                setTransaction(prev => ({ ...prev, paid_by: e.value }));
+                setSelectedPaidBy({
+                  value: e.value,
+                  label: e.label,
+                });
+              }}
+              options={accPartiesOptions}
+              placeholder="Select Payer..."
+              isSearchable={true}
+              classNamePrefix="react-select"
             />
           </div>
 
           <div className="search-field" >
             <label htmlFor="acc_category_id">Account Category:</label>
-            <input
-              type="text"
-              id="acc_category_id"
-              name="acc_category_id"
-              placeholder="Enter account category"
-              value={searchCriteria.acc_category_id}
-              onChange={handleInputChange}
-              style={{ width: '100%' }}
+            <Select name="acc_category_id"
+              isDisabled={true}
+              value={selectedAccCategory}
+              onChange={e => {
+                setTransaction(prev => ({ ...prev, acc_category_id: e.value }));
+                setSelectedAccCategory({
+                  value: e.value,
+                  label: e.label,
+                });
+              }}
+              options={accCategoryOptions}
+              placeholder="Select a acc category..."
+              isSearchable={true}
+              classNamePrefix="react-select"
             />
           </div>
 
           <div className="search-field" >
+            <label htmlFor="txn_by">Txn By</label>
+            <Select name="txn_by"
+              isDisabled={true}
+              value={selectedTxnBy}
+              onChange={e => {
+                setTransaction(prev => ({ ...prev, txn_by: e.value }));
+                setSelectedTxnBy({
+                  value: e.value,
+                  label: e.label,
+                });
+              }}
+              options={accPartiesOptions}
+              placeholder="Transaction made by ..."
+              isSearchable={true}
+              classNamePrefix="react-select"
+            />
+          </div>
+
+
+          <div className="search-field" >
             <label htmlFor="receivedBy">Received By:</label>
-            <input
-              type="text"
-              id="receivedBy"
-              name="receivedBy"
-              placeholder="Enter received by"
-              value={searchCriteria.receivedBy}
-              onChange={handleInputChange}
-              style={{ width: '100%' }}
+            <Select name="received_by"
+              isDisabled={true}
+              value={selectedReceivedBy}
+              onChange={e => {
+                setTransaction(prev => ({ ...prev, received_by: e.value }));
+                setSelectedReceivedBy({
+                  value: e.value,
+                  label: e.label,
+                });
+              }}
+              options={accPartiesOptions}
+              placeholder="Select Receiver..."
+              isSearchable={true}
+              classNamePrefix="react-select"
             />
           </div>
 
           <div className="search-field" >
             <label htmlFor="receivedForBookingId">Received For Booking ID:</label>
             <input
+              disabled={true}
               type="text"
               id="receivedForBookingId"
               name="receivedForBookingId"

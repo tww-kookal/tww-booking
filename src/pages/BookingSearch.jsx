@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
+import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import BookingList from "./BookingList";
 import { getAllAttachedBookings, getAllBookings } from "../modules/booking.module";
+import { getAllCustomers } from '../modules/customer.module';
 
 import '../css/bookingSearch.large.css';
 import '../css/bookingSearch.handheld.css';
@@ -22,6 +24,9 @@ const BookingSearch = () => {
   const today = new Date().toISOString().split('T')[0];
   const initialCheckInDate = location.state?.defaultCheckInDate || today;
   const exactStartDate = location.state?.exactStartDate || false;
+  const [customers, setCustomers] = useState([]);
+  const [customerOptions, setCustomerOptions] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   const [searchCriteria, setSearchCriteria] = useState({
     bookingDate: "",
@@ -64,8 +69,30 @@ const BookingSearch = () => {
   };
 
   useEffect(() => {
+    getAllCustomers(navigate).then(customers => {
+      setCustomers(customers);
+      setCustomerOptions(customers.map(c => ({
+        value: c.customer_id,
+        label: `${c.customer_name} - ${c.phone}`
+      })));
+    })
     fetchFutureBookings();
   }, []);
+
+  const handleCustomerChange = (e) => {
+    setSelectedCustomer(e);
+    handleChange({
+      target: {
+        name: "customer_id",
+        value: e.value,
+      }
+    })
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setSearchCriteria((prev) => ({ ...prev, [name]: value }));
+  }
 
   const handleSearch = () => {
     // if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
@@ -146,6 +173,18 @@ const BookingSearch = () => {
 
         <div className="search-form" >
           <div className="search-field" >
+            <label htmlFor="checkInDate">Check In Date:</label>
+            <input            
+              type="date"
+              id="checkInDate"
+              name="checkInDate"
+              value={searchCriteria.checkInDate}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
+            />
+          </div>
+
+          <div className="search-field" >
             <label htmlFor="bookingDate">Booking Date:</label>
             <input
               type="date"
@@ -159,45 +198,21 @@ const BookingSearch = () => {
 
           <div className="search-field" >
             <label htmlFor="guestName">Guest Name:</label>
-            <input
-              type="text"
-              id="guestName"
-              name="guestName"
-              placeholder="Enter guest name"
-              value={searchCriteria.guestName}
-              onChange={handleInputChange}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div className="search-field" >
-            <label htmlFor="checkInDate">Check In Date:</label>
-            <input
-              type="date"
-              id="checkInDate"
-              name="checkInDate"
-              value={searchCriteria.checkInDate}
-              onChange={handleInputChange}
-              style={{ width: '100%' }}
-            />
-          </div>
-
-          <div className="search-field" >
-            <label htmlFor="contactNumber">Contact Number:</label>
-            <input
-              type="text"
-              id="contactNumber"
-              name="contactNumber"
-              placeholder="Enter contact number"
-              value={searchCriteria.contactNumber}
-              onChange={handleInputChange}
-              style={{ width: '100%' }}
+            <Select name="customer_id"
+              isDisabled = {true}
+              value={selectedCustomer}
+              onChange={handleCustomerChange}
+              options={customerOptions}
+              placeholder="Select a guest..."
+              isSearchable={true}
+              classNamePrefix="react-select"
             />
           </div>
 
           <div className="search-field" >
             <label htmlFor="bookingID">Booking ID:</label>
             <input
+              disabled = {true}
               type="text"
               id="bookingID"
               name="bookingID"
