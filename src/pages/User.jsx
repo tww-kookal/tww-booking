@@ -121,9 +121,9 @@ const User = () => {
             // Update or Add User
             let createdUser = null;
             if (user.user_id) {
-                createdUser = await updateUser(navigate, user);
+                createdUser = await updateUser(navigate, {...user, user_type: 'BOOKING-AGENT'});
             } else {
-                createdUser = await addUser(navigate, user);
+                createdUser = await addUser(navigate, {...user, user_type: 'BOOKING-AGENT'});
             }
 
             navigate(location.state?.returnTo || '/booking/', {
@@ -170,6 +170,7 @@ const User = () => {
                     <label>Last Name:</label>
                     <input type="text" name="last_name" value={user.last_name} onChange={handleChange} />
                 </div>
+
                 <div className='form-group'>
                     <label>Booking Commission %:</label>
                     <input type="number" name="booking_commission" value={user.booking_commission} onChange={handleChange} />

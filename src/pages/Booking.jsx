@@ -9,7 +9,7 @@ import { DEFAULT_BOOKING } from "../modules/constants";
 import { calculateCommission, getCommissionPercent, parseNumber } from "../modules/common.module";
 import { getAllCustomers } from '../modules/customer.module';
 import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getPaymentsForBooking, getAllRooms, fetchAttachments } from '../modules/booking.module';
-import { getAllUsers } from '../modules/users.module';
+import { getAllBookingSources } from '../modules/users.module';
 import { isUserInRoles } from '../contexts/constants';
 
 import '../css/booking.large.css';
@@ -59,8 +59,8 @@ const Booking = () => {
             });
         }
         if (location.state?.createdCustomer) {
-            let updateCustomer = location.state?.toUpdateCustomer || true
-            if (!updateCustomer) {
+            let updateCustomer = location.state?.toUpdateCustomer || false
+            if (updateCustomer) {
                 setCustomers(prev => [...prev, location.state.createdCustomer]);
                 setCustomerOptions(prev => [...prev, {
                     value: location.state.createdCustomer.customer_id,
@@ -77,8 +77,8 @@ const Booking = () => {
             }));
         }
         if (location.state?.createdUser) {
-            let updateUser = location.state?.toUpdateUser || true
-            if (!updateUser) {
+            let updateUser = location.state?.toUpdateUser || false
+            if (updateUser) {
                 setUsers(prev => [...prev, location.state.createdUser]);
                 setUserOptions(prev => [...prev, {
                     value: location.state.createdUser.user_id,
@@ -97,7 +97,7 @@ const Booking = () => {
     }, [location.state]);
 
     useEffect(() => {
-        getAllUsers(navigate).then(users => {
+        getAllBookingSources(navigate).then(users => {
             setUsers(users);
             setUserOptions(users.map(u => ({
                 value: u.user_id,

@@ -3,22 +3,33 @@
   /* Adjusted for screens more than 1000 pixels */
 
   .user-form-container {
-    max-width: 90%;
-    width: 90%;
-    margin: 0 auto;
-    margin: 2rem auto;
-    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    max-width: 95%;
+    width: 100%;
     background-color: #f7f9fc;
     border-radius: 12px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 1.2rem
+    font-size: 1.2rem;
+    align-items: center;
+    margin: 2rem auto;
+    padding: 2rem;
   }
 
   .user-form-container h2 {
     text-align: center;
     margin-bottom: 1.5rem;
     color: #333;
+  }
+
+  .user-form-container form {
+    width: 95%;
+  }
+
+  .user-form-container form .form-group {
+    display: flex;
+    flex-direction: row;
   }
 
   .form-group {
@@ -29,6 +40,7 @@
 
   .form-group label {
     font-weight: 600;
+    width: 25%;
     margin-bottom: 0.4rem;
     color: #555;
   }
@@ -37,6 +49,7 @@
   .form-group select,
   .form-group textarea {
     padding: 0.5rem 0.75rem;
+    width: 50%;
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 1rem;

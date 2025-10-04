@@ -8,13 +8,13 @@ import api from './apiClient';
  * @async
  * @returns {Promise<Array<User>>} A promise that resolves to an array of user objects.
  */
-export const getAllUsers = async (navigate) => {
-    console.debug("Customer.Module::getAllUsers::Fetching all users");
+export const getAllBookingSources = async (navigate) => {
+    console.debug("Booking.Source.Module::getAllBookingSources::Fetching all booking sources");
     try {
-        const response = await api.get("/users/");
+        const response = await api.get("/users/bookingSource");
         return response.data?.users || []
     } catch (error) {
-        console.debug("User.Module::getAllUsers::Error fetching all users", error);
+        console.debug("Users.Module::getAllBookingSources::Error fetching all booking sources", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }

@@ -77,7 +77,7 @@ export const addCustomer = async (navigate, customer) => {
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
-        return {}
+        throw error
     }
 }
 
@@ -95,7 +95,7 @@ export const updateCustomer = async (navigate, customer) => {
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }
-        return {}
+        throw error
     }
 }
 
