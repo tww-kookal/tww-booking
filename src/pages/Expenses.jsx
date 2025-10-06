@@ -6,11 +6,11 @@ import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { getAllAccountingCategories, validateTransaction, createTransaction, updateTransaction } from '../modules/accounting.module';
 import { getAllBookings } from '../modules/booking.module';
-import { getAllCustomers } from '../modules/customer.module';
+import { getAllBookingSources, getAllEmployees, getAllVendors } from '../modules/users.module';
 import { isUserInRoles, getUserContext } from '../contexts/constants';
 
-import '../css/transaction.large.css';
-import '../css/transaction.handheld.css';
+import '../css/expense.large.css';
+import '../css/expense.handheld.css';
 import ScrollToTop from '../site/ScrollToTop';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectFade, Autoplay } from 'swiper';
@@ -20,22 +20,22 @@ import 'swiper/css';
 
 import { PAYMENT_TYPE } from '../modules/constants';
 
-const Transaction = () => {
+const Expenses = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFormDisabled, setIsFormDisabled] = useState(false);
     const [accCategoryOptions, setAccCategoryOptions] = useState([]);
-    const [accPartiesOptions, setAccPartiesOptions] = useState([])
-    const [bookingOptions, setBookingOptions] = useState([]);
+    const [employeeOptions, setEmployeeOptions] = useState([])
+    const [vendorOptions, setVendorOptions] = useState([])
+    const [allVendors, setAllVendors] = useState([]);
     const [selectedAccCategory, setSelectedAccCategory] = useState();
     const [selectedPaidBy, setSelectedPaidBy] = useState();
     const [selectedTxnBy, setSelectedTxnBy] = useState();
     const [selectedReceivedBy, setSelectedReceivedBy] = useState();
-    const [selectedReceivedForBooking, setSelectedReceivedForBooking] = useState();
-    const [isUpdatingTransaction, setIsUpdatingTransaction] = useState(false);
-    const [allCustomers, setAllCustomers] = useState([]);
-    const [transaction, setTransaction] = useState({
+    const [isUpdatingExpense, setIsUpdatingExpense] = useState(false);
+    const [allEmployees, setAllEmployees] = useState([]);
+    const [expense, setExpense] = useState({
         acc_entry_id: '',
         acc_category_id: '',
         acc_entry_amount: 0,
@@ -49,25 +49,8 @@ const Transaction = () => {
     });
 
     useEffect(() => {
-        getAllBookings(navigate, '2021-01-01').then(bookings => {
-            //sort booking by booking id
-            bookings = bookings.sort((a, b) => b.booking_id - a.booking_id);
-            bookings = [{
-                booking_id: 0,
-                room_name: 'NO BOOKING',
-                customer_name: '',
-            }, ...bookings]
-            setBookingOptions(bookings.map(u => ({
-                value: u.booking_id,
-                label: `${u.room_name} - ${u.customer_name} - [${u.booking_id}] `
-            })));
-        }).catch(error => {
-            console.error('Accounting::Error fetching bookings:', error);
-        });
-    }, []);
-
-    useEffect(() => {
         getAllAccountingCategories(navigate).then(accCategories => {
+            accCategories = accCategories.filter(u => u.acc_category_type === 'debit');
             setAccCategoryOptions(accCategories.map(u => ({
                 value: u.acc_category_id,
                 label: `[${(u.acc_category_type || '#').charAt(0)}] ${u.acc_category_name}`
@@ -78,63 +61,71 @@ const Transaction = () => {
     }, []);
 
     useEffect(() => {
-        getAllCustomers(navigate).then(customers => {
-            setAllCustomers(customers);
-            setAccPartiesOptions(customers.map(u => ({
-                value: u.customer_id,
-                label: `${u.customer_name} - ${u.phone}`
+        getAllEmployees(navigate).then(employees => {
+            setAllEmployees(employees);
+            setEmployeeOptions(employees.map(user => ({
+                value: user.user_id,
+                label: user?.first_name + " " + user?.last_name + " - " + user?.phone,
             })));
         }).catch(error => {
-            console.error('Accounting::Error fetching acc parties:', error);
+            console.error('Accounting::Error fetching Employees:', error);
         });
     }, []);
 
     useEffect(() => {
-        if (location.state && location.state.preloadedTransaction) {
-            const preloadedTransaction = location.state.preloadedTransaction
-            setIsUpdatingTransaction(true);
-            setTransaction(preloadedTransaction || {});
+        getAllBookingSources(navigate).then(vendors => {
+            setAllVendors(vendors);
+            setVendorOptions(vendors.map(user => ({
+                value: user.user_id,
+                label: user?.first_name + " " + user?.last_name + " - " + user?.phone,
+            })));
+        }).catch(error => {
+            console.error('Accounting::Error fetching Vendors:', error);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (location.state && location.state.preloadedExpense) {
+            const preloadedExpense = location.state.preloadedExpense
+            setIsUpdatingExpense(true);
+            setExpense(preloadedExpense || {});
             setSelectedAccCategory({
-                value: preloadedTransaction.acc_category_id,
-                label: `[${(preloadedTransaction.acc_category_type || '#').charAt(0)}] ${preloadedTransaction.acc_category_name}`
+                value: preloadedExpense.acc_category_id,
+                label: `[${(preloadedExpense.acc_category_type || '#').charAt(0)}] ${preloadedExpense.acc_category_name}`
             });
             setSelectedPaidBy({
-                value: preloadedTransaction.paid_by,
-                label: `${preloadedTransaction.paid_by_customer_name} - ${preloadedTransaction.paid_by_customer_phone}`
+                value: preloadedExpense.paid_by,
+                label: `${preloadedExpense.paid_by_customer_name} - ${preloadedExpense.paid_by_customer_phone}`
             });
             setSelectedTxnBy({
-                value: preloadedTransaction.txn_by,
-                label: `${preloadedTransaction.txn_by_customer_name} - ${preloadedTransaction.txn_by_customer_phone}`
+                value: preloadedExpense.txn_by,
+                label: `${preloadedExpense.txn_by_customer_name} - ${preloadedExpense.txn_by_customer_phone}`
             });
             setSelectedReceivedBy({
-                value: preloadedTransaction.received_by,
-                label: `${preloadedTransaction.received_by_customer_name} - ${preloadedTransaction.received_by_customer_phone}`
-            });
-            setSelectedReceivedForBooking({
-                value: preloadedTransaction.received_for_booking_id,
-                label: `${preloadedTransaction.room_name} - ${preloadedTransaction.booking_customer_name} - [${preloadedTransaction.received_for_booking_id}] `
+                value: preloadedExpense.received_by,
+                label: `${preloadedExpense.received_by_customer_name} - ${preloadedExpense.received_by_customer_phone}`
             });
         } else {
-            //find customer based on user_id from usercontext
-            let customer = allCustomers.find(u => u.email === getUserContext().logged_in_user?.email);
-            if (customer) {
+            //find employee based on user_id from usercontext
+            let employee = allEmployees.find(u => u.email === getUserContext().logged_in_user?.email);
+            if (employee) {
                 setSelectedPaidBy({
-                    value: customer.customer_id,
-                    label: `${customer.customer_name} - ${customer.phone}`
+                    value: employee.user_id,
+                    label: `${employee.first_name} ${employee.last_name} - ${employee.phone}`
                 });
-                setTransaction(prev => ({ ...prev, txn_by: customer.customer_id }));
-                customer = allCustomers.find(u => u.email === 'thewestwood.kookal@gmail.com');
+                setExpense(prev => ({ ...prev, txn_by: employee.user_id }));
+                employee = allEmployees.find(u => u.email === 'thewestwood.kookal@gmail.com');
                 setSelectedTxnBy({
-                    value: customer.customer_id,
-                    label: `${customer.customer_name} - ${customer.phone}`
+                    value: employee.user_id,
+                    label: `${employee.first_name} ${employee.last_name} - ${employee.phone}`
                 });
-                setTransaction(prev => ({ ...prev, paid_by: customer.customer_id }));
+                setExpense(prev => ({ ...prev, paid_by: employee.user_id }));
             }
         }
     }, [location.state])
 
     const handleCancel = () => {
-        if (location.state?.from === 'searchTransaction') {
+        if (location.state?.from === 'searchExpense') {
             navigate('/transactions/search');
         } else {
             // Otherwise go to dashboard
@@ -143,31 +134,31 @@ const Transaction = () => {
     }
 
     const handleUpdate = async () => {
-        const validated = validateTransaction(transaction)
+        const validated = validateTransaction(expense)
         if (validated !== 'ALL_GOOD') {
             toast.error(validated);
             return
         }
-        setTransaction(prev => ({ ...prev, acc_entry_amount: Number(transaction.acc_entry_amount) }));
+        setExpense(prev => ({ ...prev, acc_entry_amount: Number(expense.acc_entry_amount) }));
         try {
-            if (isUpdatingTransaction) {
-                await updateTransaction(transaction);
-                toast.success('Transaction updated successfully');
+            if (isUpdatingExpense) {
+                await updateTransaction(expense);
+                toast.success('Expense updated successfully');
             } else {
-                await createTransaction(transaction);
-                toast.success('Transaction created successfully');
+                await createTransaction(expense);
+                toast.success('Expense created successfully');
             }
             navigate('/dashboard');
         } catch (error) {
-            console.error('Accounting::Error adding/editing transaction:', error);
-            toast.error('Unable to add/edit transaction');
+            console.error('Accounting::Error adding/editing expense:', error);
+            toast.error('Unable to add/edit expense');
         }
     }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        setTransaction(prev => {
+        setExpense(prev => {
             const updated = {
                 ...prev,
                 [name]: value,
@@ -191,14 +182,14 @@ const Transaction = () => {
             ></Swiper>
             <ToastContainer />
             <div className="accounting-form-container">
-                <h2>{isUpdatingTransaction ? 'Update Transaction' : 'Add Transaction'}</h2>
+                <h2>{isUpdatingExpense ? 'Update Expense' : 'Add Expense'}</h2>
                 <form onSubmit={e => e.preventDefault()}>
                     <div className='form-group'>
                         <label htmlFor="acc_category_id">Category</label>
                         <Select name="acc_category_id"
                             value={selectedAccCategory}
                             onChange={e => {
-                                setTransaction(prev => ({ ...prev, acc_category_id: e.value }));
+                                setExpense(prev => ({ ...prev, acc_category_id: e.value }));
                                 setSelectedAccCategory({
                                     value: e.value,
                                     label: e.label,
@@ -213,17 +204,12 @@ const Transaction = () => {
                     </div>
                     <div className='form-group'>
                         <label>Amount</label>
-                        <input type="number" name="acc_entry_amount" value={transaction.acc_entry_amount} onChange={handleChange} />
-                    </div>
-
-                    <div className='form-group'>
-                        <label>Description</label>
-                        <input type="text" name="acc_entry_description" value={transaction.acc_entry_description} onChange={handleChange} />
+                        <input type="number" name="acc_entry_amount" value={expense.acc_entry_amount} onChange={handleChange} />
                     </div>
 
                     <div className='form-group'>
                         <label>Txn Date</label>
-                        <input type="date" name="acc_entry_date" value={transaction.acc_entry_date} onChange={handleChange} />
+                        <input type="date" name="acc_entry_date" value={expense.acc_entry_date} onChange={handleChange} />
                     </div>
 
                     <div className='form-group'>
@@ -231,14 +217,14 @@ const Transaction = () => {
                         <Select name="txn_by"
                             value={selectedTxnBy}
                             onChange={e => {
-                                setTransaction(prev => ({ ...prev, txn_by: e.value }));
+                                setExpense(prev => ({ ...prev, txn_by: e.value }));
                                 setSelectedTxnBy({
                                     value: e.value,
                                     label: e.label,
                                 });
                             }}
-                            options={accPartiesOptions}
-                            placeholder="Transaction made by ..."
+                            options={employeeOptions}
+                            placeholder="Expense made by ..."
                             isSearchable={true}
                             classNamePrefix="react-select"
                             className= "react-select-style"
@@ -250,13 +236,13 @@ const Transaction = () => {
                         <Select name="paid_by"
                             value={selectedPaidBy}
                             onChange={e => {
-                                setTransaction(prev => ({ ...prev, paid_by: e.value }));
+                                setExpense(prev => ({ ...prev, paid_by: e.value }));
                                 setSelectedPaidBy({
                                     value: e.value,
                                     label: e.label,
                                 });
                             }}
-                            options={accPartiesOptions}
+                            options={employeeOptions}
                             placeholder="Select Payer..."
                             isSearchable={true}
                             classNamePrefix="react-select"
@@ -269,13 +255,13 @@ const Transaction = () => {
                         <Select name="received_by"
                             value={selectedReceivedBy}
                             onChange={e => {
-                                setTransaction(prev => ({ ...prev, received_by: e.value }));
+                                setExpense(prev => ({ ...prev, received_by: e.value }));
                                 setSelectedReceivedBy({
                                     value: e.value,
                                     label: e.label,
                                 });
                             }}
-                            options={accPartiesOptions}
+                            options={vendorOptions}
                             placeholder="Select Receiver..."
                             isSearchable={true}
                             classNamePrefix="react-select"
@@ -285,29 +271,15 @@ const Transaction = () => {
 
                     <div className='form-group'>
                         <label htmlFor="payment_type">Mode</label>
-                        <select name="payment_type" value={transaction.payment_type} onChange={handleChange}>
+                        <select name="payment_type" value={expense.payment_type} onChange={handleChange}>
                             <option value="">Select Mode</option>
                             {PAYMENT_TYPE.map(r => <option key={r.id} value={r.id}>{r.value}</option>)}
                         </select>
                     </div>
 
                     <div className='form-group'>
-                        <label htmlFor="received_for_booking_id">For Booking</label>
-                        <Select name="received_for_booking_id"                            
-                            value={selectedReceivedForBooking}
-                            onChange={e => {
-                                setTransaction(prev => ({ ...prev, received_for_booking_id: e.value }));
-                                setSelectedReceivedForBooking({
-                                    value: e.value,
-                                    label: e.label,
-                                });
-                            }}
-                            options={bookingOptions}
-                            placeholder="Select booking ..."
-                            isSearchable={true}
-                            classNamePrefix="react-select"
-                            className= "react-select-style"
-                        />
+                        <label>Description</label>
+                        <textarea name="acc_entry_description" value={expense.acc_entry_description} onChange={handleChange} />
                     </div>
 
                     {/* Buttons */}
@@ -315,14 +287,14 @@ const Transaction = () => {
                         <button type="button" className="button-secondary"
                             onClick={handleCancel}
                             disabled={isFormDisabled}>Cancel</button>
-                        {isUserInRoles(['manager', 'owner']) ?
+                        {isUserInRoles(['manager', 'owner', "employee"]) ?
                             <button
                                 type="button"
                                 className="button-primary"
                                 onClick={handleUpdate}
                                 disabled={isSubmitting || isFormDisabled}
                             >
-                                {isSubmitting ? 'Processing ...' : isUpdatingTransaction ? 'Update' : 'Save'}
+                                {isSubmitting ? 'Processing ...' : isUpdatingExpense ? 'Update' : 'Save'}
                             </button>
                             : ''
                         }
@@ -333,4 +305,4 @@ const Transaction = () => {
     );
 };
 
-export default Transaction;
+export default Expenses;

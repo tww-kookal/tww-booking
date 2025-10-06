@@ -16,6 +16,7 @@ import User from "./pages/User";
 import Documents from "./pages/Documents";
 import Transaction from "./pages/Transaction"
 import TransactionSearch from "./pages/TransactionSearch";
+import Expenses from "./pages/Expenses";
 import Header from "./site/Header";
 import Home from "./site/Home";
 import RoomDetails from "./site/RoomDetails";
@@ -41,8 +42,9 @@ export default function App() {
                 <Route path="/user/new" element={<ProtectedRoute><User /></ProtectedRoute>} />
                 <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
                 <Route path="/booking/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
-                <Route path="/transactions" element={<ProtectedRoute><Transaction /></ProtectedRoute>} />
+                {/*<Route path="/transactions" element={<ProtectedRoute><Transaction /></ProtectedRoute>} /> */}                
                 <Route path="/transactions/search" element={<ProtectedRoute><TransactionSearch /></ProtectedRoute>} />
+                <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
 
                 <Route path={'/'} element={<Home />} />
                 <Route path={'/room/:id'} element={<RoomDetails />} />

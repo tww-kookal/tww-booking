@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import api from './apiClient';
+import { isUserInRoles } from '../contexts/constants';
 
 export const validateTransaction = (transactionToValidate) => {
     //consolidate all the errors as a list and return the list
@@ -114,7 +115,11 @@ export const getTransactionsSince = async (navigate, startingDate = dayjs().form
 export const getTransactions = async (navigate, searchCriteria) => {
     console.debug("Accounting.Module::getTransactions::Fetching all transactions", searchCriteria);
     try {
-        const response = await api.post("/accounting/transactions/search", searchCriteria);
+        let url = "/accounting/transactions/search";
+        if(!isUserInRoles(['manager', 'owner'])){
+            url = "/accounting/expenses/search";
+        }
+        const response = await api.post(url, searchCriteria);
         console.debug("Accounting.Module::getTransactions::Fetched all transactions", (response?.data?.transactions || []).length);
         return response?.data?.transactions || []
     } catch (error) {

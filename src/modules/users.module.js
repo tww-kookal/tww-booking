@@ -9,12 +9,40 @@ import api from './apiClient';
  * @returns {Promise<Array<User>>} A promise that resolves to an array of user objects.
  */
 export const getAllBookingSources = async (navigate) => {
-    console.debug("Booking.Source.Module::getAllBookingSources::Fetching all booking sources");
+    console.debug("Users.Module::getAllBookingSources::Fetching all booking sources");
     try {
         const response = await api.get("/users/bookingSource");
         return response.data?.users || []
     } catch (error) {
         console.debug("Users.Module::getAllBookingSources::Error fetching all booking sources", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        return []
+    }
+}
+
+export const getAllEmployees = async (navigate) => {
+    console.debug("Users.Module::getAllEmployees::Fetching all employees");
+    try {
+        const response = await api.get("/users/employees");
+        return response.data?.users || []
+    } catch (error) {
+        console.debug("Users.Module::getAllEmployees::Error fetching all employees", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        return []
+    }
+}
+
+export const getAllVendors = async (navigate) => {
+    console.debug("Users.Module::getAllVendors::Fetching all vendors");
+    try {
+        const response = await api.get("/users/vendors");
+        return response.data?.users || []
+    } catch (error) {
+        console.debug("Users.Module::getAllVendors::Error fetching all vendors", error);
         if (error?.code == 'ERR_NETWORK') {
             navigate('/login')
         }

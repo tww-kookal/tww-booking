@@ -128,14 +128,14 @@ const Header = () => {
                 }
 
                 {/* Transactions */}
-                {isUserInRoles(['manager', 'owner']) &&
+                {isUserInRoles(['manager', 'owner', 'employee']) &&
                   <>
                     <div className='font-bold'>Transactions</div>
                     <Link to="/transactions/search" className={`ml-4 ${location.pathname === '/transactions/search' ? 'active' : ''}`} onClick={() => toggleMenu()}>
                       Search
                     </Link>
-                    <Link to="/transactions" className={`ml-4 ${location.pathname === '/transactions/new' ? 'active' : ''}`} onClick={() => toggleMenu()}>
-                      New
+                    <Link to="/expenses" className={`ml-4 ${location.pathname === '/expenses/new' ? 'active' : ''}`} onClick={() => toggleMenu()}>
+                      Add Expense
                     </Link>
                   </>
                 }
@@ -192,7 +192,7 @@ const Header = () => {
                 {isTransactionsOpen && (
                   <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-32" onMouseEnter={() => setTransactionsOpen(true)} onMouseLeave={() => setTransactionsOpen(false)}>
                     <Link to="/transactions/search" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Search</Link>
-                    <Link to="/transactions" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>New</Link>
+                    <Link to="/expenses" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Add Expense</Link>
                   </div>
                 )}
               </div>

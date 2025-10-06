@@ -16,6 +16,7 @@ import { EffectFade, Autoplay } from 'swiper';
 import '../styles.css'
 import 'swiper/css/effect-fade';
 import 'swiper/css';
+import { isUserInRoles } from "../contexts/constants";
 
 const TransactionSearch = () => {
   const navigate = useNavigate();
@@ -132,12 +133,14 @@ const TransactionSearch = () => {
   }
 
   const handleViewTransaction = (selectedTransaction) => {
-    navigate(`/transactions`, {
-      state: {
-        preloadedTransaction: selectedTransaction,
-        from: 'searchTransaction'
-      }
-    });
+    if (selectedTransaction.acc_category_type === 'debit') {
+      navigate(`/expenses`, {
+        state: {
+          preloadedExpense: selectedTransaction,
+          from: 'searchExpense'
+        }
+      });
+    }
   };
 
   const paginatedTransactions = transactionsData.slice(
