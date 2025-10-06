@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import BookingList from "./BookingList";
-import { getAllAttachedBookings, getAllBookings } from "../modules/booking.module";
+import { getAllAttachedBookings, getAllBookings, searchBookings } from "../modules/booking.module";
 import { getAllCustomers } from '../modules/customer.module';
 
 import '../css/bookingSearch.large.css';
@@ -20,109 +20,42 @@ import 'swiper/css';
 
 const BookingSearch = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const today = new Date().toISOString().split('T')[0];
-  const initialCheckInDate = location.state?.defaultCheckInDate || today;
-  const exactStartDate = location.state?.exactStartDate || false;
-  const [customers, setCustomers] = useState([]);
-  const [customerOptions, setCustomerOptions] = useState([]);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
 
-  const [searchCriteria, setSearchCriteria] = useState({
-    bookingDate: "",
-    guestName: "",
-    checkInDate: initialCheckInDate,
-    contactNumber: "",
-    bookingID: "",
-  });
+  const [searchCriteria, setSearchCriteria] = useState({});
   const [results, setResults] = useState([]);
   const [attachments, setAttachments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Reduced items per page for better mobile view
+  const itemsPerPage = 6; // Reduced items per page for better mobile view
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fetchFutureBookings = async (checkinSince = dayjs().add(-1, 'day').format('YYYY-MM-DD')) => {
+  const handleSearch = async () => {
     setLoading(true);
     try {
-      const allBookings = await getAllBookings(navigate, checkinSince);
-      if (!allBookings || allBookings.length <= 0) {
-        setResults([]);
-        return;
-      }
-      setResults(allBookings);
-
+      const bookings = await searchBookings(navigate, searchCriteria);
+      setResults(bookings);
       const allAttachments = await getAllAttachedBookings(navigate);
       setAttachments(allAttachments?.files || []);
       setCurrentPage(1);
-    } catch (err) {
-      console.error("BookingSearch::FetchBookings::Error fetching data:", err);
+    } catch (error) {
+      console.error('BookingSearch::Error fetching bookings:', error);
       toast.error("Failed to fetch bookings. Please try again.");
       setResults([]);
+      setAttachments([]);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    getAllCustomers(navigate).then(customers => {
-      setCustomers(customers);
-      setCustomerOptions(customers.map(c => ({
-        value: c.customer_id,
-        label: `${c.customer_name} - ${c.phone}`
-      })));
-    })
-    fetchFutureBookings();
-  }, []);
-
-  const handleCustomerChange = (e) => {
-    setSelectedCustomer(e);
-    handleChange({
-      target: {
-        name: "customer_id",
-        value: e.value,
-      }
-    })
+  const handleCancel = () => {
+    setLoading(false);
+    setSearchCriteria({});
+    setResults([]);
   }
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setSearchCriteria((prev) => ({ ...prev, [name]: value }));
-  }
-
-  const handleSearch = () => {
-    // if (!searchCriteria.bookingDate && !searchCriteria.guestName && !searchCriteria.checkInDate && !searchCriteria.contactNumber && !searchCriteria.bookingID) {
-    //   filteredResults = allBookings.filter(booking => {
-    //     return dayjs(booking.check_in, "YYYY-MM-DD").isAfter(initialDate) && booking.status !== BOOKING_STATUS.CANCELLED;
-    //   });
-    // } else {
-    //   filteredResults = allBookings.filter(booking => {
-    //     const matchesBookingDate = !searchCriteria.bookingDate ||
-    //       booking.booking_date.includes(searchCriteria.bookingDate);
-
-    //     const matchesGuestName = !searchCriteria.guestName ||
-    //       booking.customer_name.toLowerCase().includes(searchCriteria.guestName.toLowerCase());
-
-    //     const matchesCheckInDate = !searchCriteria.checkInDate ||
-    //       exactStartDate ? booking.check_in.includes(searchCriteria.checkInDate) : dayjs(booking.check_in, 'YYYY-MM-DD').add(-1, "day").isAfter(dayjs(searchCriteria.checkInDate, 'YYYY-MM-DD'));
-
-    //     const matchesContactNumber = !searchCriteria.contactNumber ||
-    //       booking.contact_number.includes(searchCriteria.contactNumber);
-
-    //     const matchesBookingID = !searchCriteria.bookingID ||
-    //       booking.booking_id == searchCriteria.bookingID;
-
-    //     return matchesBookingDate && matchesGuestName && matchesCheckInDate &&
-    //       matchesContactNumber && matchesBookingID;
-    //   });
-    // }
-    // fetchBookings( with respective search criteria object)
-    fetchFutureBookings(searchCriteria.checkInDate);
-  };
 
   const findAttachmentsForBooking = (booking_id) => {
     if (!booking_id) {
@@ -173,51 +106,48 @@ const BookingSearch = () => {
 
         <div className="search-form" >
           <div className="search-field" >
-            <label htmlFor="checkInDate">Check In Date:</label>
+            <label htmlFor="from_date">From Date:</label>
             <input            
               type="date"
-              id="checkInDate"
-              name="checkInDate"
-              value={searchCriteria.checkInDate}
+              id="from_date"
+              name="from_date"
+              value={searchCriteria.from_date}
               onChange={handleInputChange}
               style={{ width: '100%' }}
             />
           </div>
 
           <div className="search-field" >
-            <label htmlFor="bookingDate">Booking Date:</label>
+            <label htmlFor="to_date">To Date:</label>
             <input
               type="date"
-              id="bookingDate"
-              name="bookingDate"
-              value={searchCriteria.bookingDate}
+              id="to_date"
+              name="to_date"
+              value={searchCriteria.to_date}
               onChange={handleInputChange}
               style={{ width: '100%' }}
             />
           </div>
 
           <div className="search-field" >
-            <label htmlFor="guestName">Guest Name:</label>
-            <Select name="customer_id"
-              isDisabled = {true}
-              value={selectedCustomer}
-              onChange={handleCustomerChange}
-              options={customerOptions}
-              placeholder="Select a guest..."
-              isSearchable={true}
-              classNamePrefix="react-select"
+            <label htmlFor="guest_name">Guest Name:</label>
+            <input
+              type="text"
+              id="guest_name"
+              name="guest_name"
+              value={searchCriteria.guest_name}
+              onChange={handleInputChange}
+              style={{ width: '100%' }}
             />
           </div>
 
           <div className="search-field" >
-            <label htmlFor="bookingID">Booking ID:</label>
+            <label htmlFor="guest_phone">Phone Number:</label>
             <input
-              disabled = {true}
               type="text"
-              id="bookingID"
-              name="bookingID"
-              placeholder="Enter booking ID"
-              value={searchCriteria.bookingID}
+              id="guest_phone"
+              name="guest_phone"
+              value={searchCriteria.guest_phone}
               onChange={handleInputChange}
               style={{ width: '100%' }}
             />
@@ -237,6 +167,14 @@ const BookingSearch = () => {
                 <span className="dot"></span>
               </span>
             ) : 'Search'}
+          </button>
+          <button 
+            className="cancel-button"
+            onClick={handleCancel}
+            disabled={loading}
+            style={{ width: '100%' }}
+          >
+            Cancel
           </button>
         </div>
 

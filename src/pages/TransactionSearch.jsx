@@ -38,7 +38,7 @@ const TransactionSearch = () => {
 
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5; // Reduced items per page for better mobile view
+  const itemsPerPage = 6; // Reduced items per page for better mobile view
 
   useEffect(() => {
     getAllAccountingCategories(navigate).then(accCategories => {

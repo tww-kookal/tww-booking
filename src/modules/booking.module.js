@@ -4,6 +4,30 @@ import { FOLDER_ID } from '../modules/config';
 import { getUserContext } from '../contexts/constants';
 import html2canvas from 'html2canvas';
 
+
+/**
+ * Searches for bookings based on the provided search criteria.
+ *
+ * @async
+ * @param {Object} navigate - The navigation object used to redirect or navigate to other pages.
+ * @param {Object} searchCriteria - The criteria used to filter the bookings.
+ * @returns {Promise<Array<Booking>>} A promise that resolves to an array of booking objects that match the search criteria.
+ */
+export const searchBookings = async (navigate, searchCriteria) => {
+    console.debug("Booking.Module::searchBookings::Searching bookings with criteria", searchCriteria);
+    try {
+        const response = await api.post("/booking/search", searchCriteria);
+        console.debug("Booking.Module::searchBookings::Fetched bookings", response.data);
+        return response.data.bookings || [];
+    } catch (error) {
+        console.error("Booking.Module::searchBookings::Error fetching bookings", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        return []
+    }
+}
+
 /**
  * Loads all bookings from the server.
  *
