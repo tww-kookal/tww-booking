@@ -110,3 +110,18 @@ export const getTransactionsSince = async (navigate, startingDate = dayjs().form
         return []
     }
 }
+
+export const getTransactions = async (navigate, searchCriteria) => {
+    console.debug("Accounting.Module::getTransactions::Fetching all transactions", searchCriteria);
+    try {
+        const response = await api.post("/accounting/transactions/search", searchCriteria);
+        console.debug("Accounting.Module::getTransactions::Fetched all transactions", (response?.data?.transactions || []).length);
+        return response?.data?.transactions || []
+    } catch (error) {
+        console.error("Accounting.Module::getTransactions::Error fetching all transactions", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        return []
+    }
+}
