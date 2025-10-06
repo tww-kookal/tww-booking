@@ -129,14 +129,44 @@ Content-Transfer-Encoding: base64\r
                 <head>
                     <title>Booking Receipt - ${e.customer_name} - ${e.room_name}</title>
                     <style>
-                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                        body { 
+                            font-family: Arial, sans-serif; 
+                            margin: 0; 
+                            padding: 0px; 
+                        }
+                        .a4size {
+                            position: relative;
+                            width: 900px;
+                            height: 1123px;
+                            overflow: hidden;
+                        }
+                        .background-image {
+                            background-image: url('${o}');
+                            background-attachment: fixed;
+                            background-position: center;
+                            background-repeat: no-repeat;
+                            background-size: cover;
+                        }
+                        .scale10 {
+                            width: 90%;
+                            margin: 5% auto;
+                            padding 5% auto;
+                        }
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            background-color: rgba(255, 255, 255, 0.3);    
+                            borderWidth: 0;
+                            border: 0;
+                            align: 'center';                            
+                        }
                         .receipt { max-width: 800px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; }
                         .header { text-align: center; margin-bottom: 20px; }
                         .booking-details { margin-bottom: 20px; }
                         .booking-details table { width: 100%; border-collapse: collapse; }
                         .booking-details th, .booking-details td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
                         .financial-summary { margin-top: 30px; border-top: 2px solid #333; padding-top: 20px; }
-                        .total { font-weight: bold; }
+                        .total { font-weight: bold; }                        
                         @media print { .no-print { display: none; } }
                         .watermark-layer {opacity: 0.8; position: absolute; width: 100%; height: 100%; z-index: 0; scale: 0.57; top: 15%; left: -300;  }
                         .watermark-image {opacity: 0.3; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
@@ -155,24 +185,9 @@ Content-Transfer-Encoding: base64\r
                     <\/script>
                 </head>
                 <body>
-                    <div id ="booking_receipt_content" ref = {contentRef} style ={{
-                            position: 'relative', 
-                            display: 'grid',
-                            width: '100%'
-
-                    }}>
-                        <!-- Watermark overlay -->
-                        <div class = "watermark-layer">
-                            <img src='${o}'
-                                class = "watermark-image" alt="The Westwood"/>
-                        </div>
-
-                        <div id="booking_receipt_content_inner" style == {{
-                            position: 'absolute',
-                            width: '90%',
-                            zIndex: 1
-                        }}>
-                            <table style={{ borderWidth: 0, border: 0, width: '100%', align: 'center' }} >
+                    <div id ="booking_receipt_content" class = "a4size">
+                        <div class ="background-image scale10">
+                            <table style={{ borderWidth: 0, width: '100%' }} >
                                 <tr colspan = "2"><td>&nbsp;</td></tr>
                                 <tr style={{ width: '100%'}}>
                                     <td style={{ width: '20%'}}>
@@ -180,207 +195,216 @@ Content-Transfer-Encoding: base64\r
                                     </td>
                                     <td style={{ width: '80%'}}>
                                         <table style={{ borderWidth: 0, border: 0, width: '100%', align: 'center' }} >
-                                        <tr style={{ width: '100%', verticalAlign: 'bottom', textAlign: 'left' }}>
-                                            <td style={{ width: '50%', verticalAlign: 'bottom', textAlign: 'left' }}>
-                                                <big><big><big><big><big><big>Receipt</big></big></big></big></big></big>
-                                            </td>
-                                            <td align="right">
-                                                <img src="./images/westwoodlogo2.png" style= "width: 300px; max-height: 75px; height: auto;" alt="The Westwood"></img>
-                                            </td>
-                                        </tr>
-                                        <tr style={{ width: '100%', verticalAlign: 'bottom', textAlign: 'left' }}>
-                                            <td style={{ width: '50%', verticalAlign: 'bottom', textAlign: 'left' }}>
-                                                <br />
-                                                <label>Booking ID - <strong>${e.booking_id}</strong></label>
-                                                <br />
-                                                <label>Booking Date - <strong>${xe(e.booking_date,"YYYY-MM-DD").format("MMM DD, YYYY")} </strong></label>
-                                                <br />
-                                                <label>Check In - <strong>${xe(e.check_in,"YYYY-MM-DD").format("MMM DD, YYYY")} - 01:00 pm</strong></label>
-                                                <br />
-                                                <label>Check Out - <strong>${xe(e.check_out,"YYYY-MM-DD").format("MMM DD, YYYY")} - 11:00 am</strong></label>                           
-                                                <br />
-                                                <label><b>${e.room_name}</b></label> for <label><b><i>${e.customer_name} - ${e.contact_number}</i></b> (${e.number_of_nights} nights)  </label>
-                                            </td>
-                                            <td align="right">
-                                                <br />
-                                                Survey No 380, Kookal Main Road,
-                                                <br />
-                                                Kookal, Kodaikanal, Tamilnadu
-                                                <br />
-                                                thewestwood.kookal@gmail.com
-                                                <br />
-                                                https://www.thewestwood.in/
-                                                <br />
-                                                For Bookings: 98848 55014
-                                                <br />
-                                                Care Taker: 98848 55041
-                                            </td>
-                                        </tr>
+                                            <tr style={{ width: '100%', verticalAlign: 'bottom', textAlign: 'left' }}>
+                                                <td style={{ width: '50%', verticalAlign: 'bottom', textAlign: 'left' }}>
+                                                    <big><big><big><big><big><big>Receipt</big></big></big></big></big></big>
+                                                </td>
+                                                <td align="right">
+                                                    <img src="./images/westwoodlogo2.png" style= "width: 300px; max-height: 75px; height: auto;" alt="The Westwood"></img>
+                                                </td>
+                                            </tr>
+                                            <tr style={{ width: '100%', verticalAlign: 'bottom', textAlign: 'left' }}>
+                                                <td style={{ width: '50%', verticalAlign: 'bottom', textAlign: 'left' }}>
+                                                    <br />
+                                                    <label>Booking ID - <strong>${e.booking_id}</strong></label>
+                                                    <br />
+                                                    <label>Booking Date - <strong>${xe(e.booking_date,"YYYY-MM-DD").format("MMM DD, YYYY")} </strong></label>
+                                                    <br />
+                                                    <label>Check In - <strong>${xe(e.check_in,"YYYY-MM-DD").format("MMM DD, YYYY")} - 01:00 pm</strong></label>
+                                                    <br />
+                                                    <label>Check Out - <strong>${xe(e.check_out,"YYYY-MM-DD").format("MMM DD, YYYY")} - 11:00 am</strong></label>                           
+                                                    <br />
+                                                    <label><b>${e.room_name}</b></label> for <label><b><i>${e.customer_name} - ${e.contact_number}</i></b> (${e.number_of_nights} nights)  </label>
+                                                </td>
+                                                <td align="right">
+                                                    <br />
+                                                    Survey No 380, Kookal Main Road,
+                                                    <br />
+                                                    Kookal, Kodaikanal, Tamilnadu
+                                                    <br />
+                                                    thewestwood.kookal@gmail.com
+                                                    <br />
+                                                    https://www.thewestwood.in/
+                                                    <br />
+                                                    For Bookings: 98848 55014
+                                                    <br />
+                                                    Care Taker: 98848 55041
+                                                </td>
+                                            </tr>
 
-                                        <tr>
-                                            <td colspan="2">
-                                            <hr />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"><label><strong>Dear ${e.customer_name},</strong></label></td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"><label>The Westwood has received a booking at our property as per the details below.
-                                            Kindly carry this e-voucher while check in.</label></td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"><label>&nbsp;</label></td>
-                                        </tr>
-                <!--                         <tr>
-                                            <td colspan="2"><label>For your reference, Booking ID is <strong>${e.booking_id}.</strong></label>
-                                            </td>
-                                        </tr>
-                -->                        <tr>
-                                            <td colspan="2"><label><strong>Total amount payable for this booking is INR ${Math.round(e.total_price)}/- as per
-                                            the details below.</strong></label></td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"><label>Kindly consider this e-voucher for booking confirmation with the following
-                                            inclusions and services.</label></td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">
-                                            <hr />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">
-                                            <center>
-                                                <table width="98%">
+                                            <tr>
+                                                <td colspan="2">
+                                                <hr />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"><label><strong>Dear ${e.customer_name},</strong></label></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"><label>The Westwood has received a booking at our property as per the details below.
+                                                Kindly carry this e-voucher while check in.</label></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"><label>&nbsp;</label></td>
+                                            </tr>
+                    <!--                         <tr>
+                                                <td colspan="2"><label>For your reference, Booking ID is <strong>${e.booking_id}.</strong></label>
+                                                </td>
+                                            </tr>
+                    -->                        <tr>
+                                                <td colspan="2"><label><strong>Total amount payable for this booking is INR ${Math.round(e.total_price)}/- as per
+                                                the details below.</strong></label></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"><label>Kindly consider this e-voucher for booking confirmation with the following
+                                                inclusions and services.</label></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                <hr />
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                <center>
+                                                    <table width="98%">
 
-                                                <tr>
-                                                    <td><label><strong>Payment Breakup</strong></label></td>
-                                                    <td align="right"><small><font style={{ color: 'darkgray' }}>All prices indicated below are in INR </font></small></td>
-                                                </tr>
-                                                <!--<tr>
-                                                    <td colspan="2"><font style={{ color: 'darkgray' }}>TARRIF</font></td>
-                                                </tr> -->
-                                                <tr>
-                                                    <td>
-                                                    <!--<label> Property Sell Price<br /></label>-->
-                                                    <font style={{ color: 'darkgray' }}>${e.room_name} for ${e.number_of_nights} Night(s)</font>
-                                                    </td>
-                                                    <td align="right"> &nbsp;${Math.round(e.total_price)} </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2">
-                                                    <hr />
-                                                    </td>
-                                                </tr>
-                                                <!-- <tr>
-                                                    <td><label>Extra Adult / Child Charges</label></td>
-                                                    <td align="right"> {formData.extraChildren} </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2">
-                                                    <hr />
-                                                    </td>
-                                                </tr> 
-                                                <tr>
-                                                    <td><label>Voluntary Property Driven
-                                                    Coupon Discount </label></td>
-                                                    <td align="right"> ${e.discount||0} </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2">
-                                                    <hr />
-                                                    </td>
-                                                </tr> -->
-                                                <!-- <tr>
-                                                    <td><label>Property Gross Charges </label></td>
-                                                    <td align="right"> ${e.total_price} </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2">
-                                                    <hr />
-                                                    </td>
-                                                </tr> -->
-                                                <!-- <tr>
-                                                    <td><label>Agent Commission</label></td>
-                                                    <td align="right"> ${e.commission||0} </td>
-                                                </tr> 
-                                                <tr>
-                                                    <td colspan="2">
-                                                    <hr />
-                                                    </td>
-                                                </tr> -->
-                                                <!-- <tr>
-                                                    <td><label>GST @ 18%</label><br /><font style={{ color: 'darkgray' }}>(Including IGST or (SGST & CGST))</font></td>
-                                                    <td align="right"> {gst} </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2">
-                                                    <hr />
-                                                    </td>
-                                                </tr> 
-                                                <tr>
-                                                    <td><label>Property discount including tax considered in
-                                                    coupon promotion</label></td>
-                                                    <td align="right"> {formData.propertyDiscount} </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2">
-                                                    <hr />
-                                                    </td>
-                                                </tr> -->
-                                                <tr>
-                                                    <td><label>Total</label></td>
-                                                    <td align="right"> <b>${Math.round(e.total_price)}</b> </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="2">
-                                                    <hr />
-                                                    </td>
-                                                </tr>                                
-                                                <tr>
-                                                    <td colspan="2">${l}</td>
-                                                </tr>
-                                                <tr>
-                                                    <td><label>Amount Received</label></td>
-                                                    <td align="right"> ${Math.round(t)} </td>
-                                                </tr>
-                                                <tr><td colspan="2"><hr /></td></tr>                                
-                                                <tr>
-                                                    <td><label>Balance</label></td>
-                                                    <td align="right"> <b><i>${Math.round(r)}</i></b> </td>
-                                                </tr>
-                                                <!-- <tr><td colspan="2"><hr /></td></tr>                                -->
-                                                </table>
-                                            </center>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"><hr /></td>
-                                        </tr>
-                                            <td colspan="2"><stong>Identification Submitted: </stong>N/A </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2"><stong><b>Care Taker can be contacted in the premises at Ph: 98848 55041 / Extn: 701</b></stong></td>
-                                        </tr>
-                                        <tr><td colspan="2"><hr /></td></tr>
-                                        <tr>
-                                            <td colspan="2"><stong>Complimentary Breakfast is available for all days of the stay.  <b>Pets are not allowed in the premises.</b></stong></td>
-                                        </tr>
-                                        <tr><td colspan="2"><hr /></td></tr>
-                                        <tr>
-                                            <td colspan="2">Thank you for choosing The Westwood!, We hope you have a great stay with us.</td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">For any inquiries, please contact us.</td>
-                                        </tr>
+                                                    <tr>
+                                                        <td><label><strong>Payment Breakup</strong></label></td>
+                                                        <td align="right"><small><font style={{ color: 'darkgray' }}>All prices indicated below are in INR </font></small></td>
+                                                    </tr>
+                                                    <!--<tr>
+                                                        <td colspan="2"><font style={{ color: 'darkgray' }}>TARRIF</font></td>
+                                                    </tr> -->
+                                                    <tr>
+                                                        <td>
+                                                        <!--<label> Property Sell Price<br /></label>-->
+                                                        <font style={{ color: 'darkgray' }}>${e.room_name} for ${e.number_of_nights} Night(s)</font>
+                                                        </td>
+                                                        <td align="right"> &nbsp;${Math.round(e.total_price)} </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                        <hr />
+                                                        </td>
+                                                    </tr>
+                                                    <!-- <tr>
+                                                        <td><label>Extra Adult / Child Charges</label></td>
+                                                        <td align="right"> {formData.extraChildren} </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                        <hr />
+                                                        </td>
+                                                    </tr> 
+                                                    <tr>
+                                                        <td><label>Voluntary Property Driven
+                                                        Coupon Discount </label></td>
+                                                        <td align="right"> ${e.discount||0} </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                        <hr />
+                                                        </td>
+                                                    </tr> -->
+                                                    <!-- <tr>
+                                                        <td><label>Property Gross Charges </label></td>
+                                                        <td align="right"> ${e.total_price} </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                        <hr />
+                                                        </td>
+                                                    </tr> -->
+                                                    <!-- <tr>
+                                                        <td><label>Agent Commission</label></td>
+                                                        <td align="right"> ${e.commission||0} </td>
+                                                    </tr> 
+                                                    <tr>
+                                                        <td colspan="2">
+                                                        <hr />
+                                                        </td>
+                                                    </tr> -->
+                                                    <!-- <tr>
+                                                        <td><label>GST @ 18%</label><br /><font style={{ color: 'darkgray' }}>(Including IGST or (SGST & CGST))</font></td>
+                                                        <td align="right"> {gst} </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                        <hr />
+                                                        </td>
+                                                    </tr> 
+                                                    <tr>
+                                                        <td><label>Property discount including tax considered in
+                                                        coupon promotion</label></td>
+                                                        <td align="right"> {formData.propertyDiscount} </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                        <hr />
+                                                        </td>
+                                                    </tr> -->
+                                                    <tr>
+                                                        <td><label>Total</label></td>
+                                                        <td align="right"> <b>${Math.round(e.total_price)}</b> </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">
+                                                        <hr />
+                                                        </td>
+                                                    </tr>                                
+                                                    <tr>
+                                                        <td colspan="2">${l}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><label>Amount Received</label></td>
+                                                        <td align="right"> ${Math.round(t)} </td>
+                                                    </tr>
+                                                    <tr><td colspan="2"><hr /></td></tr>                                
+                                                    <tr>
+                                                        <td><label>Balance</label></td>
+                                                        <td align="right"> <b><i>${Math.round(r)}</i></b> </td>
+                                                    </tr>
+                                                    <!-- <tr><td colspan="2"><hr /></td></tr>                                -->
+                                                    </table>
+                                                </center>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"><hr /></td>
+                                            </tr>
+                                                <td colspan="2"><stong>Identification Submitted: </stong>N/A </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2"><stong><b>Care Taker can be contacted in the premises at Ph: 98848 55041 / Extn: 701</b></stong></td>
+                                            </tr>
+                                            <tr><td colspan="2"><hr /></td></tr>
+                                            <tr>
+                                                <td colspan="2"><stong>Complimentary Breakfast is available for all days of the stay.  <b>Pets are not allowed in the premises.</b></stong></td>
+                                            </tr>
+                                            <tr><td colspan="2"><hr /></td></tr>
+                                            <tr>
+                                                <td colspan="2">Thank you for choosing The Westwood!, We hope you have a great stay with us.</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">For any inquiries, please contact us.</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">&nbsp;</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">&nbsp;</td>
+                                            </tr>
                                         </table>                                        
                                     </td>
                                 </tr>
                             </table>
-                        </div>    
+                        </div>
                     </div>                    
-                    <div class="no-print" style={{width: '100%'}}>
+                    <div class="no-print" style={{width: 100%}}>
                         <table style={{ borderWidth: 0, width: '100%' }} ><tr><td>
                             <button id="download-jpg-btn" onclick="downloadAsImage()">Download as JPEG</button>
                             <button id="download-png-btn" onclick="downloadAsImage()">Download as PNG</button>
@@ -390,7 +414,7 @@ Content-Transfer-Encoding: base64\r
                     </div>
                 </body>
             </html>
-        `);const c=A.document.createElement("script");c.src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",c.onload=function(){const u=A.document.getElementById("download-png-btn");u.onclick=function(){const g=A.document.querySelector("div[ref]");g&&Ev(g,{width:900,height:1200,backgroundColor:"#fff",scale:1}).then(v=>{const Q=A.document.createElement("a");Q.download=`Booking Receipt - ${e.customer_name} - ${e.room_name}.png`,Q.href=v.toDataURL("image/png"),Q.click()})};const f=A.document.getElementById("download-jpg-btn");f.onclick=function(){const g=A.document.getElementById("booking_receipt_content");g&&Ev(g,{width:900,height:1123,backgroundColor:"#fff",scale:1}).then(v=>{const Q=A.document.createElement("a");Q.download=`Booking Receipt - ${e.customer_name} - ${e.room_name}.jpg`,Q.href=v.toDataURL("image/jpeg"),Q.click()})};const p=A.document.getElementById("download-svg-btn");p.onclick=function(){if(console.log("download svg btn clicked"),A.document.getElementById("booking_receipt_content")){const v=document.getElementById("booking_receipt_content"),y=new XMLSerializer().serializeToString(v),C=new Blob([y],{type:"image/svg+xml"}),w=document.createElement("a");w.href=URL.createObjectURL(C),w.download="receipt.svg",w.click()}},f.click()},A.document.head.appendChild(c),A.document.close()},KH=()=>{const[e,A]=U.useState(0),[t,r]=U.useState(0),[s,o]=U.useState(0),[l,c]=U.useState(0),[u,f]=U.useState([]),[p,g]=U.useState([]),v=ZA();U.useEffect(()=>{Q()},[]);const Q=async()=>{kH(v).then(y=>{o(y)}),Jl(v).then(y=>{if(y){const C=new xe().format("YYYY-MM-DD"),w=y.filter(S=>S.check_in>=C&&S.status!==Ie.CANCELLED).length;c(w);const F=y.filter(S=>S.check_in===C&&S.status!==Ie.CANCELLED).length;A(F);const x=y.filter(S=>S.check_out===C&&S.status==Ie.CONFIRMED).length;r(x);const b=y.filter(S=>S.check_in===C&&S.status!==Ie.CANCELLED).map(S=>({customer_name:ff(S.customer_name),number_of_people:S.number_of_people,room_name:S.room_name}));f(b);const I=y.filter(S=>S.check_out===C&&S.status!==Ie.CANCELLED).map(S=>({customer_name:ff(S.customer_name),number_of_people:S.number_of_people,room_name:S.room_name}));g(I)}}).catch(y=>{console.error("Dashboard::fetchBookingStats::Error fetching booking stats:",y),pe.error("Failed to load booking statistics.")})};return m.jsxs("div",{style:{backgroundColor:"black"},children:[m.jsx(yt,{}),m.jsx(wt,{modules:[Ot,Lt],effect:"fade",loop:!0,autoplay:{delay:3e3,disableOnInteraction:!1},className:"heroSlider h-[100px] lg:h-[27px]"}),m.jsx(HA,{}),m.jsxs("div",{className:"dashboard-container",children:[m.jsxs("div",{className:"stats-grid",children:[m.jsxs("div",{className:"stat-card",children:[m.jsx(Pe,{to:"/availability",state:{exactStartDate:!0},className:"action-button search",children:m.jsx("h3",{children:"Today's Check-ins"})}),m.jsx("p",{className:"stat-value",children:e}),u.map((y,C)=>m.jsx("div",{children:m.jsxs("span",{children:[y.room_name,": ",y.customer_name," (🧑‍💼",y.number_of_people,")"]})},C))]}),m.jsxs("div",{className:"stat-card",children:[m.jsx(Pe,{to:"/availability",state:{exactStartDate:!0},className:"action-button search",children:m.jsx("h3",{children:"Today's Check-outs"})}),m.jsx("p",{className:"stat-value",children:t}),p.map((y,C)=>m.jsx("div",{children:m.jsxs("span",{children:[y.room_name,": ",y.customer_name," (🧑‍💼",y.number_of_people,")"]})},C))]}),m.jsxs("div",{className:"stat-card",children:[m.jsx(Pe,{to:"/availability",state:{defaultCheckInDate:"2020-01-01"},className:"action-button search",children:m.jsx("h3",{children:"Today's Guests Count"})}),m.jsx("p",{className:"stat-value",children:s})]}),m.jsxs("div",{className:"stat-card",children:[m.jsx(Pe,{to:"/booking/search",className:"action-button search",children:m.jsx("h3",{children:"Upcoming Bookings"})}),m.jsx("p",{className:"stat-value",children:l})]})]}),m.jsx("div",{className:"quick-actions",children:m.jsxs("div",{className:"action-buttons",children:[wA(["manager","owner"])?m.jsxs(Pe,{to:"/booking",state:{from:"dashboard"},className:"action-button create",children:[m.jsx("span",{className:"icon",children:"+"}),m.jsx("span",{children:"New"})]}):"",m.jsxs(Pe,{to:"/availability",state:{from:"dashboard"},className:"action-button find",children:[m.jsx("span",{className:"icon",children:"↻"}),m.jsx("span",{children:"Availability"})]}),m.jsxs(Pe,{to:"/booking/search",className:"action-button find",children:[m.jsx("span",{className:"icon",children:"🔍"}),m.jsx("span",{children:"Search"})]}),m.jsxs("button",{onClick:Q,className:"action-button refresh",children:[m.jsx("span",{className:"icon",children:"↻"}),m.jsx("span",{children:"Refresh"})]}),m.jsxs(Pe,{to:"/transactions",className:"action-button find",children:[m.jsx("span",{className:"icon",children:"➕"}),m.jsx("span",{children:"Transaction"})]})]})})]})]})},jH=({startDate:e})=>{const[A,t]=U.useState(!0),[r,s]=U.useState([]),[o,l]=U.useState([]),c=ZA(),u=28,[f,p]=U.useState(e?xe(e):xe().add(-3,"day")),g=U.useMemo(()=>Array.from({length:u},(w,F)=>xe(f).add(F,"day").format("YYYY-MM-DD")),[f]),v=U.useMemo(()=>g,[g]);U.useEffect(()=>{(async()=>{const F=new Set(Array.from({length:u},(x,b)=>f.add(b,"day").format("YYYY-MM-DD")));Sy(c).then(x=>{l(x||[])}).catch(x=>{console.error("AvailabilityChart::Error fetching rooms:",x),pe.error("Unable to get the rooms"),l([])}).finally(()=>{}),Jl(c,f.format("YYYY-MM-DD")).then(x=>{const b=rI(x,F,v);s(b)}).catch(x=>{console.error("AvailabilityChart::Error fetching data:",x),pe.error("Failed to fetch bookings. Please try again."),s([])}).finally(()=>{})})()},[f,e]);const Q=w=>{p(xe(w.target.value))},y=(w,F,x)=>{console.debug("Is Injected or Actual "),w.chart_data==="ACTUAL"?DH(c,w.booking_id).then(b=>{c("/booking",{state:{preloadedBooking:b}})}).catch(b=>{console.error("AvailabilityChart::Error fetching booking:",b),pe.error("Failed to fetch booking. Please try again.")}):w.chart_data==="INJECTED"&&c("/booking",{state:{checkInDate:F,selectedRoom:x}})},C=()=>m.jsxs("div",{className:"room-chartlist",children:[m.jsxs("div",{className:"room-chart-rooms-horizontal room-chart-header",children:[m.jsx("div",{className:"room-chart-date",children:"Date"}),o.map(w=>m.jsx("div",{className:"room-chart-room",style:{background:"#e3eafc",color:"#1976d2"},children:w.room_name},w.room_id))]}),v.map(w=>m.jsxs("div",{className:"room-chart-rooms-horizontal",style:{padding:"4px 0",background:"#fff"},children:[m.jsx("div",{className:"room-chart-date",style:{color:"#1976d2"},children:xe(w,"YYYY-MM-DD").format("MMM DD 'YY")}),o.map(F=>{const x=xe(w,"YYYY-MM-DD");let b=r.find(_=>_.chart_data==="ACTUAL"&&_.room_name===F.room_name&&(new xe(_.check_in,"YYYY-MM-DD").isSame(x)||x.isAfter(new xe(_.check_in,"YYYY-MM-DD"))&&x.isBefore(new xe(_.check_out,"YYYY-MM-DD"))));if(b){let _=xe(b.check_out,"YYYY-MM-DD"),L=xe(b.check_in,"YYYY-MM-DD");x.isSame(L)?b={...b,isTodayCheckIn:!0,isTodayCheckOut:!1}:x.isSame(_)?b={...b,isTodayCheckOut:!0,isTodayCheckIn:!1}:x.isSame(L)&&x.isSame(_)&&(b={...b,isTodayCheckIn:!0,isTodayCheckOut:!0})}const I=r.find(_=>_.chart_data==="INJECTED"&&_.room_name===F.room_name&&new xe(_.check_in,"YYYY-MM-DD").isSame(x));let S="#5d595cff",H="";return b?(S=nI(b),H=`${ff(b.customer_name)}
+        `);const c=A.document.createElement("script");c.src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",c.onload=function(){const u=A.document.getElementById("download-png-btn");u.onclick=function(){const g=A.document.querySelector("div[ref]");g&&Ev(g,{width:900,height:1200,backgroundColor:"#fff",scale:1}).then(v=>{const Q=A.document.createElement("a");Q.download=`Booking Receipt - ${e.customer_name} - ${e.room_name}.png`,Q.href=v.toDataURL("image/png"),Q.click()})};const f=A.document.getElementById("download-jpg-btn");f.onclick=function(){const g=A.document.getElementById("booking_receipt_content");g&&Ev(g,{backgroundColor:"#fff",scale:1}).then(v=>{const Q=A.document.createElement("a");Q.download=`Booking Receipt - ${e.customer_name} - ${e.room_name}.jpg`,Q.href=v.toDataURL("image/jpeg"),Q.click()})};const p=A.document.getElementById("download-svg-btn");p.onclick=function(){if(console.log("download svg btn clicked"),A.document.getElementById("booking_receipt_content")){const v=document.getElementById("booking_receipt_content"),y=new XMLSerializer().serializeToString(v),C=new Blob([y],{type:"image/svg+xml"}),w=document.createElement("a");w.href=URL.createObjectURL(C),w.download="receipt.svg",w.click()}}},A.document.head.appendChild(c),A.document.close()},KH=()=>{const[e,A]=U.useState(0),[t,r]=U.useState(0),[s,o]=U.useState(0),[l,c]=U.useState(0),[u,f]=U.useState([]),[p,g]=U.useState([]),v=ZA();U.useEffect(()=>{Q()},[]);const Q=async()=>{kH(v).then(y=>{o(y)}),Jl(v).then(y=>{if(y){const C=new xe().format("YYYY-MM-DD"),w=y.filter(S=>S.check_in>=C&&S.status!==Ie.CANCELLED).length;c(w);const F=y.filter(S=>S.check_in===C&&S.status!==Ie.CANCELLED).length;A(F);const x=y.filter(S=>S.check_out===C&&S.status==Ie.CONFIRMED).length;r(x);const b=y.filter(S=>S.check_in===C&&S.status!==Ie.CANCELLED).map(S=>({customer_name:ff(S.customer_name),number_of_people:S.number_of_people,room_name:S.room_name}));f(b);const I=y.filter(S=>S.check_out===C&&S.status!==Ie.CANCELLED).map(S=>({customer_name:ff(S.customer_name),number_of_people:S.number_of_people,room_name:S.room_name}));g(I)}}).catch(y=>{console.error("Dashboard::fetchBookingStats::Error fetching booking stats:",y),pe.error("Failed to load booking statistics.")})};return m.jsxs("div",{style:{backgroundColor:"black"},children:[m.jsx(yt,{}),m.jsx(wt,{modules:[Ot,Lt],effect:"fade",loop:!0,autoplay:{delay:3e3,disableOnInteraction:!1},className:"heroSlider h-[100px] lg:h-[27px]"}),m.jsx(HA,{}),m.jsxs("div",{className:"dashboard-container",children:[m.jsxs("div",{className:"stats-grid",children:[m.jsxs("div",{className:"stat-card",children:[m.jsx(Pe,{to:"/availability",state:{exactStartDate:!0},className:"action-button search",children:m.jsx("h3",{children:"Today's Check-ins"})}),m.jsx("p",{className:"stat-value",children:e}),u.map((y,C)=>m.jsx("div",{children:m.jsxs("span",{children:[y.room_name,": ",y.customer_name," (🧑‍💼",y.number_of_people,")"]})},C))]}),m.jsxs("div",{className:"stat-card",children:[m.jsx(Pe,{to:"/availability",state:{exactStartDate:!0},className:"action-button search",children:m.jsx("h3",{children:"Today's Check-outs"})}),m.jsx("p",{className:"stat-value",children:t}),p.map((y,C)=>m.jsx("div",{children:m.jsxs("span",{children:[y.room_name,": ",y.customer_name," (🧑‍💼",y.number_of_people,")"]})},C))]}),m.jsxs("div",{className:"stat-card",children:[m.jsx(Pe,{to:"/availability",state:{defaultCheckInDate:"2020-01-01"},className:"action-button search",children:m.jsx("h3",{children:"Today's Guests Count"})}),m.jsx("p",{className:"stat-value",children:s})]}),m.jsxs("div",{className:"stat-card",children:[m.jsx(Pe,{to:"/booking/search",className:"action-button search",children:m.jsx("h3",{children:"Upcoming Bookings"})}),m.jsx("p",{className:"stat-value",children:l})]})]}),m.jsx("div",{className:"quick-actions",children:m.jsxs("div",{className:"action-buttons",children:[wA(["manager","owner"])?m.jsxs(Pe,{to:"/booking",state:{from:"dashboard"},className:"action-button create",children:[m.jsx("span",{className:"icon",children:"+"}),m.jsx("span",{children:"New"})]}):"",m.jsxs(Pe,{to:"/availability",state:{from:"dashboard"},className:"action-button find",children:[m.jsx("span",{className:"icon",children:"↻"}),m.jsx("span",{children:"Availability"})]}),m.jsxs(Pe,{to:"/booking/search",className:"action-button find",children:[m.jsx("span",{className:"icon",children:"🔍"}),m.jsx("span",{children:"Search"})]}),m.jsxs("button",{onClick:Q,className:"action-button refresh",children:[m.jsx("span",{className:"icon",children:"↻"}),m.jsx("span",{children:"Refresh"})]}),m.jsxs(Pe,{to:"/transactions",className:"action-button find",children:[m.jsx("span",{className:"icon",children:"➕"}),m.jsx("span",{children:"Transaction"})]})]})})]})]})},jH=({startDate:e})=>{const[A,t]=U.useState(!0),[r,s]=U.useState([]),[o,l]=U.useState([]),c=ZA(),u=28,[f,p]=U.useState(e?xe(e):xe().add(-3,"day")),g=U.useMemo(()=>Array.from({length:u},(w,F)=>xe(f).add(F,"day").format("YYYY-MM-DD")),[f]),v=U.useMemo(()=>g,[g]);U.useEffect(()=>{(async()=>{const F=new Set(Array.from({length:u},(x,b)=>f.add(b,"day").format("YYYY-MM-DD")));Sy(c).then(x=>{l(x||[])}).catch(x=>{console.error("AvailabilityChart::Error fetching rooms:",x),pe.error("Unable to get the rooms"),l([])}).finally(()=>{}),Jl(c,f.format("YYYY-MM-DD")).then(x=>{const b=rI(x,F,v);s(b)}).catch(x=>{console.error("AvailabilityChart::Error fetching data:",x),pe.error("Failed to fetch bookings. Please try again."),s([])}).finally(()=>{})})()},[f,e]);const Q=w=>{p(xe(w.target.value))},y=(w,F,x)=>{console.debug("Is Injected or Actual "),w.chart_data==="ACTUAL"?DH(c,w.booking_id).then(b=>{c("/booking",{state:{preloadedBooking:b}})}).catch(b=>{console.error("AvailabilityChart::Error fetching booking:",b),pe.error("Failed to fetch booking. Please try again.")}):w.chart_data==="INJECTED"&&c("/booking",{state:{checkInDate:F,selectedRoom:x}})},C=()=>m.jsxs("div",{className:"room-chartlist",children:[m.jsxs("div",{className:"room-chart-rooms-horizontal room-chart-header",children:[m.jsx("div",{className:"room-chart-date",children:"Date"}),o.map(w=>m.jsx("div",{className:"room-chart-room",style:{background:"#e3eafc",color:"#1976d2"},children:w.room_name},w.room_id))]}),v.map(w=>m.jsxs("div",{className:"room-chart-rooms-horizontal",style:{padding:"4px 0",background:"#fff"},children:[m.jsx("div",{className:"room-chart-date",style:{color:"#1976d2"},children:xe(w,"YYYY-MM-DD").format("MMM DD 'YY")}),o.map(F=>{const x=xe(w,"YYYY-MM-DD");let b=r.find(_=>_.chart_data==="ACTUAL"&&_.room_name===F.room_name&&(new xe(_.check_in,"YYYY-MM-DD").isSame(x)||x.isAfter(new xe(_.check_in,"YYYY-MM-DD"))&&x.isBefore(new xe(_.check_out,"YYYY-MM-DD"))));if(b){let _=xe(b.check_out,"YYYY-MM-DD"),L=xe(b.check_in,"YYYY-MM-DD");x.isSame(L)?b={...b,isTodayCheckIn:!0,isTodayCheckOut:!1}:x.isSame(_)?b={...b,isTodayCheckOut:!0,isTodayCheckIn:!1}:x.isSame(L)&&x.isSame(_)&&(b={...b,isTodayCheckIn:!0,isTodayCheckOut:!0})}const I=r.find(_=>_.chart_data==="INJECTED"&&_.room_name===F.room_name&&new xe(_.check_in,"YYYY-MM-DD").isSame(x));let S="#5d595cff",H="";return b?(S=nI(b),H=`${ff(b.customer_name)}
                                 ${b.number_of_people?`(🧑‍💼${b.number_of_people})`:""} `):I&&(S=sI(I),H=iI(I)),m.jsx("div",{className:"room-chart-room",style:{backgroundColor:S},onClick:b&&b.status!=="Available"?()=>y(b,w,F):I?()=>y(I,w,F):void 0,children:m.jsxs("span",{style:{fontSize:"1.15em"},children:[" ",H]})},F.room_id)})]},w))]});return m.jsxs("div",{style:{backgroundColor:"black"},children:[m.jsx(yt,{}),m.jsx(wt,{modules:[Ot,Lt],effect:"fade",loop:!0,autoplay:{delay:3e3,disableOnInteraction:!1},className:"heroSlider h-[100px] lg:h-[27px]"}),m.jsxs("div",{className:"room-chart-container",children:[m.jsx(HA,{}),m.jsxs("div",{className:"form-search",children:[m.jsx("label",{children:"Start Date:  "}),m.jsx("input",{type:"date",value:f.format("YYYY-MM-DD"),onChange:Q})]}),m.jsx("div",{className:"room-chart",style:{width:"100%",maxHeight:"80vh",overflowY:"auto"},children:C()})]})]})};function Cn(e){"@babel/helpers - typeof";return Cn=typeof Symbol=="function"&&typeof Symbol.iterator=="symbol"?function(A){return typeof A}:function(A){return A&&typeof Symbol=="function"&&A.constructor===Symbol&&A!==Symbol.prototype?"symbol":typeof A},Cn(e)}function VH(e,A){if(Cn(e)!="object"||!e)return e;var t=e[Symbol.toPrimitive];if(t!==void 0){var r=t.call(e,A);if(Cn(r)!="object")return r;throw new TypeError("@@toPrimitive must return a primitive value.")}return(A==="string"?String:Number)(e)}function Iy(e){var A=VH(e,"string");return Cn(A)=="symbol"?A:A+""}function Fi(e,A,t){return(A=Iy(A))in e?Object.defineProperty(e,A,{value:t,enumerable:!0,configurable:!0,writable:!0}):e[A]=t,e}function bv(e,A){var t=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);A&&(r=r.filter(function(s){return Object.getOwnPropertyDescriptor(e,s).enumerable})),t.push.apply(t,r)}return t}function Ce(e){for(var A=1;A<arguments.length;A++){var t=arguments[A]!=null?arguments[A]:{};A%2?bv(Object(t),!0).forEach(function(r){Fi(e,r,t[r])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(t)):bv(Object(t)).forEach(function(r){Object.defineProperty(e,r,Object.getOwnPropertyDescriptor(t,r))})}return e}function GH(e){if(Array.isArray(e))return e}function $H(e,A){var t=e==null?null:typeof Symbol<"u"&&e[Symbol.iterator]||e["@@iterator"];if(t!=null){var r,s,o,l,c=[],u=!0,f=!1;try{if(o=(t=t.call(e)).next,A===0){if(Object(t)!==t)return;u=!1}else for(;!(u=(r=o.call(t)).done)&&(c.push(r.value),c.length!==A);u=!0);}catch(p){f=!0,s=p}finally{try{if(!u&&t.return!=null&&(l=t.return(),Object(l)!==l))return}finally{if(f)throw s}}return c}}function kf(e,A){(A==null||A>e.length)&&(A=e.length);for(var t=0,r=Array(A);t<A;t++)r[t]=e[t];return r}function Ty(e,A){if(e){if(typeof e=="string")return kf(e,A);var t={}.toString.call(e).slice(8,-1);return t==="Object"&&e.constructor&&(t=e.constructor.name),t==="Map"||t==="Set"?Array.from(e):t==="Arguments"||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t)?kf(e,A):void 0}}function zH(){throw new TypeError(`Invalid attempt to destructure non-iterable instance.
 In order to be iterable, non-array objects must have a [Symbol.iterator]() method.`)}function lr(e,A){return GH(e)||$H(e,A)||Ty(e,A)||zH()}function YH(e,A){if(e==null)return{};var t={};for(var r in e)if({}.hasOwnProperty.call(e,r)){if(A.indexOf(r)!==-1)continue;t[r]=e[r]}return t}function pr(e,A){if(e==null)return{};var t,r,s=YH(e,A);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);for(r=0;r<o.length;r++)t=o[r],A.indexOf(t)===-1&&{}.propertyIsEnumerable.call(e,t)&&(s[t]=e[t])}return s}var WH=["defaultInputValue","defaultMenuIsOpen","defaultValue","inputValue","menuIsOpen","onChange","onInputChange","onMenuClose","onMenuOpen","value"];function XH(e){var A=e.defaultInputValue,t=A===void 0?"":A,r=e.defaultMenuIsOpen,s=r===void 0?!1:r,o=e.defaultValue,l=o===void 0?null:o,c=e.inputValue,u=e.menuIsOpen,f=e.onChange,p=e.onInputChange,g=e.onMenuClose,v=e.onMenuOpen,Q=e.value,y=pr(e,WH),C=U.useState(c!==void 0?c:t),w=lr(C,2),F=w[0],x=w[1],b=U.useState(u!==void 0?u:s),I=lr(b,2),S=I[0],H=I[1],_=U.useState(Q!==void 0?Q:l),L=lr(_,2),P=L[0],te=L[1],V=U.useCallback(function(k,Y){typeof f=="function"&&f(k,Y),te(k)},[f]),q=U.useCallback(function(k,Y){var G;typeof p=="function"&&(G=p(k,Y)),x(G!==void 0?G:k)},[p]),ee=U.useCallback(function(){typeof v=="function"&&v(),H(!0)},[v]),Z=U.useCallback(function(){typeof g=="function"&&g(),H(!1)},[g]),N=c!==void 0?c:F,T=u!==void 0?u:S,K=Q!==void 0?Q:P;return Ce(Ce({},y),{},{inputValue:N,menuIsOpen:T,onChange:V,onInputChange:q,onMenuClose:Z,onMenuOpen:ee,value:K})}function Qe(){return Qe=Object.assign?Object.assign.bind():function(e){for(var A=1;A<arguments.length;A++){var t=arguments[A];for(var r in t)({}).hasOwnProperty.call(t,r)&&(e[r]=t[r])}return e},Qe.apply(null,arguments)}function JH(e,A){if(!(e instanceof A))throw new TypeError("Cannot call a class as a function")}function Sv(e,A){for(var t=0;t<A.length;t++){var r=A[t];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,Iy(r.key),r)}}function ZH(e,A,t){return A&&Sv(e.prototype,A),t&&Sv(e,t),Object.defineProperty(e,"prototype",{writable:!1}),e}function Mf(e,A){return Mf=Object.setPrototypeOf?Object.setPrototypeOf.bind():function(t,r){return t.__proto__=r,t},Mf(e,A)}function qH(e,A){if(typeof A!="function"&&A!==null)throw new TypeError("Super expression must either be null or a function");e.prototype=Object.create(A&&A.prototype,{constructor:{value:e,writable:!0,configurable:!0}}),Object.defineProperty(e,"prototype",{writable:!1}),A&&Mf(e,A)}function Bl(e){return Bl=Object.setPrototypeOf?Object.getPrototypeOf.bind():function(A){return A.__proto__||Object.getPrototypeOf(A)},Bl(e)}function _y(){try{var e=!Boolean.prototype.valueOf.call(Reflect.construct(Boolean,[],function(){}))}catch{}return(_y=function(){return!!e})()}function eL(e){if(e===void 0)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return e}function AL(e,A){if(A&&(Cn(A)=="object"||typeof A=="function"))return A;if(A!==void 0)throw new TypeError("Derived constructors may only return object or undefined");return eL(e)}function tL(e){var A=_y();return function(){var t,r=Bl(e);if(A){var s=Bl(this).constructor;t=Reflect.construct(r,arguments,s)}else t=r.apply(this,arguments);return AL(this,t)}}function rL(e){if(Array.isArray(e))return kf(e)}function nL(e){if(typeof Symbol<"u"&&e[Symbol.iterator]!=null||e["@@iterator"]!=null)return Array.from(e)}function sL(){throw new TypeError(`Invalid attempt to spread non-iterable instance.
 In order to be iterable, non-array objects must have a [Symbol.iterator]() method.`)}function vp(e){return rL(e)||nL(e)||Ty(e)||sL()}function iL(e){if(e.sheet)return e.sheet;for(var A=0;A<document.styleSheets.length;A++)if(document.styleSheets[A].ownerNode===e)return document.styleSheets[A]}function oL(e){var A=document.createElement("style");return A.setAttribute("data-emotion",e.key),e.nonce!==void 0&&A.setAttribute("nonce",e.nonce),A.appendChild(document.createTextNode("")),A.setAttribute("data-s",""),A}var aL=(function(){function e(t){var r=this;this._insertTag=function(s){var o;r.tags.length===0?r.insertionPoint?o=r.insertionPoint.nextSibling:r.prepend?o=r.container.firstChild:o=r.before:o=r.tags[r.tags.length-1].nextSibling,r.container.insertBefore(s,o),r.tags.push(s)},this.isSpeedy=t.speedy===void 0?!0:t.speedy,this.tags=[],this.ctr=0,this.nonce=t.nonce,this.key=t.key,this.container=t.container,this.prepend=t.prepend,this.insertionPoint=t.insertionPoint,this.before=null}var A=e.prototype;return A.hydrate=function(r){r.forEach(this._insertTag)},A.insert=function(r){this.ctr%(this.isSpeedy?65e3:1)===0&&this._insertTag(oL(this));var s=this.tags[this.tags.length-1];if(this.isSpeedy){var o=iL(s);try{o.insertRule(r,o.cssRules.length)}catch{}}else s.appendChild(document.createTextNode(r));this.ctr++},A.flush=function(){this.tags.forEach(function(r){var s;return(s=r.parentNode)==null?void 0:s.removeChild(r)}),this.tags=[],this.ctr=0},e})(),bA="-ms-",vl="-moz-",Oe="-webkit-",Hy="comm",wp="rule",yp="decl",lL="@import",Ly="@keyframes",uL="@layer",cL=Math.abs,Zl=String.fromCharCode,dL=Object.assign;function fL(e,A){return yA(e,0)^45?(((A<<2^yA(e,0))<<2^yA(e,1))<<2^yA(e,2))<<2^yA(e,3):0}function Oy(e){return e.trim()}function pL(e,A){return(e=A.exec(e))?e[0]:e}function De(e,A,t){return e.replace(A,t)}function Nf(e,A){return e.indexOf(A)}function yA(e,A){return e.charCodeAt(A)|0}function Ni(e,A,t){return e.slice(A,t)}function Vt(e){return e.length}function Cp(e){return e.length}function ka(e,A){return A.push(e),e}function hL(e,A){return e.map(A).join("")}var ql=1,us=1,Dy=0,JA=0,oA=0,gs="";function eu(e,A,t,r,s,o,l){return{value:e,root:A,parent:t,type:r,props:s,children:o,line:ql,column:us,length:l,return:""}}function hi(e,A){return dL(eu("",null,null,"",null,null,0),e,{length:-e.length},A)}function gL(){return oA}function mL(){return oA=JA>0?yA(gs,--JA):0,us--,oA===10&&(us=1,ql--),oA}function st(){return oA=JA<Dy?yA(gs,JA++):0,us++,oA===10&&(us=1,ql++),oA}function zt(){return yA(gs,JA)}function Za(){return JA}function Ji(e,A){return Ni(gs,e,A)}function Ri(e){switch(e){case 0:case 9:case 10:case 13:case 32:return 5;case 33:case 43:case 44:case 47:case 62:case 64:case 126:case 59:case 123:case 125:return 4;case 58:return 3;case 34:case 39:case 40:case 91:return 2;case 41:case 93:return 1}return 0}function ky(e){return ql=us=1,Dy=Vt(gs=e),JA=0,[]}function My(e){return gs="",e}function qa(e){return Oy(Ji(JA-1,Rf(e===91?e+2:e===40?e+1:e)))}function BL(e){for(;(oA=zt())&&oA<33;)st();return Ri(e)>2||Ri(oA)>3?"":" "}function vL(e,A){for(;--A&&st()&&!(oA<48||oA>102||oA>57&&oA<65||oA>70&&oA<97););return Ji(e,Za()+(A<6&&zt()==32&&st()==32))}function Rf(e){for(;st();)switch(oA){case e:return JA;case 34:case 39:e!==34&&e!==39&&Rf(oA);break;case 40:e===41&&Rf(e);break;case 92:st();break}return JA}function wL(e,A){for(;st()&&e+oA!==57;)if(e+oA===84&&zt()===47)break;return"/*"+Ji(A,JA-1)+"*"+Zl(e===47?e:st())}function yL(e){for(;!Ri(zt());)st();return Ji(e,JA)}function CL(e){return My(el("",null,null,null,[""],e=ky(e),0,[0],e))}function el(e,A,t,r,s,o,l,c,u){for(var f=0,p=0,g=l,v=0,Q=0,y=0,C=1,w=1,F=1,x=0,b="",I=s,S=o,H=r,_=b;w;)switch(y=x,x=st()){case 40:if(y!=108&&yA(_,g-1)==58){Nf(_+=De(qa(x),"&","&\f"),"&\f")!=-1&&(F=-1);break}case 34:case 39:case 91:_+=qa(x);break;case 9:case 10:case 13:case 32:_+=BL(y);break;case 92:_+=vL(Za()-1,7);continue;case 47:switch(zt()){case 42:case 47:ka(QL(wL(st(),Za()),A,t),u);break;default:_+="/"}break;case 123*C:c[f++]=Vt(_)*F;case 125*C:case 59:case 0:switch(x){case 0:case 125:w=0;case 59+p:F==-1&&(_=De(_,/\f/g,"")),Q>0&&Vt(_)-g&&ka(Q>32?Tv(_+";",r,t,g-1):Tv(De(_," ","")+";",r,t,g-2),u);break;case 59:_+=";";default:if(ka(H=Iv(_,A,t,f,p,s,c,b,I=[],S=[],g),o),x===123)if(p===0)el(_,A,H,H,I,o,g,c,S);else switch(v===99&&yA(_,3)===110?100:v){case 100:case 108:case 109:case 115:el(e,H,H,r&&ka(Iv(e,H,H,0,0,s,c,b,s,I=[],g),S),s,S,g,c,r?I:S);break;default:el(_,H,H,H,[""],S,0,c,S)}}f=p=Q=0,C=F=1,b=_="",g=l;break;case 58:g=1+Vt(_),Q=y;default:if(C<1){if(x==123)--C;else if(x==125&&C++==0&&mL()==125)continue}switch(_+=Zl(x),x*C){case 38:F=p>0?1:(_+="\f",-1);break;case 44:c[f++]=(Vt(_)-1)*F,F=1;break;case 64:zt()===45&&(_+=qa(st())),v=zt(),p=g=Vt(b=_+=yL(Za())),x++;break;case 45:y===45&&Vt(_)==2&&(C=0)}}return o}function Iv(e,A,t,r,s,o,l,c,u,f,p){for(var g=s-1,v=s===0?o:[""],Q=Cp(v),y=0,C=0,w=0;y<r;++y)for(var F=0,x=Ni(e,g+1,g=cL(C=l[y])),b=e;F<Q;++F)(b=Oy(C>0?v[F]+" "+x:De(x,/&\f/g,v[F])))&&(u[w++]=b);return eu(e,A,t,s===0?wp:c,u,f,p)}function QL(e,A,t){return eu(e,A,t,Hy,Zl(gL()),Ni(e,2,-2),0)}function Tv(e,A,t,r){return eu(e,A,t,yp,Ni(e,0,r),Ni(e,r+1,-1),r)}function is(e,A){for(var t="",r=Cp(e),s=0;s<r;s++)t+=A(e[s],s,e,A)||"";return t}function FL(e,A,t,r){switch(e.type){case uL:if(e.children.length)break;case lL:case yp:return e.return=e.return||e.value;case Hy:return"";case Ly:return e.return=e.value+"{"+is(e.children,r)+"}";case wp:e.value=e.props.join(",")}return Vt(t=is(e.children,r))?e.return=e.value+"{"+t+"}":""}function EL(e){var A=Cp(e);return function(t,r,s,o){for(var l="",c=0;c<A;c++)l+=e[c](t,r,s,o)||"";return l}}function UL(e){return function(A){A.root||(A=A.return)&&e(A)}}function xL(e){var A=Object.create(null);return function(t){return A[t]===void 0&&(A[t]=e(t)),A[t]}}var bL=function(A,t,r){for(var s=0,o=0;s=o,o=zt(),s===38&&o===12&&(t[r]=1),!Ri(o);)st();return Ji(A,JA)},SL=function(A,t){var r=-1,s=44;do switch(Ri(s)){case 0:s===38&&zt()===12&&(t[r]=1),A[r]+=bL(JA-1,t,r);break;case 2:A[r]+=qa(s);break;case 4:if(s===44){A[++r]=zt()===58?"&\f":"",t[r]=A[r].length;break}default:A[r]+=Zl(s)}while(s=st());return A},IL=function(A,t){return My(SL(ky(A),t))},_v=new WeakMap,TL=function(A){if(!(A.type!=="rule"||!A.parent||A.length<1)){for(var t=A.value,r=A.parent,s=A.column===r.column&&A.line===r.line;r.type!=="rule";)if(r=r.parent,!r)return;if(!(A.props.length===1&&t.charCodeAt(0)!==58&&!_v.get(r))&&!s){_v.set(A,!0);for(var o=[],l=IL(t,o),c=r.props,u=0,f=0;u<l.length;u++)for(var p=0;p<c.length;p++,f++)A.props[f]=o[u]?l[u].replace(/&\f/g,c[p]):c[p]+" "+l[u]}}},_L=function(A){if(A.type==="decl"){var t=A.value;t.charCodeAt(0)===108&&t.charCodeAt(2)===98&&(A.return="",A.value="")}};function Ny(e,A){switch(fL(e,A)){case 5103:return Oe+"print-"+e+e;case 5737:case 4201:case 3177:case 3433:case 1641:case 4457:case 2921:case 5572:case 6356:case 5844:case 3191:case 6645:case 3005:case 6391:case 5879:case 5623:case 6135:case 4599:case 4855:case 4215:case 6389:case 5109:case 5365:case 5621:case 3829:return Oe+e+e;case 5349:case 4246:case 4810:case 6968:case 2756:return Oe+e+vl+e+bA+e+e;case 6828:case 4268:return Oe+e+bA+e+e;case 6165:return Oe+e+bA+"flex-"+e+e;case 5187:return Oe+e+De(e,/(\w+).+(:[^]+)/,Oe+"box-$1$2"+bA+"flex-$1$2")+e;case 5443:return Oe+e+bA+"flex-item-"+De(e,/flex-|-self/,"")+e;case 4675:return Oe+e+bA+"flex-line-pack"+De(e,/align-content|flex-|-self/,"")+e;case 5548:return Oe+e+bA+De(e,"shrink","negative")+e;case 5292:return Oe+e+bA+De(e,"basis","preferred-size")+e;case 6060:return Oe+"box-"+De(e,"-grow","")+Oe+e+bA+De(e,"grow","positive")+e;case 4554:return Oe+De(e,/([^-])(transform)/g,"$1"+Oe+"$2")+e;case 6187:return De(De(De(e,/(zoom-|grab)/,Oe+"$1"),/(image-set)/,Oe+"$1"),e,"")+e;case 5495:case 3959:return De(e,/(image-set\([^]*)/,Oe+"$1$`$1");case 4968:return De(De(e,/(.+:)(flex-)?(.*)/,Oe+"box-pack:$3"+bA+"flex-pack:$3"),/s.+-b[^;]+/,"justify")+Oe+e+e;case 4095:case 3583:case 4068:case 2532:return De(e,/(.+)-inline(.+)/,Oe+"$1$2")+e;case 8116:case 7059:case 5753:case 5535:case 5445:case 5701:case 4933:case 4677:case 5533:case 5789:case 5021:case 4765:if(Vt(e)-1-A>6)switch(yA(e,A+1)){case 109:if(yA(e,A+4)!==45)break;case 102:return De(e,/(.+:)(.+)-([^]+)/,"$1"+Oe+"$2-$3$1"+vl+(yA(e,A+3)==108?"$3":"$2-$3"))+e;case 115:return~Nf(e,"stretch")?Ny(De(e,"stretch","fill-available"),A)+e:e}break;case 4949:if(yA(e,A+1)!==115)break;case 6444:switch(yA(e,Vt(e)-3-(~Nf(e,"!important")&&10))){case 107:return De(e,":",":"+Oe)+e;case 101:return De(e,/(.+:)([^;!]+)(;|!.+)?/,"$1"+Oe+(yA(e,14)===45?"inline-":"")+"box$3$1"+Oe+"$2$3$1"+bA+"$2box$3")+e}break;case 5936:switch(yA(e,A+11)){case 114:return Oe+e+bA+De(e,/[svh]\w+-[tblr]{2}/,"tb")+e;case 108:return Oe+e+bA+De(e,/[svh]\w+-[tblr]{2}/,"tb-rl")+e;case 45:return Oe+e+bA+De(e,/[svh]\w+-[tblr]{2}/,"lr")+e}return Oe+e+bA+e+e}return e}var HL=function(A,t,r,s){if(A.length>-1&&!A.return)switch(A.type){case yp:A.return=Ny(A.value,A.length);break;case Ly:return is([hi(A,{value:De(A.value,"@","@"+Oe)})],s);case wp:if(A.length)return hL(A.props,function(o){switch(pL(o,/(::plac\w+|:read-\w+)/)){case":read-only":case":read-write":return is([hi(A,{props:[De(o,/:(read-\w+)/,":"+vl+"$1")]})],s);case"::placeholder":return is([hi(A,{props:[De(o,/:(plac\w+)/,":"+Oe+"input-$1")]}),hi(A,{props:[De(o,/:(plac\w+)/,":"+vl+"$1")]}),hi(A,{props:[De(o,/:(plac\w+)/,bA+"input-$1")]})],s)}return""})}},LL=[HL],OL=function(A){var t=A.key;if(t==="css"){var r=document.querySelectorAll("style[data-emotion]:not([data-s])");Array.prototype.forEach.call(r,function(C){var w=C.getAttribute("data-emotion");w.indexOf(" ")!==-1&&(document.head.appendChild(C),C.setAttribute("data-s",""))})}var s=A.stylisPlugins||LL,o={},l,c=[];l=A.container||document.head,Array.prototype.forEach.call(document.querySelectorAll('style[data-emotion^="'+t+' "]'),function(C){for(var w=C.getAttribute("data-emotion").split(" "),F=1;F<w.length;F++)o[w[F]]=!0;c.push(C)});var u,f=[TL,_L];{var p,g=[FL,UL(function(C){p.insert(C)})],v=EL(f.concat(s,g)),Q=function(w){return is(CL(w),v)};u=function(w,F,x,b){p=x,Q(w?w+"{"+F.styles+"}":F.styles),b&&(y.inserted[F.name]=!0)}}var y={key:t,sheet:new aL({key:t,container:l,nonce:A.nonce,speedy:A.speedy,prepend:A.prepend,insertionPoint:A.insertionPoint}),nonce:A.nonce,inserted:o,registered:{},insert:u};return y.sheet.hydrate(c),y},Od={exports:{}},Me={};/** @license React v16.13.1
