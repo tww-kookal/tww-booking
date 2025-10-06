@@ -37,6 +37,10 @@
     font-size: 1rem;
   }
 
+  .react-select-style {
+    width: 97%;
+  }
+
   .form-group label {
     font-weight: 600;
     width:40%;

@@ -20,13 +20,6 @@ import 'swiper/css';
 
 import { PAYMENT_TYPE } from '../modules/constants';
 
-const customStyles = {
-    container: (provided) => ({
-        ...provided,
-        width: '75%',
-    }),
-};
-
 const Transaction = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -206,7 +199,6 @@ const Transaction = () => {
                     <div className='form-group'>
                         <label htmlFor="acc_category_id">Category</label>
                         <Select name="acc_category_id"
-                            styles={customStyles}
                             value={selectedAccCategory}
                             onChange={e => {
                                 setTransaction(prev => ({ ...prev, acc_category_id: e.value }));
@@ -219,6 +211,7 @@ const Transaction = () => {
                             placeholder="Select a acc category..."
                             isSearchable={true}
                             classNamePrefix="react-select"
+                            className= "react-select-style"
                         />
                     </div>
                     <div className='form-group'>
@@ -239,7 +232,6 @@ const Transaction = () => {
                     <div className='form-group'>
                         <label htmlFor="txn_by">Txn By</label>
                         <Select name="txn_by"
-                            styles={customStyles}
                             value={selectedTxnBy}
                             onChange={e => {
                                 setTransaction(prev => ({ ...prev, txn_by: e.value }));
@@ -252,13 +244,13 @@ const Transaction = () => {
                             placeholder="Transaction made by ..."
                             isSearchable={true}
                             classNamePrefix="react-select"
+                            className= "react-select-style"
                         />
                     </div>
 
                     <div className='form-group'>
                         <label htmlFor="paid_by">Paid By</label>
                         <Select name="paid_by"
-                            styles={customStyles}
                             value={selectedPaidBy}
                             onChange={e => {
                                 setTransaction(prev => ({ ...prev, paid_by: e.value }));
@@ -271,13 +263,13 @@ const Transaction = () => {
                             placeholder="Select Payer..."
                             isSearchable={true}
                             classNamePrefix="react-select"
+                            className= "react-select-style"
                         />
                     </div>
 
                     <div className='form-group'>
                         <label htmlFor="received_by">Receiver</label>
                         <Select name="received_by"
-                            styles={customStyles}
                             value={selectedReceivedBy}
                             onChange={e => {
                                 setTransaction(prev => ({ ...prev, received_by: e.value }));
@@ -290,6 +282,7 @@ const Transaction = () => {
                             placeholder="Select Receiver..."
                             isSearchable={true}
                             classNamePrefix="react-select"
+                            className= "react-select-style"
                         />
                     </div>
 
@@ -303,8 +296,7 @@ const Transaction = () => {
 
                     <div className='form-group'>
                         <label htmlFor="received_for_booking_id">For Booking</label>
-                        <Select name="received_for_booking_id"
-                            styles={customStyles}
+                        <Select name="received_for_booking_id"                            
                             value={selectedReceivedForBooking}
                             onChange={e => {
                                 setTransaction(prev => ({ ...prev, received_for_booking_id: e.value }));
@@ -317,6 +309,7 @@ const Transaction = () => {
                             placeholder="Select booking ..."
                             isSearchable={true}
                             classNamePrefix="react-select"
+                            className= "react-select-style"
                         />
                     </div>
 

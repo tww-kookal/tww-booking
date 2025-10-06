@@ -22,13 +22,6 @@ import '../styles.css'
 import 'swiper/css/effect-fade';
 import 'swiper/css';
 
-const customStyles = {
-    container: (provided) => ({
-        ...provided,
-        width: '75%',
-    }),
-};
-
 const Booking = () => {
     const location = useLocation();
     const preloadedBooking = location.state?.preloadedBooking;
@@ -71,11 +64,11 @@ const Booking = () => {
                 setCustomers(prev => [...prev, location.state.createdCustomer]);
                 setCustomerOptions(prev => [...prev, {
                     value: location.state.createdCustomer.customer_id,
-                    label: location.state.createdCustomer.customer_name,
+                    label: `${location.state.createdCustomer.customer_name} - ${location.state.createdCustomer.phone || '--'}`,
                 }]);
                 setSelectedCustomer({
                     value: location.state.createdCustomer.customer_id,
-                    label: location.state.createdCustomer.customer_name,
+                    label: `${location.state.createdCustomer.customer_name} - ${location.state.createdCustomer.phone || '--'}`,
                 })
             }
             setBooking(prev => ({
@@ -132,7 +125,7 @@ const Booking = () => {
             setCustomers(customers);
             setCustomerOptions(customers.map(c => ({
                 value: c.customer_id,
-                label: c.customer_name,
+                label: `${c.customer_name} - ${c.phone || '--'}`,
             })));
             if (preloadedBooking) {
                 //Get the first name and last name of the found custoemr with user_id as customer id
@@ -141,7 +134,7 @@ const Booking = () => {
                 if (customer) {
                     setSelectedCustomer({
                         value: preloadedBooking.customer_id,
-                        label: customer?.customer_name,
+                        label: `${customer?.customer_name} - ${customer?.phone || '--'}`,
                     })
                 }
             }
@@ -364,13 +357,13 @@ const Booking = () => {
                     <div className='form-group'>
                         <label htmlFor="customer_id">Guest</label>
                         <Select name="customer_id"
-                            styles={customStyles}
                             value={selectedCustomer}
                             onChange={handleCustomerChange}
                             options={customerOptions}
                             placeholder="Select a guest..."
                             isSearchable={true}
                             classNamePrefix="react-select"
+                            className= "react-select-style"
                         />
                         {/*                     <select isSearchable={true} id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
                         <option value="">Select Customer</option>
@@ -379,7 +372,7 @@ const Booking = () => {
                         ))}
                     </select>
  */}                </div>
-                    <div className='form-group' style={{ alignItems: "center" }}>
+                    <div className='form-group-button' style={{ alignItems: "center" }}>
                         <label></label>
                         <button
                             type="button"
@@ -423,13 +416,13 @@ const Booking = () => {
                     <div className='form-group'>
                         <label>Source</label>
                         <Select name="source_of_booking_id"
-                            styles={customStyles}
                             value={selectedBookingSource}
                             onChange={handleBookingSourceChange}
                             options={userOptions}
                             placeholder="Select a referral..."
                             isSearchable={true}
                             classNamePrefix="react-select"
+                            className= "react-select-style"
                         />
 
                         {/*                     <select name="source_of_booking_id" value={booking.source_of_booking_id} onChange={handleChange}>
@@ -437,7 +430,7 @@ const Booking = () => {
                         {users.map(s => <option key={s.user_id} value={s.user_id}>{s.first_name} {s.last_name} ({s.booking_commission || 0}%)</option>)}
                     </select>
  */}                </div>
-                    <div className='form-group' style={{ alignItems: "center" }}>
+                    <div className='form-group-button' style={{ alignItems: "center" }}>
                         <label></label>
                         <button
                             type="button"

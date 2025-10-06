@@ -27,20 +27,84 @@
     width: 95%;
   }
 
+  .booking-form-container .button-primary,
+  .booking-form-container .button-secondary,
+  .booking-form-container input,
+  .booking-form-container textarea {
+    font-size: 1.2rem !important;
+  }
+
+  .booking-form-container Select,
+  .booking-form-container select,
+  .booking-form-container select option {
+    font-size: 1.2rem !important;
+    font-family: inherit;
+  }
+
+  .booking-form-container input:focus,
+  .booking-form-container Select:focus,
+  .booking-form-container select:focus,
+  .booking-form-container select option:focus,
+  .booking-form-container textarea:focus {
+    font-size: 1.2rem !important;
+  }
+
   .booking-form-container .form-group {
     display: flex;
     flex-direction: row;
   }
 
+  .form-group-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .react-select-style {
+    width: 75%;
+  }
+
+  .form-group-button button {
+    margin-left: 2%;
+    margin-bottom: 2%;
+    width: 15%;
+    background-color: aquamarine;
+    border-color: #007bff;
+    border-width: 2px;
+    border: 1px solid #007bff;
+    color: #333;
+    padding: 0.7rem 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .form-group-button label {
+    font-weight: 600;
+    width: 30%;
+    margin-bottom: 0.4rem;
+    color: #555;
+  }
+
+  .form-label {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    align-items: flex-end;
+    align-content: flex-end;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+  }
+
   .form-group {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     margin-bottom: 1rem;
   }
 
   .form-group label {
     font-weight: 600;
-    width: 25%;
+    width: 30%;
     margin-bottom: 0.4rem;
     color: #555;
   }
@@ -49,7 +113,8 @@
   .form-group select,
   .form-group textarea {
     padding: 0.5rem 0.75rem;
-    width: 50%;
+    width: 97%;
+    max-width: 100%;
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 1rem;
