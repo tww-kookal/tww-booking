@@ -424,12 +424,7 @@ const Booking = () => {
                             classNamePrefix="react-select"
                             className= "react-select-style"
                         />
-
-                        {/*                     <select name="source_of_booking_id" value={booking.source_of_booking_id} onChange={handleChange}>
-                        <option value="">Select</option>
-                        {users.map(s => <option key={s.user_id} value={s.user_id}>{s.first_name} {s.last_name} ({s.booking_commission || 0}%)</option>)}
-                    </select>
- */}                </div>
+                    </div>
                     <div className='form-group-button' style={{ alignItems: "center" }}>
                         <label></label>
                         <button

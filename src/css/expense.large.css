@@ -35,6 +35,34 @@
     width: 75%;
   }
 
+  .form-group-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .form-group-button button {
+    margin-left: 2%;
+    margin-bottom: 2%;
+    width: 15%;
+    background-color: aquamarine;
+    border-color: #007bff;
+    border-width: 2px;
+    border: 1px solid #007bff;
+    color: #333;
+    padding: 0.7rem 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .form-group-button label {
+    font-weight: 600;
+    width: 30%;
+    margin-bottom: 0.4rem;
+    color: #555;
+  }
+
   .form-group {
     display: flex;
     flex-direction: column;

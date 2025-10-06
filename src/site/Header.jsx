@@ -186,7 +186,7 @@ const Header = () => {
             }
 
             {/* Transactions Dropdown */}
-            {isUserInRoles(['manager', 'owner']) &&
+            {isUserInRoles(['manager', 'owner', 'employee']) &&
               <div className="relative" onMouseEnter={() => setTransactionsOpen(true)} onMouseLeave={() => setTransactionsOpen(false)}>
                 <button className='transition hover:text-accent'>TRANSACTIONS</button>
                 {isTransactionsOpen && (

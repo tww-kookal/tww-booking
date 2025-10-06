@@ -199,7 +199,7 @@ const Expenses = () => {
                             placeholder="Select a acc category..."
                             isSearchable={true}
                             classNamePrefix="react-select"
-                            className= "react-select-style"
+                            className="react-select-style"
                         />
                     </div>
                     <div className='form-group'>
@@ -227,7 +227,7 @@ const Expenses = () => {
                             placeholder="Expense made by ..."
                             isSearchable={true}
                             classNamePrefix="react-select"
-                            className= "react-select-style"
+                            className="react-select-style"
                         />
                     </div>
 
@@ -246,7 +246,7 @@ const Expenses = () => {
                             placeholder="Select Payer..."
                             isSearchable={true}
                             classNamePrefix="react-select"
-                            className= "react-select-style"
+                            className="react-select-style"
                         />
                     </div>
 
@@ -265,9 +265,28 @@ const Expenses = () => {
                             placeholder="Select Receiver..."
                             isSearchable={true}
                             classNamePrefix="react-select"
-                            className= "react-select-style"
+                            className="react-select-style"
                         />
                     </div>
+                    {isUserInRoles(['manager', 'owner']) ?
+                        <div className='form-group-button' style={{ alignItems: "center" }}>
+                            <label></label>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/user/new', { state: { returnTo: '/expenses', expenseDraft: expense } })}
+                                style={{ padding: '4px 8px' }}
+                            >
+                                + New
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => navigate('/user/new', { state: { returnTo: '/expenses', expenseDraft: expense, user_id: expense.received_by } })}
+                                style={{ padding: '4px 8px' }}
+                            >
+                                + Update
+                            </button>
+                        </div>
+                        : ''}
 
                     <div className='form-group'>
                         <label htmlFor="payment_type">Mode</label>
