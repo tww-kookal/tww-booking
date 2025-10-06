@@ -72,6 +72,7 @@ export const DEFAULT_BOOKING = {
 export const roomOptions = ['Cedar', 'Pine', 'Teak', 'Maple', 'Tent'];
 export const PAYMENT_TYPE = [{ id: 'cash', value: 'Cash' }, { id: 'cc', value: 'Credit Card' }, { id: 'dc', value: 'Debit Card' }, { id: 'gpay', value: 'Google Pay' }, { id: 'upi', value: 'UPI' }, { id: 'bank', value: 'Bank' }]
 export const ROOM_NAMES = roomOptions
+export const USER_TYPES = ['BACK-OFFICE', 'BOOKING-AGENT', 'COMPANY', 'CONTRACTOR', 'CUSTOMER', 'CXO', 'EMPLOYEE', 'PARTNER', 'VENDOR']
 /**
  * @constant {object} roomAvailabilityStatusColors - An object mapping booking statuses to their corresponding colors.
  * @property {string} Confirmed - Hex color code for 'Confirmed' status.

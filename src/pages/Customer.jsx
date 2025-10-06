@@ -65,21 +65,6 @@ const Customer = () => {
         }
     }, [preloadedCustomer, id]);
 
-    // useEffect(() => {
-    //     setCustomer(prev => ({
-    //         ...prev,
-    //         numberOfNights,
-    //         commission,
-    //         balanceToPay,
-    //         twwRevenue
-    //     }));
-    // }, [booking.check_in, booking.check_out, booking.room_price, booking.food_price, booking.service_price, booking.advance_paid || 0]);
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setCustomer(prev => ({ ...prev, [name]: name === 'numberOfPeople' || name.includes('Amount') || name === 'food' || name === 'campFire' || name === 'advancePaid' ? +value : value }));
-    // };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -97,6 +82,7 @@ const Customer = () => {
         setCustomer({
             customer_id: '',
             customer_name: '',
+            user_type: 'CUSTOMER',
             phone: '',
             email: '',
             area: '',

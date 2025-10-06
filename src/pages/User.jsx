@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { validateUser, addUser, updateUser, getUserById } from '../modules/users.module';
 import { isUserInRoles } from '../contexts/constants';
 
+
 import '../styles.css'
 import '../css/user.large.css';
 import '../css/user.handheld.css';
@@ -14,12 +15,13 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectFade, Autoplay } from 'swiper';
 import 'swiper/css/effect-fade';
 import 'swiper/css';
+import { USER_TYPES } from '../modules/constants';
 
 const User = () => {
     const { id } = useParams();
     const location = useLocation();
     const preloadedUser = location.state?.preloadedUser;
-    const toUpdateUserId = location.state?.user_id;
+    const toUpdateUserId = location.state?.user_id;  
 
     const navigate = useNavigate();
     const [toUpdateUser, setToUpdateUser] = useState(false);
@@ -65,21 +67,6 @@ const User = () => {
         }
     }, [preloadedUser, id]);
 
-    // useEffect(() => {
-    //     setUser(prev => ({
-    //         ...prev,
-    //         numberOfNights,
-    //         commission,
-    //         balanceToPay,
-    //         twwRevenue
-    //     }));
-    // }, [booking.check_in, booking.check_out, booking.room_price, booking.food_price, booking.service_price, booking.advance_paid || 0]);
-
-    // const handleChange = (e) => {
-    //     const { name, value } = e.target;
-    //     setUser(prev => ({ ...prev, [name]: name === 'numberOfPeople' || name.includes('Amount') || name === 'food' || name === 'campFire' || name === 'advancePaid' ? +value : value }));
-    // };
-
     const handleChange = (e) => {
         const { name, value } = e.target;
 
@@ -98,6 +85,7 @@ const User = () => {
             user_id: '',
             username: '',
             password: '',
+            user_type: '',
             first_name: '',
             last_name: '',
             email: '',
@@ -127,9 +115,9 @@ const User = () => {
             // Update or Add User
             let createdUser = null;
             if (user.user_id) {
-                createdUser = await updateUser(navigate, { ...user, user_type: 'BOOKING-AGENT' });
+                createdUser = await updateUser(navigate, { ...user});
             } else {
-                createdUser = await addUser(navigate, { ...user, user_type: 'BOOKING-AGENT' });
+                createdUser = await addUser(navigate, { ...user});
             }
 
             navigate(location.state?.returnTo || '/booking/', {
@@ -188,6 +176,15 @@ const User = () => {
                     <div className='form-group'>
                         <label>Last Name:</label>
                         <input type="text" name="last_name" value={user.last_name} onChange={handleChange} />
+                    </div>
+
+                    <div className='form-group'>
+                        <label>User Type:</label>
+                        <select name="user_type" value={user.user_type} onChange={handleChange}>
+                            {USER_TYPES.map(type => (
+                                <option key={type} value={type}>{type}</option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className='form-group'>

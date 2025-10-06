@@ -70,6 +70,8 @@ export const validateCustomer = (customer) => {
 export const addCustomer = async (navigate, customer) => {
     console.debug("Customer.Module::addCustomer::Adding customer");
     try {
+        // Set default user_type if not provided
+        customer.user_type = customer.user_type || 'CUSTOMER';
         const response = await api.post("/customers/create", customer);
         return response.data?.customer || {}
     } catch (error) {
@@ -86,6 +88,7 @@ export const updateCustomer = async (navigate, customer) => {
     try {
         const response = await api.post("/customers/update", {
             ...customer,
+            user_type: customer.user_type || 'CUSTOMER',
             customer_id: customer.customer_id.toString()
         });
 
