@@ -22,6 +22,13 @@ import '../styles.css'
 import 'swiper/css/effect-fade';
 import 'swiper/css';
 
+const customStyles = {
+    container: (provided) => ({
+        ...provided,
+        width: '75%',
+    }),
+};
+
 const Booking = () => {
     const location = useLocation();
     const preloadedBooking = location.state?.preloadedBooking;
@@ -357,6 +364,7 @@ const Booking = () => {
                     <div className='form-group'>
                         <label htmlFor="customer_id">Guest</label>
                         <Select name="customer_id"
+                            styles={customStyles}
                             value={selectedCustomer}
                             onChange={handleCustomerChange}
                             options={customerOptions}
@@ -415,6 +423,7 @@ const Booking = () => {
                     <div className='form-group'>
                         <label>Source</label>
                         <Select name="source_of_booking_id"
+                            styles={customStyles}
                             value={selectedBookingSource}
                             onChange={handleBookingSourceChange}
                             options={userOptions}
