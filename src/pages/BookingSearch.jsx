@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import BookingList from "./BookingList";
 import { getAllAttachedBookings, getAllBookings, searchBookings } from "../modules/booking.module";
-import { getAllCustomers } from '../modules/customer.module';
+import { getAllBookingSources } from '../modules/users.module';
 
 import '../css/bookingSearch.large.css';
 import '../css/bookingSearch.handheld.css';
@@ -27,6 +27,23 @@ const BookingSearch = () => {
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // Reduced items per page for better mobile view
+  const [users, setUsers] = useState([]);
+  const [userOptions, setUserOptions] = useState([]);
+  const [selectedBookingSource, setSelectedBookingSource] = useState(null);
+
+  useEffect(() => {
+    getAllBookingSources(navigate).then(users => {
+      setUsers(users);
+      setUserOptions(users.map(u => ({
+        value: u.user_id,
+        label: `${u.first_name} ${u.last_name} - ${u.phone}`,
+      })));
+    }).catch(err => {
+      console.error('Booking::Error fetching users:', err);
+      toast.error('Failed to fetch users');
+    }).finally(() => {
+    })
+  }, [])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -107,7 +124,7 @@ const BookingSearch = () => {
         <div className="search-form" >
           <div className="search-field" >
             <label htmlFor="from_date">From Date:</label>
-            <input            
+            <input
               type="date"
               id="from_date"
               name="from_date"
@@ -153,6 +170,25 @@ const BookingSearch = () => {
             />
           </div>
 
+          <div className='search-field'>
+            <label>Source</label>
+            <Select name="source_of_booking_id"
+              value={selectedBookingSource}
+              onChange={e => {
+                setSearchCriteria(prev => ({ ...prev, source_of_booking_id: e.value }));
+                setSelectedBookingSource({
+                  value: e.value,
+                  label: e.label,
+                });
+              }}
+              options={userOptions}
+              placeholder="Select a referral..."
+              isSearchable={true}
+              classNamePrefix="react-select"
+              className="react-select-style"
+            />
+          </div>
+
           <button
             className="search-button"
             onClick={handleSearch}
@@ -168,7 +204,7 @@ const BookingSearch = () => {
               </span>
             ) : 'Search'}
           </button>
-          <button 
+          <button
             className="cancel-button"
             onClick={handleCancel}
             disabled={loading}
