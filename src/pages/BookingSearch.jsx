@@ -72,6 +72,10 @@ const BookingSearch = () => {
     setLoading(false);
     setSearchCriteria({});
     setResults([]);
+    setSelectedBookingSource({
+      value: 0,
+      label: 'Select a referral...',
+    });
   }
 
   const findAttachmentsForBooking = (booking_id) => {
