@@ -24,7 +24,17 @@
   }
 
   .booking-form-container form {
-    width: 95%;
+    width: 99%;
+  }
+
+  form .form-buttons {
+    display: flex;
+    max-width: 98%;
+    width: 100%;
+    flex-direction: row;
+    justify-content: wrap;
+    margin-top: 0.5rem;
+    margin-left: 1%;
   }
 
   .booking-form-container .button-primary,
@@ -139,13 +149,13 @@
 
   .form-buttons {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: space-around;
     margin-top: 2rem;
     gap: 10px;
   }
 
   .form-buttons button {
-    flex: 1;
     padding: 0.7rem 1rem;
     font-size: 1rem;
     font-weight: 600;
@@ -157,6 +167,22 @@
 
   .form-buttons button:hover {
     opacity: 0.9;
+  }
+
+  .form-group-row {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 0.5rem;
+    margin-left: 0.2rem;
+    font-weight: 600;
+  }
+
+  .form-group-row label {
+    font-weight: 600;
+    width: 33%;
+    margin-bottom: 0.4rem;
+    color: #555;
+    font-size: 1.2rem;
   }
 
   .button-primary {

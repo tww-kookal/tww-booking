@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { DEFAULT_BOOKING } from "../modules/constants";
+import { DEFAULT_BOOKING, REFUND_TO_GUEST } from "../modules/constants";
 import { calculateCommission, getCommissionPercent, parseNumber } from "../modules/common.module";
 import { getAllCustomers } from '../modules/customer.module';
 import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getPaymentsForBooking, getAllRooms, fetchAttachments } from '../modules/booking.module';
@@ -174,8 +174,9 @@ const Booking = () => {
                 setBooking(prev => ({
                     ...prev,
                     payments: payments || [],
-                    totalPaid: (payments || []).reduce((acc, p) => acc + parseNumber(p.payment_amount), 0),
-                    balanceToPay: calculateTotalAmount(booking) - parseNumber((payments || []).reduce((acc, p) => acc + parseNumber(p.payment_amount), 0)),
+                    // Calulate totalPaid when the acc_category_name is 'Refund to Guest' then that has to be negative
+                    totalPaid: (payments || []).reduce((acc, p) => acc + (p.acc_category_name === REFUND_TO_GUEST ? -parseNumber(p.payment_amount) : parseNumber(p.payment_amount)), 0),
+                    balanceToPay: calculateTotalAmount(booking) - parseNumber((payments || []).reduce((acc, p) => acc + (p.acc_category_name === REFUND_TO_GUEST ? -parseNumber(p.payment_amount) : parseNumber(p.payment_amount)), 0)),
                 }));
             });
         }
@@ -363,15 +364,9 @@ const Booking = () => {
                             placeholder="Select a guest..."
                             isSearchable={true}
                             classNamePrefix="react-select"
-                            className= "react-select-style"
+                            className="react-select-style"
                         />
-                        {/*                     <select isSearchable={true} id="customer_id" name="customer_id" value={booking.customer_id} onChange={handleChange}>
-                        <option value="">Select Customer</option>
-                        {customers.map(c => (
-                            <option key={c.customer_id} value={c.customer_id}>{c.customer_name} - {c.phone}</option>
-                        ))}
-                    </select>
- */}                </div>
+                    </div>
                     <div className='form-group-button' style={{ alignItems: "center" }}>
                         <label></label>
                         <button
@@ -422,7 +417,7 @@ const Booking = () => {
                             placeholder="Select a referral..."
                             isSearchable={true}
                             classNamePrefix="react-select"
-                            className= "react-select-style"
+                            className="react-select-style"
                         />
                     </div>
                     <div className='form-group-button' style={{ alignItems: "center" }}>
@@ -467,39 +462,48 @@ const Booking = () => {
                         </fieldset>
                         <fieldset>
                             <legend>Payments</legend>
-                            <div className='form-group'>
-                                <label>Total</label>
-                                <label>{booking.total_price}</label>
+                            <div className='form-group-row'>
+                                <label style={{ width: '25%', textAlign: 'left' }}>Total</label>
+                                <label style={{ width: '25%', textAlign: 'right' }}>{booking.total_price}</label>
+                            </div>
+                            <div className='form-group-row'>
+                                <label style={{ width: '25%', fontSize: "1rem", textAlign: 'right' }}><b>Date</b></label>
+                                <label style={{ width: '25%', fontSize: "1rem", textAlign: 'right' }}><b>Amount</b></label>
+                                &nbsp;&nbsp;&nbsp;
+                                <label style={{ width: '50%', fontSize: "1rem" }}><b>Description</b></label>
                             </div>
                             {booking.payments &&
                                 (booking.payments || []).map(p => (
-                                    <div key={p.booking_payments_id} className='form-group'>
-                                        <label style={{ fontSize: "1rem" }}>{p.payment_date}</label>
-                                        <label style={{ fontSize: "1rem" }}>{p.payment_amount}</label>
-                                        <label style={{ fontSize: "1rem" }}>{p.acc_category_name}</label>
+                                    <div key={p.booking_payments_id} className='form-group-row'>
+                                        <label style={{ width: '25%', fontSize: "1rem", textAlign: 'right' }}>{dayjs(p.payment_date).format('MMM DD, \'YY')}</label>
+                                        <label style={{ width: '25%', fontSize: "1rem", textAlign: 'right' }}>{p.acc_category_name === REFUND_TO_GUEST ? `-${p.payment_amount}` : p.payment_amount}</label>
+                                        &nbsp;&nbsp;&nbsp;
+                                        <label style={{ width: '50%', fontSize: "1rem" }}>{p.acc_category_name}&nbsp;
+                                            {p.remarks ? <i>{`[${p.remarks}]`}</i> : ''}
+                                        </label>
                                     </div>
                                 ))}
                             {/* when the booking.payments is availble then display hte totalPaid and balanceToPay */}
                             {booking.payments && (
-                                <div className='form-group'>
-                                    <label>Paid</label>
-                                    <label>{booking.totalPaid || 0}</label>
+                                <div className='form-group-row'>
+                                    <label style={{ width: '25%', textAlign: 'left' }}>Paid</label>
+                                    <label style={{ width: '25%', textAlign: 'right' }}>{booking.totalPaid || 0}</label>
                                 </div>
                             )}
 
                             {booking.payments && (
-                                <div className='form-group'>
-                                    <label>Balance</label>
-                                    <label>{Math.round(booking.total_price - booking.totalPaid, 2)}</label>
+                                <div className='form-group-row'>
+                                    <label style={{ width: '25%', textAlign: 'left' }}>Balance</label>
+                                    <label style={{ width: '25%', textAlign: 'right' }}>{Math.round(booking.total_price - booking.totalPaid, 2)}</label>
                                 </div>
                             )}
-                            <div className='form-group-button' style={{ maxWidth: '100%', alignItems: "center", width: '100%' }}>                                
+                            <div className='form-group-button' style={{ alignItems: "center" }}>
                                 <label></label>
                                 {preloadedBooking && preloadedBooking.booking_id && (
                                     <button
                                         type="button"
                                         onClick={() => navigate('/payments', { state: { returnTo: '/booking', booking: booking, users: users } })}
-                                        style={{ width: '60%' }}>Manage Payments</button>
+                                        style={{ width: '60%', padding: '4px 8px' }}>Manage Payments</button>
                                 )}
                             </div>
 

@@ -5,9 +5,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { updatePayment, addPayment, deletePaymentById } from '../modules/payment.module';
-import { PAYMENT_TYPE } from '../modules/constants';
+import { PAYMENT_TYPE, REFUND_TO_GUEST } from '../modules/constants';
 import { getAllAccountingCategories } from '../modules/accounting.module';
-import { getAllBookingSources } from '../modules/users.module'
+import { getAllEmployees } from '../modules/users.module'
 import { getUserContext } from '../contexts/constants';
 
 import '../css/payment.large.css';
@@ -44,7 +44,7 @@ const Payments = () => {
     }, []);
 
     useEffect(() => {
-        getAllBookingSources(navigate).then(users => {
+        getAllEmployees(navigate).then(users => {
             setAccPartiesOptions(users.map(u => ({
                 value: u.user_id,
                 label: `${u.first_name} ${u.last_name} - ${u.phone}`
@@ -101,6 +101,11 @@ const Payments = () => {
         ]);
     };
 
+    const isPaymentForRefundToGuest = (paymentFor) => {
+        const paymentForLabel = (accCategoryOptions.find(u => u.value === paymentFor)?.label || '');
+        return paymentForLabel.includes(REFUND_TO_GUEST) ;
+    }
+
     const getSelectedAccCategory = (payment_for) => {
         return accCategoryOptions.find(u => u.value === payment_for);
     }
@@ -111,6 +116,7 @@ const Payments = () => {
 
     const handleUpdate = async (payment) => {
         try {
+            payment.payment_to = isPaymentForRefundToGuest(payment.payment_for) ? booking?.customer_id || 0 : payment.payment_to;
             const updatedPayment = await updatePayment(navigate, payment);
             setPayments(payments.map(p => p.booking_payments_id === payment.booking_payments_id ? payment : p));
             setBooking({
@@ -143,7 +149,8 @@ const Payments = () => {
     }
 
     const handleAddNew = async (payment) => {
-        try {
+        try {            
+            payment.payment_to = isPaymentForRefundToGuest(payment.payment_for) ? booking?.customer_id || 0 : payment.payment_to;
             const addedPayment = await addPayment(navigate, payment);
             toast.success("Payment added successfully");
             setPayments(payments.map(p => p.booking_payments_id === -999 ? addedPayment : p));
@@ -233,6 +240,13 @@ const Payments = () => {
                         <div className="form-group">
                             <label>Pay To</label>
                             <Select name="payment_to"
+                                isDisabled={isPaymentForRefundToGuest(payment.payment_for)}
+                                styles = {{
+                                    container: (base) => ({
+                                        ...base,
+                                        display: isPaymentForRefundToGuest(payment.payment_for) ? 'none' : 'block'
+                                    })
+                                }}
                                 value={getSelectePaymentTo(payment.payment_to)}
                                 onChange={e => {
                                     payment.payment_to = e.value;
@@ -247,6 +261,9 @@ const Payments = () => {
                                 classNamePrefix="react-select"
                                 className="react-select-style"
                             />
+                            <label style={{ display: isPaymentForRefundToGuest(payment.payment_for) ? 'block' : 'none', width: '100%', maxWidth: '75%', color: 'blue' }}>
+                                <small>{booking?.customer_name} [Guest]</small>
+                            </label>
                         </div>
                         <div className="form-group">
                             <label>Remarks</label>
