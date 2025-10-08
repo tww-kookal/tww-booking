@@ -493,13 +493,13 @@ const Booking = () => {
                                     <label>{Math.round(booking.total_price - booking.totalPaid, 2)}</label>
                                 </div>
                             )}
-                            <div className='form-group' style={{ alignItems: "center" }}>
+                            <div className='form-group-button' style={{ maxWidth: '100%', alignItems: "center", width: '100%' }}>                                
                                 <label></label>
                                 {preloadedBooking && preloadedBooking.booking_id && (
                                     <button
                                         type="button"
                                         onClick={() => navigate('/payments', { state: { returnTo: '/booking', booking: booking, users: users } })}
-                                        style={{ padding: '4px 8px' }}>Manage Payments</button>
+                                        style={{ width: '60%' }}>Manage Payments</button>
                                 )}
                             </div>
 
