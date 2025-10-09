@@ -6,7 +6,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { DEFAULT_BOOKING, REFUND_TO_GUEST, COMMISSION_PAYOUT } from "../modules/constants";
-import { calculateCommission, getCommissionPercent, parseNumber } from "../modules/common.module";
+import { calculateCommission, getCommissionPercent, parseNumber} from "../modules/common.module";
+import { LOADING_DOTS } from './Common';
 import { getAllCustomers } from '../modules/customer.module';
 import { calculateTotalPaid, validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getPaymentsForBooking, getAllRooms, fetchAttachments } from '../modules/booking.module';
 import { getAllBookingSources } from '../modules/users.module';
@@ -27,6 +28,9 @@ const Booking = () => {
     const preloadedBooking = location.state?.preloadedBooking;
     const checkInDate = location.state?.checkInDate || dayjs().format("YYYY-MM-DD");  //If from Availability chart to book a room
     const selectedRoom = location.state?.selectedRoom || undefined;
+
+    const [isCustomerLoading, setIsCustomerLoading] = useState(true);
+    const [isBookingSourceLoading, setIsBookingSourceLoading] = useState(true);
     const [isPaymentLoading, setIsPaymentLoading] = useState(true);
 
     const navigate = useNavigate();
@@ -98,6 +102,7 @@ const Booking = () => {
     }, [location.state]);
 
     useEffect(() => {
+        setIsBookingSourceLoading(true);
         getAllBookingSources(navigate).then(users => {
             setUsers(users);
             setUserOptions(users.map(u => ({
@@ -118,10 +123,12 @@ const Booking = () => {
             console.error('Booking::Error fetching users:', err);
             toast.error('Failed to fetch users');
         }).finally(() => {
+            setIsBookingSourceLoading(false);
         })
     }, [])
 
     useEffect(() => {
+        setIsCustomerLoading(true);
         getAllCustomers(navigate).then(customers => {
             setCustomers(customers);
             setCustomerOptions(customers.map(c => ({
@@ -143,6 +150,7 @@ const Booking = () => {
             console.error('Booking::Error fetching customers:', err);
             toast.error('Failed to fetch customers');
         }).finally(() => {
+            setIsCustomerLoading(false);
         })
     }, [])
 
@@ -362,8 +370,12 @@ const Booking = () => {
                     </div>
 
                     <div className='form-group'>
-                        <label htmlFor="customer_id">Guest</label>
+                        <label htmlFor="customer_id">
+                            {isCustomerLoading ? 'Loading Guests' : 'Guest'}
+                            {isCustomerLoading && <LOADING_DOTS />}
+                        </label>
                         <Select name="customer_id"
+                            isDisabled={isCustomerLoading}
                             value={selectedCustomer}
                             onChange={handleCustomerChange}
                             options={customerOptions}
@@ -415,8 +427,12 @@ const Booking = () => {
                     }
 
                     <div className='form-group'>
-                        <label>Source</label>
+                        <label>
+                            {isBookingSourceLoading ? 'Loading Source' : 'Source'}
+                            {isBookingSourceLoading && <LOADING_DOTS />}
+                        </label>
                         <Select name="source_of_booking_id"
+                            isDisabled={isBookingSourceLoading}
                             value={selectedBookingSource}
                             onChange={handleBookingSourceChange}
                             options={userOptions}

@@ -29,6 +29,7 @@ const Payments = () => {
     const [selectedPaymentTo, setSelectedPaymentTo] = useState();
     const [selectedPaidBy, setSelectedPaidBy] = useState();
     const [accPartiesOptions, setAccPartiesOptions] = useState([])
+    const [editingPaymentId, setEditingPaymentId] = useState(null);
 
     useEffect(() => {
         getAllAccountingCategories(navigate).then(accCategories => {
@@ -196,6 +197,7 @@ const Payments = () => {
                 payments: [booking.payments.map(p => p.booking_payments_id === payment.booking_payments_id ? payment : p)]
             })
             toast.success("Payment updated successfully");
+            setEditingPaymentId(null);
         } catch (err) {
             console.error('Payments::handleUpdate:', err);
             toast.error("Error updating payment");
@@ -237,6 +239,12 @@ const Payments = () => {
         setPayments(payments.filter(p => p.booking_payments_id !== payment.booking_payments_id));
     }
 
+    const handleCancelEdit = () => {
+        const originalPayment = location.state.booking.payments.find(p => p.booking_payments_id === editingPaymentId);
+        setPayments(payments.map(p => p.booking_payments_id === editingPaymentId ? originalPayment : p));
+        setEditingPaymentId(null);
+    };
+
     const handleCancel = () => {
         navigate(location.state?.returnTo || '/booking/', {
             state: {
@@ -272,6 +280,7 @@ const Payments = () => {
                                 name="payment_date"
                                 value={dayjs(payment.payment_date).format('YYYY-MM-DD')}
                                 onChange={(e) => handleChange(index, e)}
+                                disabled={payment.booking_payments_id !== -999 && editingPaymentId !== payment.booking_payments_id}
                             />
                         </div>
                         <div className="form-group">
@@ -291,6 +300,7 @@ const Payments = () => {
                                 isSearchable={true}
                                 classNamePrefix="react-select"
                                 className="react-select-style"
+                                isDisabled={payment.booking_payments_id !== -999 && editingPaymentId !== payment.booking_payments_id}
                             />
                         </div>
                         <div className="form-group">
@@ -301,11 +311,12 @@ const Payments = () => {
                                 placeholder="Amount"
                                 value={payment.payment_amount}
                                 onChange={(e) => handleChange(index, e)}
+                                disabled={payment.booking_payments_id !== -999 && editingPaymentId !== payment.booking_payments_id}
                             />
                         </div>
                         <div className="form-group">
                             <label>Mode</label>
-                            <select name="payment_type" value={payment.payment_type} onChange={(e) => handleChange(index, e)}>
+                            <select name="payment_type" value={payment.payment_type} onChange={(e) => handleChange(index, e)} disabled={payment.booking_payments_id !== -999 && editingPaymentId !== payment.booking_payments_id}>
                                 <option value="">Select Type</option>
                                 {PAYMENT_TYPE && PAYMENT_TYPE.length > 0 && PAYMENT_TYPE.map(type => (
                                     <option key={type.id} value={type.id}>{type.value}</option>
@@ -316,7 +327,7 @@ const Payments = () => {
                         <div className="form-group">
                             <label>Paid By</label>
                             <Select name="paid_by"
-                                isDisabled={!isPaidByVisibleBasedOnPaymentFor(payment.payment_for)}
+                                isDisabled={!isPaidByVisibleBasedOnPaymentFor(payment.payment_for) || (payment.booking_payments_id !== -999 && editingPaymentId !== payment.booking_payments_id)}
                                 styles={{
                                     container: (base) => ({
                                         ...base,
@@ -345,7 +356,7 @@ const Payments = () => {
                         <div className="form-group">
                             <label>Pay To</label>
                             <Select name="payment_to"
-                                isDisabled={isPayToVisibleBasedOnPaymentFor(payment.payment_for)}
+                                isDisabled={isPayToVisibleBasedOnPaymentFor(payment.payment_for) || (payment.booking_payments_id !== -999 && editingPaymentId !== payment.booking_payments_id)}
                                 styles={{
                                     container: (base) => ({
                                         ...base,
@@ -377,6 +388,7 @@ const Payments = () => {
                                 placeholder="Remarks"
                                 value={payment.remarks}
                                 onChange={(e) => handleChange(index, e)}
+                                disabled={payment.booking_payments_id !== -999 && editingPaymentId !== payment.booking_payments_id}
                             />
                         </div>
                         {(payment.booking_payments_id === -999) ?
@@ -387,7 +399,14 @@ const Payments = () => {
                             :
                             <div className="form-buttons">
                                 <button onClick={() => handleDelete(payment)} className="button-delete" >Delete</button>
-                                <button onClick={() => handleUpdate(payment)} className="button-update" >Update</button>
+                                {editingPaymentId === payment.booking_payments_id ? (
+                                    <>
+                                        <button onClick={handleCancelEdit} className="button-secondary">Cancel</button>
+                                        <button onClick={() => handleUpdate(payment)} className="button-update">Update</button>
+                                    </>
+                                ) : (
+                                    <button onClick={() => setEditingPaymentId(payment.booking_payments_id)} className="button-primary">Edit</button>
+                                )}
                             </div>
                         }
                     </div>
