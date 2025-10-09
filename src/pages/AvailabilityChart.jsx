@@ -12,7 +12,6 @@ import { prepareChartData, getStartingCharacters, getDisplayText, getStatusColor
 import '../css/availabilityChart.handheld.css';
 import '../css/availabilityChart.large.css';
 import { getAllBookings, getBooking, getAllRooms } from '../modules/booking.module';
-import { getAvailability} from '../modules/gateway.module';
 
 const AvailabilityChart = ({ startDate: propStartDate }) => {
     const [loading, setLoading] = useState(true);
@@ -39,19 +38,24 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                 Array.from({ length: DEFAULT_NUMBER_OF_DAYS }, (_, i) => startDate.add(i, "day").format("YYYY-MM-DD"))
             );
 
-            getAvailability(navigate, startDate.format("YYYY-MM-DD")).then(availability => {
-                //Set Rooms
-                setRooms(availability?.rooms || []);                    
-
-                //Prepare ChartData based on bookings Set Bookings
-                const allData = prepareChartData(availability?.bookings || [], dateSet, memoizedDates);
-                setData(allData);
+            getAllRooms(navigate).then(rooms => {
+                setRooms(rooms || []);
             }).catch(err => {
-                console.error("AvailabilityChart::Error fetching availability:", err);
-                toast.error("Unable to get the availability");
+                console.error("AvailabilityChart::Error fetching rooms:", err);
+                toast.error("Unable to get the rooms");
                 setRooms([]);
             }).finally(() => {
             })
+
+            getAllBookings(navigate, startDate.format("YYYY-MM-DD")).then(bookings => {
+                const allData = prepareChartData(bookings, dateSet, memoizedDates);
+                setData(allData);
+            }).catch(err => {
+                console.error("AvailabilityChart::Error fetching data:", err);
+                toast.error("Failed to fetch bookings. Please try again.");
+                setData([]);
+            }).finally(() => {
+            });
         };
         filterBookings();
     }, [startDate, propStartDate]);

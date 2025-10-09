@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../css/dashboard.handheld.css';
 import '../css/dashboard.large.css';
 import { getStartingCharacters } from '../modules/common.module';
-import { getDashboard } from '../modules/gateway.module';
+import { getAllBookings, getGuestsForDay } from '../modules/booking.module';
 import { BOOKING_STATUS } from '../modules/constants';
 import { isUserInRoles } from '../contexts/constants';
 import dayjs from 'dayjs';
@@ -34,9 +34,11 @@ const Dashboard = () => {
   const fetchBookingStats = async () => {
     // No loading state set here to allow immediate render with default values
 
-    getDashboard(navigate).then(dashboard => {
-      setGuestsForDay(dashboard?.guests_for_day || 0);
-      const bookings = dashboard?.bookings || [];
+    getGuestsForDay(navigate).then(guests => {
+      setGuestsForDay(guests);
+    });
+
+    getAllBookings(navigate).then(bookings => {
       if (bookings) {
         const today = new dayjs().format("YYYY-MM-DD");
         // Calculate stats
