@@ -111,19 +111,17 @@ const Customer = () => {
 
         try {
             // Update or Add Customer
-            console.debug("Customer::With Customer ID ", customer.customer_id)
             let createdCustomer = null;
             if (customer.customer_id) {
                 createdCustomer = await updateCustomer(navigate, customer);
             } else {
                 createdCustomer = await addCustomer(navigate, customer);
             }
-
             navigate(location.state?.returnTo || '/booking/', {
                 state: {
                     ...location.state,
                     createdCustomer: createdCustomer,
-                    toUpdateCustomer: toUpdateCustomer
+                    toUpdateCustomer: true
                 }
             });
         } catch (error) {

@@ -74,7 +74,7 @@ const Booking = () => {
                 setSelectedCustomer({
                     value: location.state.createdCustomer.customer_id,
                     label: `${location.state.createdCustomer.customer_name} - ${location.state.createdCustomer.phone || '--'}`,
-                })
+                });
             }
             setBooking(prev => ({
                 ...prev,
