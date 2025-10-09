@@ -65,7 +65,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
     };
 
     const onBookingClick = (booking, selectedDate, selectedRoom) => {
-        console.debug("Is Injected or Actual ")
+        console.debug("Is Injected or Actual ", booking, booking.booking_id)
         if (booking.chart_data === 'ACTUAL') {
             getBooking(navigate, booking.booking_id).then(booking => {
                 navigate("/booking", { state: { preloadedBooking: booking } })
@@ -73,7 +73,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                 console.error("AvailabilityChart::Error fetching booking:", err);
                 toast.error("Failed to fetch booking. Please try again.");
             })
-        } else if (booking.chart_data === 'INJECTED') {
+        } else if (booking.chart_data === 'INJECTED' && booking.chart_status === 'available') {
             // Navigate to booking to create a new booking
             navigate("/booking", { state: { checkInDate: selectedDate, selectedRoom: selectedRoom } })
         }
@@ -203,7 +203,7 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
                         onChange={handleDateChange}
                     />
                 </div>
-                <div style={{ position: 'relative', maxWidth: '100%', width: '100%', justifyContent: 'center', alignItems: 'center', height: '80vh', backgroundColor: 'black' }}>
+                <div className='room-chart-inner-container'>
                     {chartLoading && (
                         <div className='glass-pane'>
                             <div className="loading-spinner-large" />

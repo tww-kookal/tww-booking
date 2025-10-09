@@ -172,7 +172,7 @@ const Booking = () => {
                 remarks: preloadedBooking.remarks || '',
             });
 
-            fetchAttachments(preloadedBooking?.booking_id, true).then(files => {
+            const attachmentPromise = fetchAttachments(preloadedBooking?.booking_id, true).then(files => {
                 console.debug("Attachment for booking in booking.jsx ")
                 setBooking(prev => ({
                     ...prev,
@@ -180,16 +180,19 @@ const Booking = () => {
                 }));
                 console.debug("PreLoaded Booking ")
             });
-            getPaymentsForBooking(navigate, preloadedBooking?.booking_id).then(payments => {
+            const paymentsPromise = getPaymentsForBooking(navigate, preloadedBooking?.booking_id).then(payments => {
                 setBooking(prev => ({
                     ...prev,
                     payments: payments || [],
                     totalPaid: calculateTotalPaid(payments || []),
                     balanceToPay: calculateTotalAmount(booking) - calculateTotalPaid(payments || []),
                 }));
+            });
+            Promise.all([attachmentPromise, paymentsPromise]).then(() => {
                 setIsPaymentLoading(false);
             });
         }
+        setIsPaymentLoading(false);
     }, [preloadedBooking]);
 
     const calculateTWWRevenue = (booking) => {

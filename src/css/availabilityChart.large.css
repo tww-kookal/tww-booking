@@ -70,11 +70,15 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .loading {
-        text-align: center;
-        padding: 2rem;
-        color: #666;
-        font-style: italic;
+    .room-chart-inner-container {
+        border-radius: 12px;
+        position: relative;
+        max-width: 100%;
+        width: 99%;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+        background-color: rgb(255, 255, 255);    
     }
 
     .error-message {
