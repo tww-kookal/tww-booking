@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { updatePayment, addPayment, deletePaymentById } from '../modules/payment.module';
-import { PAYMENT_TYPE, REFUND_TO_GUEST } from '../modules/constants';
+import { PAYMENT_TYPE, REFUND_TO_GUEST, COMMISSION_PAYOUT } from '../modules/constants';
 import { getAllAccountingCategories } from '../modules/accounting.module';
 import { getAllEmployees } from '../modules/users.module'
 import { getUserContext } from '../contexts/constants';
@@ -69,6 +69,7 @@ const Payments = () => {
     useEffect(() => {
         if (location.state.booking) {
             setPayments(location.state.booking.payments || []);
+            console.log('Payments::booking:', location.state.booking);
             setBooking(location.state.booking);
         }
     }, [location.state]);
@@ -101,11 +102,6 @@ const Payments = () => {
         ]);
     };
 
-    const isPaymentForRefundToGuest = (paymentFor) => {
-        const paymentForLabel = (accCategoryOptions.find(u => u.value === paymentFor)?.label || '');
-        return paymentForLabel.includes(REFUND_TO_GUEST) ;
-    }
-
     const getSelectedAccCategory = (payment_for) => {
         return accCategoryOptions.find(u => u.value === payment_for);
     }
@@ -114,9 +110,53 @@ const Payments = () => {
         return accPartiesOptions.find(u => u.value === payment_to);
     }
 
+    const getDisplayPaymentToBasedOnPaymentFor = (payment) => {
+        if (isPaymentForRefundToGuest(payment.payment_for)) {
+            if (!booking || !booking.customer_id || !booking.customer_name) {
+            }
+            return `${booking?.customer_name} [Guest]`
+        } else if (isPaymentForCommissionPayout(payment.payment_for)) {
+            if (!booking || !booking.source_of_booking_id || !booking.source_of_booking) {
+            }
+            return `${booking?.source_of_booking}`
+        } else {
+            return 'ERR!!!';
+        }
+    }
+
+    const getPaymentToBasedOnPaymentFor = (payment) => {
+        if (isPaymentForRefundToGuest(payment.payment_for)) {
+            if (!booking || !booking.customer_id) {
+                throw new Error('Refund to Guest must be to the customer');
+            }
+            return booking?.customer_id || 0;
+        } else if (isPaymentForCommissionPayout(payment.payment_for)) {
+            if (!booking || !booking.source_of_booking_id) {
+                throw new Error('Commission Payout must be to the source of booking');
+            }
+            return booking?.source_of_booking_id || 0;
+        } else {
+            return payment.payment_to;
+        }
+    }
+
+    const isPayToVisibleBasedOnPaymentFor = (paymentFor) => {
+        return isPaymentForRefundToGuest(paymentFor) || isPaymentForCommissionPayout(paymentFor);
+    }
+
+    const isPaymentForRefundToGuest = (paymentFor) => {
+        const paymentForLabel = (accCategoryOptions.find(u => u.value === paymentFor)?.label || '');
+        return paymentForLabel.includes(REFUND_TO_GUEST);
+    }
+
+    const isPaymentForCommissionPayout = (paymentFor) => {
+        const paymentForLabel = (accCategoryOptions.find(u => u.value === paymentFor)?.label || '');
+        return paymentForLabel.includes(COMMISSION_PAYOUT);
+    }
+
     const handleUpdate = async (payment) => {
         try {
-            payment.payment_to = isPaymentForRefundToGuest(payment.payment_for) ? booking?.customer_id || 0 : payment.payment_to;
+            payment.payment_to = getPaymentToBasedOnPaymentFor(payment);
             const updatedPayment = await updatePayment(navigate, payment);
             setPayments(payments.map(p => p.booking_payments_id === payment.booking_payments_id ? payment : p));
             setBooking({
@@ -125,7 +165,24 @@ const Payments = () => {
             })
             toast.success("Payment updated successfully");
         } catch (err) {
+            console.error('Payments::handleUpdate:', err);
             toast.error("Error updating payment");
+        }
+    }
+
+    const handleAddNew = async (payment) => {
+        try {
+            payment.payment_to = getPaymentToBasedOnPaymentFor(payment);
+            const addedPayment = await addPayment(navigate, payment);
+            toast.success("Payment added successfully");
+            setPayments(payments.map(p => p.booking_payments_id === -999 ? addedPayment : p));
+            setBooking({
+                ...booking,
+                payments: [...booking.payments, addedPayment]
+            })
+        } catch (err) {
+            console.error('Payments::handleAddNew:', err);
+            toast.error("Error adding payment");
         }
     }
 
@@ -146,21 +203,6 @@ const Payments = () => {
 
     const handleRemove = (payment) => {
         setPayments(payments.filter(p => p.booking_payments_id !== payment.booking_payments_id));
-    }
-
-    const handleAddNew = async (payment) => {
-        try {            
-            payment.payment_to = isPaymentForRefundToGuest(payment.payment_for) ? booking?.customer_id || 0 : payment.payment_to;
-            const addedPayment = await addPayment(navigate, payment);
-            toast.success("Payment added successfully");
-            setPayments(payments.map(p => p.booking_payments_id === -999 ? addedPayment : p));
-            setBooking({
-                ...booking,
-                payments: [...booking.payments, addedPayment]
-            })
-        } catch (err) {
-            toast.error("Error adding payment");
-        }
     }
 
     const handleCancel = () => {
@@ -210,6 +252,7 @@ const Payments = () => {
                                         value: e.value,
                                         label: e.label,
                                     });
+                                    payment.payment_amount = booking.commission || 0;
                                 }}
                                 options={accCategoryOptions}
                                 placeholder="Select a payment for..."
@@ -240,11 +283,11 @@ const Payments = () => {
                         <div className="form-group">
                             <label>Pay To</label>
                             <Select name="payment_to"
-                                isDisabled={isPaymentForRefundToGuest(payment.payment_for)}
-                                styles = {{
+                                isDisabled={isPayToVisibleBasedOnPaymentFor(payment.payment_for)}
+                                styles={{
                                     container: (base) => ({
                                         ...base,
-                                        display: isPaymentForRefundToGuest(payment.payment_for) ? 'none' : 'block'
+                                        display: !isPayToVisibleBasedOnPaymentFor(payment.payment_for) ? 'block' : 'none'
                                     })
                                 }}
                                 value={getSelectePaymentTo(payment.payment_to)}
@@ -261,8 +304,8 @@ const Payments = () => {
                                 classNamePrefix="react-select"
                                 className="react-select-style"
                             />
-                            <label style={{ display: isPaymentForRefundToGuest(payment.payment_for) ? 'block' : 'none', width: '100%', maxWidth: '75%', color: 'blue' }}>
-                                <small>{booking?.customer_name} [Guest]</small>
+                            <label style={{ display: isPayToVisibleBasedOnPaymentFor(payment.payment_for) ? 'block' : 'none', width: '100%', maxWidth: '75%', color: 'blue' }}>
+                                <small>{getDisplayPaymentToBasedOnPaymentFor(payment)}</small>
                             </label>
                         </div>
                         <div className="form-group">

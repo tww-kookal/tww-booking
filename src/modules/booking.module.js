@@ -3,7 +3,7 @@ import api from './apiClient';
 import { FOLDER_ID } from '../modules/config';
 import { getUserContext } from '../contexts/constants';
 import html2canvas from 'html2canvas';
-
+import { COMMISSION_PAYOUT, REFUND_TO_GUEST } from './constants';
 
 /**
  * Searches for bookings based on the provided search criteria.
@@ -384,39 +384,81 @@ export const getPaymentsForBooking = async (navigate, booking_id) => {
     }
 }
 
+export const calculateTotalPaid = (payments) => {
+    // Calulate totalPaid when the acc_category_name is 'Refund to Guest' then that has to be negative 
+    // and if the acc_category_name is 'Commission Payout' do not add to totalPaid
+    return payments.reduce((acc, p) => {
+        const amount = parseFloat(p.payment_amount) || 0;
+        if (p.acc_category_name === REFUND_TO_GUEST) {
+            return acc - amount;
+        } else if (p.acc_category_name === COMMISSION_PAYOUT) {
+            return acc; // Skip adding this payment
+        } else {
+            return acc + amount;
+        }
+    }, 0);
+}
+
 export const handleGenerateReceipt = (booking) => {
     // Create a printable receipt
     const receiptWindow = window.open('', '_blank');
-    const paidSoFar = booking.payments ? booking.payments.reduce((acc, payment) => acc + ((payment.payment_for == 'refund') ? 0 : payment.payment_amount), 0) : 0;
+    const paidSoFar = calculateTotalPaid(booking.payments || []);
     const balance = booking.total_price - paidSoFar;
-    const watermarkImages = ["./images/0.jpg", "./images/1.jpg", "./images/2.jpg", "./images/3.jpg", "./images/4.jpg", "./images/5.jpg", "./images/6.png"];    
+    const watermarkImages = ["./images/0.jpg", "./images/1.jpg", "./images/2.jpg", "./images/3.jpg", "./images/4.jpg", "./images/5.jpg", "./images/6.png"];
 
     // Pick a random one on each render
-    const watermarkImage =
-        watermarkImages[Math.floor(Math.random() * watermarkImages.length)];
-    console.log("watermarkImage", watermarkImage)
+    const watermarkImage = watermarkImages[Math.floor(Math.random() * watermarkImages.length)];
     const paymentRows = booking.payments && booking.payments.length > 0 ? `
         <table width="100%">
             <tr>
                 <td colspan="5"><font style={{ color: 'darkgray' }}><B><big>P A Y M E N T S</big></b></font></td>
             </tr>
             <tr>
-                <td width="10%"><b>Date</b></td>
-                <td width="10%"><b>For</b></td>
-                <td width="10%"><b>Type</b></td>
-                <td width="55%"><b>Remarks</b></td>
-                <td width="15%" align="right"><b>Amount</b></td>
-            ${booking.payments.map(payment => `                
+                <td width="25%"><b>Date</b></td>
+                <td width="25%"><b>For</b></td>
+                <td width="25%"><b>Type</b></td>
+                <!-- <td width="50%"><b>Remarks</b></td> -->
+                <td width="25%" align="right"><b>Amount</b></td>
+            ${booking.payments
+            .filter(payment => payment.acc_category_name !== COMMISSION_PAYOUT)
+            .map(payment => `                
                 <tr>
-                    <td>${dayjs(payment.payment_date).format('DD-MM-YY')}</td>
+                    <td>${dayjs(payment.payment_date).format('MMM DD \'YY')}</td>
                     <td>${payment.acc_category_name}</td>
                     <td>${payment.payment_type}</td>
-                    <td>${payment.remarks}</td>
+                    <!-- <td>${payment.remarks}</td> -->
                     <td align="right">${Math.round(payment.payment_amount)}</td>
                 </tr>
             `).join('')}
             <tr><td colspan="5"><hr /></td></tr>
         </table>
+    ` : '';
+
+    const foodRows = booking.food_price || 0 > 0 ? `
+        <tr>
+            <td>
+            <font style={{ color: 'darkgray' }}>Food Price</font>
+            </td>
+            <td align="right"> &nbsp;${Math.round(booking.food_price)} </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+            <hr />
+            </td>
+        </tr>
+    ` : '';
+    const serviceRows = booking.service_price || 0 > 0 ? `
+        <tr>
+            <td>
+            <font style={{ color: 'darkgray' }}>Camp Fire</font>
+            </td>
+            <td align="right"> &nbsp;${Math.round(booking.service_price)} </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+            <hr />
+            </td>
+        </tr>
     ` : '';
     receiptWindow.document.write(`
             <html>
@@ -464,7 +506,38 @@ export const handleGenerateReceipt = (booking) => {
                         @media print { .no-print { display: none; } }
                         .watermark-layer {opacity: 0.8; position: absolute; width: 100%; height: 100%; z-index: 0; scale: 0.57; top: 15%; left: -300;  }
                         .watermark-image {opacity: 0.3; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-                    </style>
+                            .button-style {
+                                width: 95%;
+                                height: 40px;
+                                font-size: 16px;
+                                font-weight: 600;
+                                background: linear-gradient(145deg, #0078d4, #005fa3); /* Elegant blue gradient */
+                                color: #ffffff;
+                                border: none;
+                                border-radius: 8px;
+                                cursor: pointer;
+                                box-shadow: 0 4px 0 #004a80, 0 6px 15px rgba(0, 0, 0, 0.15);
+                                transition: 
+                                    background-color 0.3s ease,
+                                    box-shadow 0.3s ease,
+                                    transform 0.2s ease,
+                                    opacity 0.3s ease;
+                            }
+
+                            /* Hover effect: lighter color, raised look, opacity shift */
+                            .button-style:hover {
+                                background: linear-gradient(145deg, #1890ff, #0073cc);
+                                opacity: 0.95;
+                                box-shadow: 0 6px 0 #004a80, 0 8px 20px rgba(0, 0, 0, 0.25);
+                                transform: translateY(-2px);
+                            }
+
+                            /* Active: pressed-down illusion */
+                            .button-style:active {
+                                transform: translateY(2px);
+                                box-shadow: 0 2px 0 #004a80, 0 4px 10px rgba(0, 0, 0, 0.2);
+                            }
+                        </style>
                     <script>
                         function downloadAsImage() {
                             const content = document.getElementById('booking_receipt_content');
@@ -541,11 +614,7 @@ export const handleGenerateReceipt = (booking) => {
                                             <tr>
                                                 <td colspan="2"><label>&nbsp;</label></td>
                                             </tr>
-                    <!--                         <tr>
-                                                <td colspan="2"><label>For your reference, Booking ID is <strong>${booking.booking_id}.</strong></label>
-                                                </td>
-                                            </tr>
-                    -->                        <tr>
+                                            <tr>
                                                 <td colspan="2"><label><strong>Total amount payable for this booking is INR ${Math.round(booking.total_price)}/- as per
                                                 the details below.</strong></label></td>
                                             </tr>
@@ -567,77 +636,19 @@ export const handleGenerateReceipt = (booking) => {
                                                         <td><label><strong>Payment Breakup</strong></label></td>
                                                         <td align="right"><small><font style={{ color: 'darkgray' }}>All prices indicated below are in INR </font></small></td>
                                                     </tr>
-                                                    <!--<tr>
-                                                        <td colspan="2"><font style={{ color: 'darkgray' }}>TARRIF</font></td>
-                                                    </tr> -->
                                                     <tr>
                                                         <td>
-                                                        <!--<label> Property Sell Price<br /></label>-->
                                                         <font style={{ color: 'darkgray' }}>${booking.room_name} for ${booking.number_of_nights} Night(s)</font>
                                                         </td>
-                                                        <td align="right"> &nbsp;${Math.round(booking.total_price)} </td>
+                                                        <td align="right"> &nbsp;${Math.round(booking.room_price)} </td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="2">
                                                         <hr />
                                                         </td>
                                                     </tr>
-                                                    <!-- <tr>
-                                                        <td><label>Extra Adult / Child Charges</label></td>
-                                                        <td align="right"> {formData.extraChildren} </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">
-                                                        <hr />
-                                                        </td>
-                                                    </tr> 
-                                                    <tr>
-                                                        <td><label>Voluntary Property Driven
-                                                        Coupon Discount </label></td>
-                                                        <td align="right"> ${booking.discount || 0} </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">
-                                                        <hr />
-                                                        </td>
-                                                    </tr> -->
-                                                    <!-- <tr>
-                                                        <td><label>Property Gross Charges </label></td>
-                                                        <td align="right"> ${booking.total_price} </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">
-                                                        <hr />
-                                                        </td>
-                                                    </tr> -->
-                                                    <!-- <tr>
-                                                        <td><label>Agent Commission</label></td>
-                                                        <td align="right"> ${booking.commission || 0} </td>
-                                                    </tr> 
-                                                    <tr>
-                                                        <td colspan="2">
-                                                        <hr />
-                                                        </td>
-                                                    </tr> -->
-                                                    <!-- <tr>
-                                                        <td><label>GST @ 18%</label><br /><font style={{ color: 'darkgray' }}>(Including IGST or (SGST & CGST))</font></td>
-                                                        <td align="right"> {gst} </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">
-                                                        <hr />
-                                                        </td>
-                                                    </tr> 
-                                                    <tr>
-                                                        <td><label>Property discount including tax considered in
-                                                        coupon promotion</label></td>
-                                                        <td align="right"> {formData.propertyDiscount} </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="2">
-                                                        <hr />
-                                                        </td>
-                                                    </tr> -->
+                                                    ${foodRows}
+                                                    ${serviceRows}
                                                     <tr>
                                                         <td><label>Total</label></td>
                                                         <td align="right"> <b>${Math.round(booking.total_price)}</b> </td>
@@ -698,13 +709,18 @@ export const handleGenerateReceipt = (booking) => {
                             </table>
                         </div>
                     </div>                    
-                    <div class="no-print" style={{width: 100%}}>
-                        <table style={{ borderWidth: 0, width: '100%' }} ><tr><td>
-                            <button id="download-jpg-btn" onclick="downloadAsImage()">Download as JPEG</button>
-                            <button id="download-png-btn" onclick="downloadAsImage()">Download as PNG</button>
-                            <button id="download-svg-btn" ">Download as SVG</button>
-                            <button onclick="window.print()">Print Receipt</button>
-                        </td></tr></table>
+                    <div class="no-print a4size">
+                        <table style="border-width: 0; width: 100%" >
+                            <tr>
+                                <td style = "width: 25%; align: center;"><button class="button-style" id="download-jpg-btn" onclick="downloadAsImage()">Download as JPEG</button></td>
+                                <td style = "width: 25%; align: center;"><button class="button-style" id="download-png-btn" onclick="downloadAsImage()">Download as PNG</button></td>
+                                <td style = "width: 25%; align: center;"><button class="button-style" id="download-svg-btn" onclick="downloadAsImage()">Download as SVG</button></td>
+                                <td style = "width: 25%; align: center;"><button class="button-style" onclick="window.print()">Print Receipt</button></td>
+                            </tr>
+                            <tr>
+                                <td colspan = "4">&nbsp;</td>
+                            </tr>
+                        </table>
                     </div>
                 </body>
             </html>
@@ -767,7 +783,7 @@ export const handleGenerateReceipt = (booking) => {
             }
         };
 
-        //jpgbtn.click();
+        jpgbtn.click();
 
     };
     receiptWindow.document.head.appendChild(script);

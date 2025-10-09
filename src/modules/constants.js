@@ -74,6 +74,7 @@ export const PAYMENT_TYPE = [{ id: 'cash', value: 'Cash' }, { id: 'cc', value: '
 export const ROOM_NAMES = roomOptions
 export const USER_TYPES = ['BACK-OFFICE', 'BOOKING-AGENT', 'COMPANY', 'CONTRACTOR', 'CUSTOMER', 'CXO', 'EMPLOYEE', 'PARTNER', 'VENDOR']
 export const REFUND_TO_GUEST = 'Refund to Guest'; // for Booking & Payments in booking where to hard code as they behave differently
+export const COMMISSION_PAYOUT = 'Commission Payout';
 
 /**
  * @constant {object} roomAvailabilityStatusColors - An object mapping booking statuses to their corresponding colors.

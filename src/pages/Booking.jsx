@@ -5,10 +5,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
-import { DEFAULT_BOOKING, REFUND_TO_GUEST } from "../modules/constants";
+import { DEFAULT_BOOKING, REFUND_TO_GUEST, COMMISSION_PAYOUT } from "../modules/constants";
 import { calculateCommission, getCommissionPercent, parseNumber } from "../modules/common.module";
 import { getAllCustomers } from '../modules/customer.module';
-import { validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getPaymentsForBooking, getAllRooms, fetchAttachments } from '../modules/booking.module';
+import { calculateTotalPaid, validateBooking, handleGenerateReceipt, createNewBooking, updateBooking, getPaymentsForBooking, getAllRooms, fetchAttachments } from '../modules/booking.module';
 import { getAllBookingSources } from '../modules/users.module';
 import { isUserInRoles } from '../contexts/constants';
 
@@ -174,13 +174,16 @@ const Booking = () => {
                 setBooking(prev => ({
                     ...prev,
                     payments: payments || [],
-                    // Calulate totalPaid when the acc_category_name is 'Refund to Guest' then that has to be negative
-                    totalPaid: (payments || []).reduce((acc, p) => acc + (p.acc_category_name === REFUND_TO_GUEST ? -parseNumber(p.payment_amount) : parseNumber(p.payment_amount)), 0),
-                    balanceToPay: calculateTotalAmount(booking) - parseNumber((payments || []).reduce((acc, p) => acc + (p.acc_category_name === REFUND_TO_GUEST ? -parseNumber(p.payment_amount) : parseNumber(p.payment_amount)), 0)),
+                    totalPaid: calculateTotalPaid(payments || []),
+                    balanceToPay: calculateTotalAmount(booking) - calculateTotalPaid(payments || []),
                 }));
             });
         }
     }, [preloadedBooking]);
+
+    const calculateTWWRevenue = (booking) => {
+        return calculateTotalAmount(booking) - booking.commission
+    }
 
     const calculateTotalAmount = (booking) => {
         let total_price = (parseNumber(booking.room_price || 0) + parseNumber(booking.food_price || 0) +
@@ -495,6 +498,12 @@ const Booking = () => {
                                 <div className='form-group-row'>
                                     <label style={{ width: '25%', textAlign: 'left' }}>Balance</label>
                                     <label style={{ width: '25%', textAlign: 'right' }}>{Math.round(booking.total_price - booking.totalPaid, 2)}</label>
+                                </div>
+                            )}
+                            {booking.payments && (
+                                <div className='form-group-row'>
+                                    <label style={{ width: '25%', textAlign: 'left' }}>TWW Revenue</label>
+                                    <label style={{ width: '25%', textAlign: 'right' }}>{Math.round(calculateTWWRevenue(booking), 2)}</label>
                                 </div>
                             )}
                             <div className='form-group-button' style={{ alignItems: "center" }}>
