@@ -1,6 +1,7 @@
 
 import api from './apiClient';
 import { getUserContext } from '../contexts/constants';
+
 /**
  * Validates a booking object to ensure all required fields are present and that the check-out date is after the check-in date.
  *

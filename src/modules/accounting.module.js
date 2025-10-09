@@ -130,3 +130,23 @@ export const getTransactions = async (navigate, searchCriteria) => {
         return []
     }
 }
+
+export const getConslidatedFinancials = async (navigate, searchCriteria) => {
+    console.debug("Accounting.Module::getConslidatedFinancials::Fetching all transactions", searchCriteria);
+    const defaultResponse = {
+        sales: 0,
+        expenses: 0,
+        revenue: 0
+    }
+    try {
+        const response = await api.post("/accounting/consolidated/search/", searchCriteria);
+        console.debug("Accounting.Module::getConslidatedFinancials::Fetched all transactions", response?.data);
+        return response?.data?.transactions || defaultResponse
+    } catch (error) {
+        console.error("Accounting.Module::getConslidatedFinancials::Error fetching all transactions", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        return defaultResponse
+    }
+}

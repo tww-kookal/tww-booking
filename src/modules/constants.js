@@ -109,6 +109,7 @@ export const BOOKING_STATUS = {
     'BOOKED': 'booked'
 }
 
+export const USER_LOCALE = navigator.language || navigator.userLanguage || 'en-IN';
 
 /**
  * @constant {Array<string>} sourceOptions - An array of available source options.
