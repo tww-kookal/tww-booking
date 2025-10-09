@@ -27,6 +27,7 @@ const Payments = () => {
     const [accCategoryOptions, setAccCategoryOptions] = useState([]);
     const [selectedAccCategory, setSelectedAccCategory] = useState();
     const [selectedPaymentTo, setSelectedPaymentTo] = useState();
+    const [selectedPaidBy, setSelectedPaidBy] = useState();
     const [accPartiesOptions, setAccPartiesOptions] = useState([])
 
     useEffect(() => {
@@ -59,6 +60,11 @@ const Payments = () => {
                     value: user.user_id,
                     label: `${user.first_name} ${user.last_name} - ${user.phone}`
                 });
+
+                setSelectedPaidBy({
+                    value: user.user_id,
+                    label: `${user.first_name} ${user.last_name} - ${user.phone}`
+                });
                 user = users.find(u => u.email === 'thewestwood.kookal@gmail.com');
             }
         }).catch(error => {
@@ -68,8 +74,8 @@ const Payments = () => {
 
     useEffect(() => {
         if (location.state.booking) {
-            setPayments(location.state.booking.payments || []);
             console.log('Payments::booking:', location.state.booking);
+            setPayments(location.state.booking.payments || []);
             setBooking(location.state.booking);
         }
     }, [location.state]);
@@ -106,21 +112,29 @@ const Payments = () => {
         return accCategoryOptions.find(u => u.value === payment_for);
     }
 
+    const getSelectedPaidBy = (paid_by) => {
+        return accPartiesOptions.find(u => u.value === paid_by);
+    }
+
     const getSelectePaymentTo = (payment_to) => {
         return accPartiesOptions.find(u => u.value === payment_to);
     }
 
     const getDisplayPaymentToBasedOnPaymentFor = (payment) => {
         if (isPaymentForRefundToGuest(payment.payment_for)) {
-            if (!booking || !booking.customer_id || !booking.customer_name) {
-            }
             return `${booking?.customer_name} [Guest]`
         } else if (isPaymentForCommissionPayout(payment.payment_for)) {
-            if (!booking || !booking.source_of_booking_id || !booking.source_of_booking) {
-            }
             return `${booking?.source_of_booking}`
         } else {
             return 'ERR!!!';
+        }
+    }
+
+    const getDisplayPaidByBasedOnPaymentFor = (payment) => {
+        if (isPaymentForRefundToGuest(payment.payment_for) || isPaymentForCommissionPayout(payment.payment_for)) {
+            return 'ERR!!!';
+        } else {
+            return `${booking?.customer_name} [Guest]`
         }
     }
 
@@ -129,15 +143,32 @@ const Payments = () => {
             if (!booking || !booking.customer_id) {
                 throw new Error('Refund to Guest must be to the customer');
             }
-            return booking?.customer_id || 0;
+            return booking?.customer_id;
         } else if (isPaymentForCommissionPayout(payment.payment_for)) {
             if (!booking || !booking.source_of_booking_id) {
                 throw new Error('Commission Payout must be to the source of booking');
             }
-            return booking?.source_of_booking_id || 0;
+            return booking?.source_of_booking_id;
         } else {
             return payment.payment_to;
         }
+    }
+
+    const getPaidByBasedOnPaymentFor = (payment) => {
+        if (isPaymentForRefundToGuest(payment.payment_for)) {
+            return payment.paid_by
+        } else if (isPaymentForCommissionPayout(payment.payment_for)) {
+            return payment.paid_by
+        } else {
+            if (!booking || !booking.customer_id) {
+                throw new Error('Must be done by the customer for the selected Payment');
+            }
+            return booking?.customer_id;
+        }
+    }
+
+    const isPaidByVisibleBasedOnPaymentFor = (paymentFor) => {
+        return isPaymentForRefundToGuest(paymentFor) || isPaymentForCommissionPayout(paymentFor);
     }
 
     const isPayToVisibleBasedOnPaymentFor = (paymentFor) => {
@@ -157,6 +188,7 @@ const Payments = () => {
     const handleUpdate = async (payment) => {
         try {
             payment.payment_to = getPaymentToBasedOnPaymentFor(payment);
+            payment.paid_by = getPaidByBasedOnPaymentFor(payment)
             const updatedPayment = await updatePayment(navigate, payment);
             setPayments(payments.map(p => p.booking_payments_id === payment.booking_payments_id ? payment : p));
             setBooking({
@@ -173,6 +205,7 @@ const Payments = () => {
     const handleAddNew = async (payment) => {
         try {
             payment.payment_to = getPaymentToBasedOnPaymentFor(payment);
+            payment.paid_by = getPaidByBasedOnPaymentFor(payment)
             const addedPayment = await addPayment(navigate, payment);
             toast.success("Payment added successfully");
             setPayments(payments.map(p => p.booking_payments_id === -999 ? addedPayment : p));
@@ -188,7 +221,6 @@ const Payments = () => {
 
     const handleDelete = async (payment) => {
         try {
-            console.debug("Delete Payment ", payment)
             await deletePaymentById(navigate, payment);
             setPayments(payments.filter(p => p.booking_payments_id !== payment.booking_payments_id));
             setBooking({
@@ -272,7 +304,7 @@ const Payments = () => {
                             />
                         </div>
                         <div className="form-group">
-                            <label>Type</label>
+                            <label>Mode</label>
                             <select name="payment_type" value={payment.payment_type} onChange={(e) => handleChange(index, e)}>
                                 <option value="">Select Type</option>
                                 {PAYMENT_TYPE && PAYMENT_TYPE.length > 0 && PAYMENT_TYPE.map(type => (
@@ -280,6 +312,36 @@ const Payments = () => {
                                 ))}
                             </select>
                         </div>
+
+                        <div className="form-group">
+                            <label>Paid By</label>
+                            <Select name="paid_by"
+                                isDisabled={!isPaidByVisibleBasedOnPaymentFor(payment.payment_for)}
+                                styles={{
+                                    container: (base) => ({
+                                        ...base,
+                                        display: isPaidByVisibleBasedOnPaymentFor(payment.payment_for) ? 'block' : 'none'
+                                    })
+                                }}
+                                value={getSelectedPaidBy(payment.paid_by)}
+                                onChange={e => {
+                                    payment.paid_by = e.value;
+                                    setSelectedPaidBy({
+                                        value: e.value,
+                                        label: e.label,
+                                    });
+                                }}
+                                options={accPartiesOptions}
+                                placeholder="Select Payer..."
+                                isSearchable={true}
+                                classNamePrefix="react-select"
+                                className="react-select-style"
+                            />
+                            <label style={{ display: !isPaidByVisibleBasedOnPaymentFor(payment.payment_for) ? 'block' : 'none', width: '100%', maxWidth: '75%', color: 'blue' }}>
+                                <small>{getDisplayPaidByBasedOnPaymentFor(payment)}</small>
+                            </label>
+                        </div>
+
                         <div className="form-group">
                             <label>Pay To</label>
                             <Select name="payment_to"

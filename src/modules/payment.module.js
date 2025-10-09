@@ -31,9 +31,8 @@ const transformPaymentV1toV2 = (payment) => {
         acc_entry_amount: payment.payment_amount,
         acc_entry_description: payment.remarks,
         acc_entry_date: payment.payment_date,
-        txn_by: getUserContext().user.user_id,
-        created_by: getUserContext().user.user_id,
-        paid_by: payment.customer_id,
+        txn_by: getUserContext().logged_in_user?.user_id,
+        created_by: getUserContext().logged_in_user?.user_id,
         received_by: payment.payment_to,
         received_for_booking_id: payment.booking_id,
         payment_type: payment.payment_type,
@@ -56,10 +55,14 @@ const transformTransactionV2toV1 = (transaction) => {
 }
 
 export const addPayment = async (navigate, payment) => {
-    console.debug("Payment.Module::addPayment::Adding payment");
+    console.debug("Payment.Module::addPayment::Adding payment ", payment);
     try {
-        const paymentV2 = transformPaymentV1toV2(payment);
+        const paymentV2 = {
+            ...transformPaymentV1toV2(payment),
+            paid_by: payment.paid_by,
+        }
         console.log("Payments::ModuleV2:: after ", paymentV2);
+        console.log("Payments::UserContext ", getUserContext());
         const response = await api.post("/accounting/transaction/add", paymentV2);
         const addedTransaction = transformTransactionV2toV1(response.data?.createdTransaction);
         return addedTransaction || {}
