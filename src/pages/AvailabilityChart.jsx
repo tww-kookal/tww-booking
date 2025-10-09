@@ -36,32 +36,26 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
     useEffect(() => {
         const filterBookings = async () => {
             setChartLoading(true);
-            const dateSet = new Set(
-                Array.from({ length: DEFAULT_NUMBER_OF_DAYS }, (_, i) => startDate.add(i, "day").format("YYYY-MM-DD"))
-            );
+            try {
+                const dateSet = new Set(
+                    Array.from({ length: DEFAULT_NUMBER_OF_DAYS }, (_, i) => startDate.add(i, "day").format("YYYY-MM-DD"))
+                );
 
-            const roomsPromise = getAllRooms(navigate).then(rooms => {
+                const rooms = await getAllRooms(navigate);
                 setRooms(rooms || []);
-            }).catch(err => {
-                console.error("AvailabilityChart::Error fetching rooms:", err);
-                toast.error("Unable to get the rooms");
-                setRooms([]);
-            }).finally(() => {
-            })
 
-            const bookingsPromise = getAllBookings(navigate, startDate.format("YYYY-MM-DD")).then(bookings => {
+                const bookings = await getAllBookings(navigate, startDate.format("YYYY-MM-DD"));
                 const allData = prepareChartData(bookings, dateSet, memoizedDates);
                 setData(allData);
-            }).catch(err => {
-                console.error("AvailabilityChart::Error fetching data:", err);
-                toast.error("Failed to fetch bookings. Please try again.");
-                setData([]);
-            }).finally(() => {
-            });
 
-            Promise.all([roomsPromise, bookingsPromise]).finally(() => {
+            } catch (err) {
+                console.error("AvailabilityChart::Error fetching data:", err);
+                toast.error("Failed to fetch data. Please try again.");
+                setRooms([]);
+                setData([]);
+            } finally {
                 setChartLoading(false);
-            });
+            }
         };
         filterBookings();
     }, [startDate, propStartDate]);
@@ -186,43 +180,42 @@ const AvailabilityChart = ({ startDate: propStartDate }) => {
         </div>
     );
 
-    if (chartLoading) {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'black' }}>
-                <div className="loading-spinner-large"></div>
-            </div>
-        );
-    } else {
-        return (
-            <div style={{ backgroundColor: 'black' }}>
-                <ScrollToTop />
-                <Swiper
-                    modules={[EffectFade, Autoplay]}
-                    effect={'fade'}
-                    loop={true}
-                    autoplay={{
-                        delay: 3000,
-                        disableOnInteraction: false,
-                    }}
-                    className='heroSlider h-[100px] lg:h-[27px]'
-                ></Swiper>
-                <div className="room-chart-container">
-                    <ToastContainer />
-                    <div className='form-search'>
-                        <label>Start Date: &nbsp;</label>
-                        <input
-                            type="date"
-                            value={startDate.format("YYYY-MM-DD")}
-                            onChange={handleDateChange}
-                        />
-                    </div>
-                    <div className="room-chart" style={{ width: '100%', maxHeight: '80vh', overflowY: 'auto' }} >
+    return (
+        <div style={{ backgroundColor: 'black' }}>
+            <ScrollToTop />
+            <Swiper
+                modules={[EffectFade, Autoplay]}
+                effect={'fade'}
+                loop={true}
+                autoplay={{
+                    delay: 3000,
+                    disableOnInteraction: false,
+                }}
+                className='heroSlider h-[100px] lg:h-[27px]'
+            ></Swiper>
+            <div className="room-chart-container">
+                <ToastContainer />
+                <div className='form-search'>
+                    <label>Start Date: &nbsp;</label>
+                    <input
+                        type="date"
+                        value={startDate.format("YYYY-MM-DD")}
+                        onChange={handleDateChange}
+                    />
+                </div>
+                <div style={{ position: 'relative', maxWidth: '100%', width: '100%', justifyContent: 'center', alignItems: 'center', height: '80vh', backgroundColor: 'black' }}>
+                    {chartLoading && (
+                        <div className='glass-pane'>
+                            <div className="loading-spinner-large" />
+                        </div>
+                    )}
+                    <div className="room-chart" style={{ width: '100%', maxHeight: '80vh', overflowY: 'auto' }}>
                         {renderCards()}
                     </div>
                 </div>
             </div>
-        );
-    }
+        </div>
+    );
 };
 
 export default AvailabilityChart;
