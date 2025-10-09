@@ -27,6 +27,7 @@ const Booking = () => {
     const preloadedBooking = location.state?.preloadedBooking;
     const checkInDate = location.state?.checkInDate || dayjs().format("YYYY-MM-DD");  //If from Availability chart to book a room
     const selectedRoom = location.state?.selectedRoom || undefined;
+    const [isPaymentLoading, setIsPaymentLoading] = useState(true);
 
     const navigate = useNavigate();
     const [booking, setBooking] = useState({
@@ -157,6 +158,7 @@ const Booking = () => {
 
     useEffect(() => {
         if (preloadedBooking) {
+            setIsPaymentLoading(true);
             setBooking({
                 ...preloadedBooking,
                 remarks: preloadedBooking.remarks || '',
@@ -177,6 +179,7 @@ const Booking = () => {
                     totalPaid: calculateTotalPaid(payments || []),
                     balanceToPay: calculateTotalAmount(booking) - calculateTotalPaid(payments || []),
                 }));
+                setIsPaymentLoading(false);
             });
         }
     }, [preloadedBooking]);
@@ -465,6 +468,7 @@ const Booking = () => {
                         </fieldset>
                         <fieldset>
                             <legend>Payments</legend>
+                            <div className="loading-spinner" style={{ display: isPaymentLoading ? 'block' : 'none' }}></div>
                             <div className='form-group-row'>
                                 <label style={{ width: '25%', textAlign: 'left' }}>Total</label>
                                 <label style={{ width: '25%', textAlign: 'right' }}>{booking.total_price}</label>
