@@ -194,38 +194,38 @@ Content-Transfer-Encoding: base64\r
                         @media print { .no-print { display: none; } }
                         .watermark-layer {opacity: 0.8; position: absolute; width: 100%; height: 100%; z-index: 0; scale: 0.57; top: 15%; left: -300;  }
                         .watermark-image {opacity: 0.3; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-                            .button-style {
-                                width: 95%;
-                                height: 40px;
-                                font-size: 16px;
-                                font-weight: 600;
-                                background: linear-gradient(145deg, #0078d4, #005fa3); /* Elegant blue gradient */
-                                color: #ffffff;
-                                border: none;
-                                border-radius: 8px;
-                                cursor: pointer;
-                                box-shadow: 0 4px 0 #004a80, 0 6px 15px rgba(0, 0, 0, 0.15);
-                                transition: 
-                                    background-color 0.3s ease,
-                                    box-shadow 0.3s ease,
-                                    transform 0.2s ease,
-                                    opacity 0.3s ease;
-                            }
+                        .button-style {
+                            width: 95%;
+                            height: 40px;
+                            font-size: 16px;
+                            font-weight: 600;
+                            background: linear-gradient(145deg, #0078d4, #005fa3); /* Elegant blue gradient */
+                            color: #ffffff;
+                            border: none;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            box-shadow: 0 4px 0 #004a80, 0 6px 15px rgba(0, 0, 0, 0.15);
+                            transition: 
+                                background-color 0.3s ease,
+                                box-shadow 0.3s ease,
+                                transform 0.2s ease,
+                                opacity 0.3s ease;
+                        }
 
-                            /* Hover effect: lighter color, raised look, opacity shift */
-                            .button-style:hover {
-                                background: linear-gradient(145deg, #1890ff, #0073cc);
-                                opacity: 0.95;
-                                box-shadow: 0 6px 0 #004a80, 0 8px 20px rgba(0, 0, 0, 0.25);
-                                transform: translateY(-2px);
-                            }
+                        /* Hover effect: lighter color, raised look, opacity shift */
+                        .button-style:hover {
+                            background: linear-gradient(145deg, #1890ff, #0073cc);
+                            opacity: 0.95;
+                            box-shadow: 0 6px 0 #004a80, 0 8px 20px rgba(0, 0, 0, 0.25);
+                            transform: translateY(-2px);
+                        }
 
-                            /* Active: pressed-down illusion */
-                            .button-style:active {
-                                transform: translateY(2px);
-                                box-shadow: 0 2px 0 #004a80, 0 4px 10px rgba(0, 0, 0, 0.2);
-                            }
-                        </style>
+                        /* Active: pressed-down illusion */
+                        .button-style:active {
+                            transform: translateY(2px);
+                            box-shadow: 0 2px 0 #004a80, 0 4px 10px rgba(0, 0, 0, 0.2);
+                        }
+                    </style>
                     <script>
                         function downloadAsImage() {
                             const content = document.getElementById('booking_receipt_content');
