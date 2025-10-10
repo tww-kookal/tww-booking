@@ -46,11 +46,31 @@ const Payments = () => {
     }, []);
 
     useEffect(() => {
+        if (location.state.booking) {
+            setPayments(location.state.booking.payments || []);
+            setBooking(location.state.booking);
+        }
+
         getAllEmployees(navigate).then(users => {
-            setAccPartiesOptions(users.map(u => ({
+            const employeeOptions = users.map(u => ({
                 value: u.user_id,
                 label: `${u.first_name} ${u.last_name} - ${u.phone}`
-            })));
+            }));
+
+            const allOptions = [...employeeOptions];
+            const currentBooking = location.state.booking;
+
+            if (currentBooking && currentBooking.customer_id) {
+                const customerExists = allOptions.some(option => option.value === currentBooking.customer_id);
+                if (!customerExists) {
+                    allOptions.unshift({
+                        value: currentBooking.customer_id,
+                        label: `${currentBooking.customer_name} [Guest]`
+                    });
+                }
+            }
+
+            setAccPartiesOptions(allOptions);
 
             let user = users.find(u => u.email === getUserContext().user.email);
             if (!user) {
@@ -71,14 +91,6 @@ const Payments = () => {
         }).catch(error => {
             console.error('Accounting::Error fetching acc parties:', error);
         });
-    }, []);
-
-    useEffect(() => {
-        if (location.state.booking) {
-            console.log('Payments::booking:', location.state.booking);
-            setPayments(location.state.booking.payments || []);
-            setBooking(location.state.booking);
-        }
     }, [location.state]);
 
     const handleChange = (index, e) => {
@@ -205,53 +217,45 @@ const Payments = () => {
         const errors = [];
         const mandatoryFields = [];
 
-        if (parseFloat(payment.payment_amount || 0) <= 0) {
-            errors.push("Payment amount must be greater than zero.");
+        if (!payment.payment_for) mandatoryFields.push("For");
+        if (!payment.payment_type) mandatoryFields.push("Mode");
+        if (!payment.payment_date) mandatoryFields.push("Date");
+
+        // When the "Paid By" dropdown is visible, it's mandatory.
+        if (isPaidByVisibleBasedOnPaymentFor(payment.payment_for) && (!payment.paid_by || payment.paid_by === 0)) {
+            mandatoryFields.push("Paid By");
         }
 
-        if (!payment.payment_for) {
-            mandatoryFields.push("Payment for");
+        // When the "Pay To" dropdown is visible, it's mandatory.
+        // The dropdown is visible when isPayToVisibleBasedOnPaymentFor is false.
+        if (!isPayToVisibleBasedOnPaymentFor(payment.payment_for) && (!payment.payment_to || payment.payment_to === 0)) {
+            mandatoryFields.push("Pay To");
+        }
+
+        if (parseFloat(payment.payment_amount || 0) <= 0) {
+            errors.push("Payment amount must be greater than zero.");
         }
 
         if (isPaymentForCommissionPayout(payment.payment_for)) {
             const totalCommissionPaid = getTotalCommissionPaid(payments);
             if (totalCommissionPaid > (booking?.commission || 0)) {
-                errors.push("Total paid commission cannot exceed booking commission.");
+                errors.push(`Total paid commission (${totalCommissionPaid.toFixed(2)}) cannot exceed booking commission (${(booking?.commission || 0).toFixed(2)}).`);
             }
-        }
-
-        if (!payment.payment_type) {
-            mandatoryFields.push("Mode");
-        }
-
-        if (!payment.payment_date) {
-            mandatoryFields.push("Transaction date");
         }
 
         if (payment.remarks && payment.remarks.length > 250) {
             errors.push("Remarks should not exceed 250 characters.");
         }
 
-        if (!payment.paid_by || payment.paid_by === 0) {
-            mandatoryFields.push("Paid By");
-        }
+        if (mandatoryFields.length > 0 || errors.length > 0) {
+            const toastContent = (
+                <div>
+                    {mandatoryFields.length > 0 && <div>{`Mandatory: ${mandatoryFields.join(", ")}`}</div>}
+                    {errors.map((msg, i) => <div key={i}>{msg}</div>)}
+                </div>
+            );
 
-        if (!payment.payment_to || payment.payment_to === 0) {
-            mandatoryFields.push("Pay To");
-
-        }
-
-        let allErrors = "";
-        if (mandatoryFields.length > 0) {
-            allErrors += (mandatoryFields.length > 0 ? 'Following are mandatory fields, ' : '') +  mandatoryFields.join(", ");
-        }
-
-        if (errors.length > 0) {
-            allErrors += (errors.length > 0 ? '\n and \n' + errors.join('\n') : '') ;
-        }
-
-        if (allErrors.length > 0) {
-            toast.error(allErrors);
+            toast.error(toastContent);
             return false;
         }
 
@@ -261,10 +265,8 @@ const Payments = () => {
     const handleUpdate = async (payment) => {
         try {
             const paymentToUpdate = { ...payment };
-            if (isPaymentForCommissionPayout(paymentToUpdate.payment_for)) {
-                paymentToUpdate.payment_to = getPaymentToBasedOnPaymentFor(paymentToUpdate);
-                paymentToUpdate.paid_by = getPaidByBasedOnPaymentFor(paymentToUpdate);
-            }
+            paymentToUpdate.payment_to = getPaymentToBasedOnPaymentFor(paymentToUpdate);
+            paymentToUpdate.paid_by = getPaidByBasedOnPaymentFor(paymentToUpdate);
 
             if (!validatePayment(paymentToUpdate)) {
                 return;
@@ -273,20 +275,19 @@ const Payments = () => {
             if (updatedPayment) {
                 setPayments(payments.map(p => p.booking_payments_id === updatedPayment.booking_payments_id ? updatedPayment : p));
                 toast.success("Payment updated successfully");
+                setEditingPaymentId(null);
             }
         } catch (error) {
             console.error("Failed to update payment:", error);
             toast.error("Failed to update payment.");
         }
-    }
+    };
 
     const handleAddNew = async (payment) => {
         try {
             const paymentToAdd = { ...payment };
-            if (isPaymentForCommissionPayout(paymentToAdd.payment_for)) {
-                paymentToAdd.payment_to = getPaymentToBasedOnPaymentFor(paymentToAdd);
-                paymentToAdd.paid_by = getPaidByBasedOnPaymentFor(paymentToAdd);
-            }
+            paymentToAdd.payment_to = getPaymentToBasedOnPaymentFor(paymentToAdd);
+            paymentToAdd.paid_by = getPaidByBasedOnPaymentFor(paymentToAdd);
 
             if (!validatePayment(paymentToAdd)) {
                 return;
@@ -300,7 +301,7 @@ const Payments = () => {
             console.error("Failed to add payment:", error);
             toast.error("Failed to add payment.");
         }
-    }
+    };
 
     const handleDelete = async (payment) => {
         try {
