@@ -92,15 +92,21 @@ const Payments = () => {
     };
 
     const handleAdd = () => {
+        if (payments.some(p => p.booking_payments_id === -999)) {
+            toast.warn("A new payment is already being added.");
+            return;
+        }
+
         setPayments([
             ...payments,
-            !payments.find(p => p.booking_payments_id === -999) && {
+            {
                 booking_payments_id: -999,
                 booking_id: booking?.booking_id || 0,
                 payment_type: '',
                 payment_amount: 0,
                 payment_date: dayjs().format('YYYY-MM-DD'),
                 payment_to: 0,
+                paid_by: booking?.customer_id || 0,
                 payment_for: '',
                 remarks: '',
                 customer_id: booking?.customer_id || 0,
@@ -186,38 +192,113 @@ const Payments = () => {
         return paymentForLabel.includes(COMMISSION_PAYOUT);
     }
 
+    const getTotalCommissionPaid = (paymentsToConsider) => {
+        return (paymentsToConsider || []).reduce((total, payment) => {
+            if (isPaymentForCommissionPayout(payment.payment_for)) {
+                return total + parseFloat(payment.payment_amount || 0);
+            }
+            return total;
+        }, 0);
+    };
+
+    const validatePayment = (payment) => {
+        const errors = [];
+        const mandatoryFields = [];
+
+        if (parseFloat(payment.payment_amount || 0) <= 0) {
+            errors.push("Payment amount must be greater than zero.");
+        }
+
+        if (!payment.payment_for) {
+            mandatoryFields.push("Payment for");
+        }
+
+        if (isPaymentForCommissionPayout(payment.payment_for)) {
+            const totalCommissionPaid = getTotalCommissionPaid(payments);
+            if (totalCommissionPaid > (booking?.commission || 0)) {
+                errors.push("Total paid commission cannot exceed booking commission.");
+            }
+        }
+
+        if (!payment.payment_type) {
+            mandatoryFields.push("Mode");
+        }
+
+        if (!payment.payment_date) {
+            mandatoryFields.push("Transaction date");
+        }
+
+        if (payment.remarks && payment.remarks.length > 250) {
+            errors.push("Remarks should not exceed 250 characters.");
+        }
+
+        if (!payment.paid_by || payment.paid_by === 0) {
+            mandatoryFields.push("Paid By");
+        }
+
+        if (!payment.payment_to || payment.payment_to === 0) {
+            mandatoryFields.push("Pay To");
+
+        }
+
+        let allErrors = "";
+        if (mandatoryFields.length > 0) {
+            allErrors += (mandatoryFields.length > 0 ? 'Following are mandatory fields, ' : '') +  mandatoryFields.join(", ");
+        }
+
+        if (errors.length > 0) {
+            allErrors += (errors.length > 0 ? '\n and \n' + errors.join('\n') : '') ;
+        }
+
+        if (allErrors.length > 0) {
+            toast.error(allErrors);
+            return false;
+        }
+
+        return true;
+    };
+
     const handleUpdate = async (payment) => {
         try {
-            payment.payment_to = getPaymentToBasedOnPaymentFor(payment);
-            payment.paid_by = getPaidByBasedOnPaymentFor(payment)
-            const updatedPayment = await updatePayment(navigate, payment);
-            setPayments(payments.map(p => p.booking_payments_id === payment.booking_payments_id ? payment : p));
-            setBooking({
-                ...booking,
-                payments: [booking.payments.map(p => p.booking_payments_id === payment.booking_payments_id ? payment : p)]
-            })
-            toast.success("Payment updated successfully");
-            setEditingPaymentId(null);
-        } catch (err) {
-            console.error('Payments::handleUpdate:', err);
-            toast.error("Error updating payment");
+            const paymentToUpdate = { ...payment };
+            if (isPaymentForCommissionPayout(paymentToUpdate.payment_for)) {
+                paymentToUpdate.payment_to = getPaymentToBasedOnPaymentFor(paymentToUpdate);
+                paymentToUpdate.paid_by = getPaidByBasedOnPaymentFor(paymentToUpdate);
+            }
+
+            if (!validatePayment(paymentToUpdate)) {
+                return;
+            }
+            const updatedPayment = await updatePayment(navigate, paymentToUpdate);
+            if (updatedPayment) {
+                setPayments(payments.map(p => p.booking_payments_id === updatedPayment.booking_payments_id ? updatedPayment : p));
+                toast.success("Payment updated successfully");
+            }
+        } catch (error) {
+            console.error("Failed to update payment:", error);
+            toast.error("Failed to update payment.");
         }
     }
 
     const handleAddNew = async (payment) => {
         try {
-            payment.payment_to = getPaymentToBasedOnPaymentFor(payment);
-            payment.paid_by = getPaidByBasedOnPaymentFor(payment)
-            const addedPayment = await addPayment(navigate, payment);
-            toast.success("Payment added successfully");
-            setPayments(payments.map(p => p.booking_payments_id === -999 ? addedPayment : p));
-            setBooking({
-                ...booking,
-                payments: [...booking.payments, addedPayment]
-            })
-        } catch (err) {
-            console.error('Payments::handleAddNew:', err);
-            toast.error("Error adding payment");
+            const paymentToAdd = { ...payment };
+            if (isPaymentForCommissionPayout(paymentToAdd.payment_for)) {
+                paymentToAdd.payment_to = getPaymentToBasedOnPaymentFor(paymentToAdd);
+                paymentToAdd.paid_by = getPaidByBasedOnPaymentFor(paymentToAdd);
+            }
+
+            if (!validatePayment(paymentToAdd)) {
+                return;
+            }
+            const addedPayment = await addPayment(navigate, paymentToAdd);
+            if (addedPayment) {
+                setPayments(payments.map(p => p.booking_payments_id === -999 ? addedPayment : p));
+                toast.success("Payment added successfully");
+            }
+        } catch (error) {
+            console.error("Failed to add payment:", error);
+            toast.error("Failed to add payment.");
         }
     }
 
@@ -288,12 +369,33 @@ const Payments = () => {
                             <Select name="payment_for"
                                 value={getSelectedAccCategory(payment.payment_for)}
                                 onChange={e => {
-                                    payment.payment_for = e.value;
+                                    const newPaymentFor = e.value;
+                                    let newPaymentAmount = payment.payment_amount;
+
+                                    if (isPaymentForCommissionPayout(newPaymentFor)) {
+                                        const otherPayments = payments.filter(p => p.booking_payments_id !== payment.booking_payments_id);
+                                        const commissionPaidOnOtherPayments = getTotalCommissionPaid(otherPayments);
+                                        newPaymentAmount = (booking?.commission || 0) - commissionPaidOnOtherPayments;
+                                    } else if (payment.payment_for !== newPaymentFor) {
+                                        newPaymentAmount = 0;
+                                    }
+
+                                    const updatedPayments = payments.map((p, i) => {
+                                        if (index === i) {
+                                            return {
+                                                ...p,
+                                                payment_for: newPaymentFor,
+                                                payment_amount: newPaymentAmount
+                                            };
+                                        }
+                                        return p;
+                                    });
+                                    setPayments(updatedPayments);
+
                                     setSelectedAccCategory({
                                         value: e.value,
                                         label: e.label,
                                     });
-                                    payment.payment_amount = booking.commission || 0;
                                 }}
                                 options={accCategoryOptions}
                                 placeholder="Select a payment for..."
@@ -412,7 +514,7 @@ const Payments = () => {
                     </div>
                 ))}
                 <div className="form-buttons">
-                    <button onClick={handleAdd} className="button-primary">Add Payment</button>
+                    <button onClick={handleAdd} className="button-primary" disabled={payments.some(p => p.booking_payments_id === -999)}>Add Payment</button>
                     <button onClick={handleCancel} className="button-secondary">Cancel</button>
                 </div>
             </div>
