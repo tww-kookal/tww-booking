@@ -54,7 +54,7 @@ const Dashboard = () => {
       setMonthlyRevenue((financials?.sales || 0).toLocaleString(USER_LOCALE, { maximumFractionDigits: 0 }));
       setMonthlyExpenses((financials?.expenses || 0).toLocaleString(USER_LOCALE, { maximumFractionDigits: 0 }));
       setGrossProfit((financials?.revenue || 0).toLocaleString(USER_LOCALE, { maximumFractionDigits: 0 }));
-      setGrossProfitColor(financials?.revenue < 0 ? 'red' : financials?.revenue > monthlyIncome * 0.3 ? 'rgb(30, 144, 255)' : 'black');
+      setGrossProfitColor(financials?.revenue < 0 ? 'red' : financials?.revenue > monthlyRevenue * 0.3 ? 'rgb(30, 144, 255)' : 'black');
     });
 
     Promise.all([financialsPromise]).then(() => {
