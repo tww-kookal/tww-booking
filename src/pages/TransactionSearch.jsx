@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from 'react-router-dom';
 import Select from 'react-select';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -21,8 +22,10 @@ import { isUserInRoles } from "../contexts/constants";
 const TransactionSearch = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const [searchCriteria, setSearchCriteria] = useState({});
+  const { startDate } = useParams(); // startDate get form url (/transactions/search/:startDate) as string...
+  const [searchCriteria, setSearchCriteria] = useState({
+    transaction_date: startDate,
+  });
   const [transactionsData, setTransactionsData] = useState([]);
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
@@ -82,6 +85,10 @@ const TransactionSearch = () => {
     });
   }, []);
 
+  useEffect(() => {
+    handleSearch(startDate);
+  }, [startDate]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
@@ -96,7 +103,8 @@ const TransactionSearch = () => {
     setCurrentPage(1);
   }
 
-  const handleSearch = () => {
+  const handleSearch = (startDate) => {
+    if(!startDate) return;
     getTransactions(navigate, searchCriteria).then(transactions => {
       setTransactionsData(transactions);
       calculateTotalDebitCredit(transactions);

@@ -212,8 +212,8 @@ const Dashboard = () => {
             }
           </div>
           {isUserInRoles(['manager', 'owner']) ?
-            <div className="stat-card">
-              <Link to="/transactions/search" className="action-button search">
+            <div className="stat-card">                            
+              <Link to={`/transactions/search/${dayjs().startOf('month').format('YYYY-MM-DD')}`} className="action-button search">
                 <h3>{dayjs().format("MMMM")} Expenses</h3>
               </Link>
               {isFinancialsLoading ?
@@ -225,7 +225,7 @@ const Dashboard = () => {
             : ''}
           {isUserInRoles(['manager', 'owner']) ?
             <div className="stat-card">
-              <Link to="/expenses" className="action-button search">
+              <Link to={`/transactions/search/${dayjs().startOf('month').format('YYYY-MM-DD')}`} className="action-button search">
                 <h3>{dayjs().format("MMMM")} Revenue</h3>
               </Link>
               {isFinancialsLoading ?
@@ -237,7 +237,7 @@ const Dashboard = () => {
             : ''}
           {isUserInRoles(['manager', 'owner']) ?
             <div className="stat-card">
-              <Link to="/expenses" className="action-button search">
+              <Link to={`/transactions/search/${dayjs().startOf('month').format('YYYY-MM-DD')}`} className="action-button search">
                 <h3>
                   {dayjs().format("MMMM")} Gross Profit
                 </h3>

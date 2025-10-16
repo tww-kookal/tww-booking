@@ -44,8 +44,9 @@ export default function App() {
                 <Route path="/booking/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
                 {/*<Route path="/transactions" element={<ProtectedRoute><Transaction /></ProtectedRoute>} /> */}                
                 <Route path="/transactions/search" element={<ProtectedRoute><TransactionSearch /></ProtectedRoute>} />
+                <Route path="/transactions/search/:startDate" element={<ProtectedRoute><TransactionSearch /></ProtectedRoute>} />                    
+                
                 <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
-
                 <Route path={'/'} element={<Home />} />
                 <Route path={'/room/:id'} element={<RoomDetails />} />
                 <Route path={'*'} element={<PageNotFound />} />
