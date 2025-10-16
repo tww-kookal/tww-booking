@@ -22,14 +22,14 @@ import 'swiper/css';
 const Dashboard = () => {
   const [todayCheckIns, setTodayCheckIns] = useState(0);
   const [todayCheckOuts, setTodayCheckOuts] = useState(0);
-  const [monthlyIncome, setMonthlyIncome] = useState(0);
+  const [monthlyRevenue, setMonthlyRevenue] = useState(0);
   const [monthlyExpenses, setMonthlyExpenses] = useState(0);
-  const [revenue, setRevenue] = useState(0);
+  const [grossProfit, setGrossProfit] = useState(0);
   const [guestsForDay, setGuestsForDay] = useState(0);
   const [upcomingBookings, setUpcomingBookings] = useState(0);
   const [todayCheckInDetails, setTodayCheckInDetails] = useState([]);
   const [todayCheckOutDetails, setTodayCheckOutDetails] = useState([]);
-  const [revenueColor, setRevenueColor] = useState('black');
+  const [grossProfitColor, setGrossProfitColor] = useState('black');
   const [isFinancialsLoading, setIsFinancialsLoading] = useState(true);
   const [isBookingsLoading, setIsBookingsLoading] = useState(true);
   const navigate = useNavigate();
@@ -51,10 +51,10 @@ const Dashboard = () => {
       transaction_date: dayjs().startOf('month').format('YYYY-MM-DD'),
       transaction_end_date: dayjs().endOf('month').format('YYYY-MM-DD')
     }).then(financials => {
-      setMonthlyIncome((financials?.sales || 0).toLocaleString(USER_LOCALE, { maximumFractionDigits: 0 }));
+      setMonthlyRevenue((financials?.sales || 0).toLocaleString(USER_LOCALE, { maximumFractionDigits: 0 }));
       setMonthlyExpenses((financials?.expenses || 0).toLocaleString(USER_LOCALE, { maximumFractionDigits: 0 }));
-      setRevenue((financials?.revenue || 0).toLocaleString(USER_LOCALE, { maximumFractionDigits: 0 }));
-      setRevenueColor(financials?.revenue < 0 ? 'red' : financials?.revenue > monthlyIncome * 0.3 ? 'rgb(30, 144, 255)' : 'black');
+      setGrossProfit((financials?.revenue || 0).toLocaleString(USER_LOCALE, { maximumFractionDigits: 0 }));
+      setGrossProfitColor(financials?.revenue < 0 ? 'red' : financials?.revenue > monthlyIncome * 0.3 ? 'rgb(30, 144, 255)' : 'black');
     });
 
     Promise.all([financialsPromise]).then(() => {
@@ -226,12 +226,12 @@ const Dashboard = () => {
           {isUserInRoles(['manager', 'owner']) ?
             <div className="stat-card">
               <Link to="/expenses" className="action-button search">
-                <h3>{dayjs().format("MMMM")} Sales</h3>
+                <h3>{dayjs().format("MMMM")} Revenue</h3>
               </Link>
               {isFinancialsLoading ?
                 <div className="loading-spinner"></div>
                 :
-                <p className="stat-value">{monthlyIncome}</p>
+                <p className="stat-value">{monthlyRevenue}</p>
               }
             </div>
             : ''}
@@ -239,14 +239,14 @@ const Dashboard = () => {
             <div className="stat-card">
               <Link to="/expenses" className="action-button search">
                 <h3>
-                  {dayjs().format("MMMM")} Revenue
+                  {dayjs().format("MMMM")} Gross Profit
                 </h3>
               </Link>
               {isFinancialsLoading ?
                 <div className="loading-spinner"></div>
                 :
-                <p className="stat-value" style={{ color: revenueColor }}>
-                  {revenue}
+                <p className="stat-value" style={{ color: grossProfitColor }}>
+                  {grossProfit}
                 </p>
               }
             </div>

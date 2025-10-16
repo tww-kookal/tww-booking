@@ -132,7 +132,6 @@ export const getTransactions = async (navigate, searchCriteria) => {
 }
 
 export const getConslidatedFinancials = async (navigate, searchCriteria) => {
-    console.debug("Accounting.Module::getConslidatedFinancials::Fetching all transactions", searchCriteria);
     const defaultResponse = {
         sales: 0,
         expenses: 0,
@@ -140,7 +139,6 @@ export const getConslidatedFinancials = async (navigate, searchCriteria) => {
     }
     try {
         const response = await api.post("/accounting/consolidated/search/", searchCriteria);
-        console.debug("Accounting.Module::getConslidatedFinancials::Fetched all transactions", response?.data);
         return response?.data?.transactions || defaultResponse
     } catch (error) {
         console.error("Accounting.Module::getConslidatedFinancials::Error fetching all transactions", error);
