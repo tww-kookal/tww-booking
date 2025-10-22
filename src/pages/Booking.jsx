@@ -25,7 +25,7 @@ import 'swiper/css';
 
 const Booking = () => {
     const location = useLocation();
-    const preloadedBooking = location.state?.preloadedBooking;
+    const [preloadedBooking, setPreloadedBooking] = useState(location.state?.preloadedBooking || {});
     const checkInDate = location.state?.checkInDate || dayjs().format("YYYY-MM-DD");  //If from Availability chart to book a room
     const selectedRoom = location.state?.selectedRoom || undefined;
 
@@ -286,8 +286,10 @@ const Booking = () => {
             if (isUpdate) {
                 updateBooking(navigate, booking).then((updatedBooking) => {
                     toast.success('Booking updated successfully!');
-                    handleGenerateReceipt(updatedBooking);
-                    navigate("/dashboard")
+                    //handleGenerateReceipt(updatedBooking);
+                    //navigate("/dashboard")
+                    setBooking(updatedBooking);
+                    setPreloadedBooking(updatedBooking);
                 }).catch((err) => {
                     console.error('Booking::Error updating booking:', err.response?.data?.detail || err.message);
                     toast.error(`Failed to update booking. ${err.response?.data?.detail || err.message}`);
@@ -300,7 +302,9 @@ const Booking = () => {
                 createNewBooking(navigate, booking).then((createdBooking) => {
                     toast.success('Booking saved successfully!');
                     //handleGenerateReceipt(createdBooking);
-                    navigate("/dashboard")
+                    //navigate("/dashboard")
+                    setBooking(updatedBooking);
+                    setPreloadedBooking(updatedBooking);
                 }).catch((err) => {
                     console.error('Booking::Error creating booking:', err.response?.data?.detail || err.message);
                     toast.error(`Failed to create booking. ${err.response?.data?.detail || err.message}`);
