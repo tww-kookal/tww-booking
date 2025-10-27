@@ -137,7 +137,15 @@ const CommissionPayout = () => {
             const unique = [...new Set(updated)];
             return unique;
         });
-    };;
+    };
+
+    const handleSelectAll = () => {
+        if (bookings.length > 0 && selectedBookings.length === bookings.length) {
+            setSelectedBookings([]);
+        } else {
+            setSelectedBookings(bookings.map(b => b.booking_id));
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -252,7 +260,7 @@ const CommissionPayout = () => {
                         onClick={handleLoad}
                         disabled={isUsersLoading || isBookingsLoading}
                     >
-                        {isBookingsLoading ? 'Loading...' : 'Load'}
+                        {isBookingsLoading ? 'Loading...' : bookings.length > 0 ? `Loaded ${bookings.length} bookings` : 'Load'}
                     </button>
                 </div>
                 {isBookingsLoading && <LOADING_DOTS />}
@@ -262,17 +270,23 @@ const CommissionPayout = () => {
                             <table className="bookings-table">
                                 <thead>
                                     <tr>
-                                        <th width="5%"></th>
-                                        <th width="10%">Room</th>
-                                        <th width="15%">Checkin</th>
-                                        <th width="30%">Guest</th>
-                                        <th width="20%">Comm</th>
+                                        <th width="5%" style={{ textAlign: 'center' }}>
+                                            <input
+                                                type="checkbox"
+                                                onChange={handleSelectAll}
+                                                checked={bookings.length > 0 && selectedBookings.length === bookings.length}
+                                            />
+                                        </th>
+                                        <th width="10%" style={{ textAlign: 'left' }}>Room</th>
+                                        <th width="15%" style={{ textAlign: 'left' }}>Checkin</th>
+                                        <th width="30%" style={{ textAlign: 'left' }}>Guest</th>
+                                        <th width="20%" style={{ textAlign: 'right' }}>Comm</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {bookings.map((booking, index) => (
                                         <tr key={booking.booking_id} onClick={() => handleBookingSelection(booking.booking_id)} style={{ backgroundColor: index % 2 === 0 ? '#f9f9f9' : 'white', cursor: 'pointer' }}>
-                                            <td>
+                                            <td style={{ textAlign: 'center' }}>
                                                 <input
                                                     type="checkbox"
                                                     checked={selectedBookings.includes(booking.booking_id)}
@@ -339,7 +353,7 @@ const CommissionPayout = () => {
                                 className="button-primary"
                                 onClick={handlePay}
                             >
-                                &nbsp;Pay ₹{totalCommission().toFixed(2)}&nbsp;
+                                &nbsp;Pay ₹{Number(totalCommission().toFixed(0)).toLocaleString('en-IN')}&nbsp;
                             </button>
                         </div>
                     </>
