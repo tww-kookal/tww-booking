@@ -14,7 +14,7 @@ export const validateTransaction = (transactionToValidate) => {
     }
     if (!transactionToValidate.acc_entry_amount) {
         errors.push("Amount");
-    } 
+    }
 
     if (Number(transactionToValidate.acc_entry_amount) <= 0) {
         errorMessage = "Amount must be above 0";
@@ -35,7 +35,7 @@ export const validateTransaction = (transactionToValidate) => {
 
     if (errors.length > 0 && errorMessage != '') {
         return "Mandatory fields [" + errors.join(", ") + "], " + errorMessage;
-    } else if (errors.length == 0 && errorMessage != ''){
+    } else if (errors.length == 0 && errorMessage != '') {
         return errorMessage;
     } else if (errors.length == 0 && errorMessage == '') {
         return 'ALL_GOOD';
@@ -116,7 +116,7 @@ export const getTransactions = async (navigate, searchCriteria) => {
     console.debug("Accounting.Module::getTransactions::Fetching all transactions", searchCriteria);
     try {
         let url = "/accounting/transactions/search";
-        if(!isUserInRoles(['manager', 'owner'])){
+        if (!isUserInRoles(['manager', 'owner'])) {
             url = "/accounting/expenses/search";
         }
         const response = await api.post(url, searchCriteria);
@@ -146,5 +146,20 @@ export const getConslidatedFinancials = async (navigate, searchCriteria) => {
             navigate('/login')
         }
         return defaultResponse
+    }
+}
+
+export const addCommissionPayouts = async (commission) => {
+    console.debug("Accounting.Module::addCommissionPayouts::Adding commission payouts", commission);
+    try {
+        const response = await api.post("/accounting/commission-payouts/add", commission);
+        console.debug("Accounting.Module::addCommissionPayouts::Added commission payouts", response?.data);
+        return response?.data;
+    } catch (error) {
+        console.error("Accounting.Module::addCommissionPayouts::Error adding commission payouts", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        throw error;
     }
 }

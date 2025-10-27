@@ -35,7 +35,7 @@ const Payments = () => {
         getAllAccountingCategories(navigate).then(accCategories => {
             setAccCategoryOptions(
                 accCategories
-                    .filter(u => u.acc_category_type === 'credit' || u.acc_category_name.includes('Refund') || u.acc_category_name.includes('Commission'))
+                    .filter(u => u.acc_category_type === 'credit' || u.acc_category_name.includes('Refund'))
                     .map(u => ({
                         value: u.acc_category_id,
                         label: `[${(u.acc_category_type || '#').charAt(0)}] ${u.acc_category_name}`

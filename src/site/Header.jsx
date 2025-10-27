@@ -17,6 +17,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBookingOpen, setBookingOpen] = useState(false);
   const [isTransactionsOpen, setTransactionsOpen] = useState(false);
+  const [isAccountingOpen, setAccountingOpen] = useState(false);
 
   useEffect(() => {
     window.addEventListener('scroll', () =>
@@ -127,15 +128,18 @@ const Header = () => {
                   </>
                 }
 
-                {/* Transactions */}
-                {isUserInRoles(['manager', 'owner', 'employee']) &&
+                {/* Accounting */}
+                {isUserInRoles(['manager', 'owner']) &&
                   <>
-                    <div className='font-bold'>Transactions</div>
+                    <div className='font-bold'>Accounting</div>
                     <Link to="/transactions/search" className={`ml-4 ${location.pathname === '/transactions/search' ? 'active' : ''}`} onClick={() => toggleMenu()}>
                       Search
                     </Link>
                     <Link to="/expenses" className={`ml-4 ${location.pathname === '/expenses/new' ? 'active' : ''}`} onClick={() => toggleMenu()}>
                       Add Expense
+                    </Link>
+                    <Link to="/commission-payout" className={`ml-4 ${location.pathname === '/commission-payout' ? 'active' : ''}`} onClick={() => toggleMenu()}>
+                      Commission Payout
                     </Link>
                   </>
                 }
@@ -185,12 +189,13 @@ const Header = () => {
               </div>
             }
 
-            {/* Transactions Dropdown */}
-            {isUserInRoles(['manager', 'owner', 'employee']) &&
-              <div className="relative" onMouseEnter={() => setTransactionsOpen(true)} onMouseLeave={() => setTransactionsOpen(false)}>
-                <button className='transition hover:text-accent'>TRANSACTIONS</button>
-                {isTransactionsOpen && (
-                  <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-32" onMouseEnter={() => setTransactionsOpen(true)} onMouseLeave={() => setTransactionsOpen(false)}>
+            {/* Accounting Dropdown */}
+            {isUserInRoles(['manager', 'owner']) &&
+              <div className="relative" onMouseEnter={() => setAccountingOpen(true)} onMouseLeave={() => setAccountingOpen(false)}>
+                <button className='transition hover:text-accent'>ACCOUNTING</button>
+                {isAccountingOpen && (
+                  <div className="absolute top-full left-0 bg-white shadow-lg rounded-md py-2 w-48" onMouseEnter={() => setAccountingOpen(true)} onMouseLeave={() => setAccountingOpen(false)}>
+                    <Link to="/commission-payout" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Commission Payout</Link>
                     <Link to="/transactions/search" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Search</Link>
                     <Link to="/expenses" className='block px-4 py-2 text-gray-800 hover:bg-gray-100'>Add Expense</Link>
                   </div>

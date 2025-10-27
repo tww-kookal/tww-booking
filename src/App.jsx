@@ -21,6 +21,7 @@ import Header from "./site/Header";
 import Home from "./site/Home";
 import RoomDetails from "./site/RoomDetails";
 import PageNotFound from "./site/PageNotFound";
+import CommissionPayout from "./pages/CommissionPayout";
 
 export default function App() {
 
@@ -45,6 +46,7 @@ export default function App() {
                 {/*<Route path="/transactions" element={<ProtectedRoute><Transaction /></ProtectedRoute>} /> */}                
                 <Route path="/transactions/search" element={<ProtectedRoute><TransactionSearch /></ProtectedRoute>} />
                 <Route path="/transactions/search/:startDate" element={<ProtectedRoute><TransactionSearch /></ProtectedRoute>} />                    
+                <Route path="/commission-payout" element={<ProtectedRoute><CommissionPayout /></ProtectedRoute>} />
                 
                 <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
                 <Route path={'/'} element={<Home />} />
