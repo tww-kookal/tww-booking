@@ -51,6 +51,26 @@ export const getAllVendors = async (navigate) => {
 }
 
 /**
+ * Loads all non-customers from the server.
+ *
+ * @async
+ * @returns {Promise<Array<User>>} A promise that resolves to an array of user objects.
+ */
+export const getAllNonCustomers = async (navigate) => {
+    console.debug("Users.Module::getAllNonCustomers::Fetching all non-customers");
+    try {
+        const response = await api.get("/users/non-customers");
+        return response.data?.users || []
+    } catch (error) {
+        console.debug("Users.Module::getAllNonCustomers::Error fetching all non-customers", error);
+        if (error?.code == 'ERR_NETWORK') {
+            navigate('/login')
+        }
+        return []
+    }
+}
+
+/**
  * Loads user by ID from the server.
  *
  * @async

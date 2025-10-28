@@ -5,8 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { getAllAccountingCategories, validateTransaction, createTransaction, updateTransaction } from '../modules/accounting.module';
-import { getAllBookings } from '../modules/booking.module';
-import { getAllBookingSources, getAllEmployees, getAllVendors } from '../modules/users.module';
+import { getAllNonCustomers, getAllEmployees,  } from '../modules/users.module';
 import { isUserInRoles, getUserContext } from '../contexts/constants';
 
 import '../css/expense.large.css';
@@ -73,7 +72,7 @@ const Expenses = () => {
     }, []);
 
     useEffect(() => {
-        getAllBookingSources(navigate).then(vendors => {
+        getAllNonCustomers(navigate).then(vendors => {
             setAllVendors(vendors);
             setVendorOptions(vendors.map(user => ({
                 value: user.user_id,
