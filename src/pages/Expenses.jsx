@@ -49,7 +49,8 @@ const Expenses = () => {
 
     useEffect(() => {
         getAllAccountingCategories(navigate).then(accCategories => {
-            accCategories = accCategories.filter(u => u.acc_category_type === 'debit');
+            // do not include anything with the name "Commission Payout on it"
+            accCategories = accCategories.filter(u => u.acc_category_type === 'debit' && !u.acc_category_name.includes("Commission Payout"));
             setAccCategoryOptions(accCategories.map(u => ({
                 value: u.acc_category_id,
                 label: `[${(u.acc_category_type || '#').charAt(0)}] ${u.acc_category_name}`
