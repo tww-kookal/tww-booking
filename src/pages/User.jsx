@@ -28,6 +28,7 @@ const User = () => {
     const [user, setUser] = useState({
         user_id: '',
         username: '',
+        user_type: '',
         password: '',
         first_name: '',
         last_name: '',
@@ -165,11 +166,11 @@ const User = () => {
                 <h2>{toUpdateUser ? "Update" : "Create"} User {toUpdateUserId && <>({toUpdateUserId})</>}</h2>
 
                 <form onSubmit={e => e.preventDefault()}>
-                    <div className='form-group'>
+{/*                     <div className='form-group'>
                         <label>Username:</label>
                         <input type="text" name="username" value={user.username} onChange={handleChange} />
                     </div>
-                    <div className='form-group'>
+ */}                    <div className='form-group'>
                         <label>First Name:</label>
                         <input type="text" name="first_name" value={user.first_name} onChange={handleChange} />
                     </div>
@@ -181,6 +182,7 @@ const User = () => {
                     <div className='form-group'>
                         <label>User Type:</label>
                         <select name="user_type" value={user.user_type} onChange={handleChange}>
+                            <option key="" value="Please Select">Please Select</option>
                             {USER_TYPES.map(type => (
                                 <option key={type} value={type}>{type}</option>
                             ))}

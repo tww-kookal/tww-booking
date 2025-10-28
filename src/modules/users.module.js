@@ -85,7 +85,7 @@ export const validateUser = (user) => {
 
     // Check required fields
     if (!user.username) {
-        errors.push('Username');
+        //errors.push('Username');
     }
     if (!user.first_name) {
         errors.push('First Name');
@@ -98,6 +98,9 @@ export const validateUser = (user) => {
     }
     if (!user.phone) {
         errors.push('Phone');
+    }
+    if (!user.user_type || user.user_type == 'Please Select' || user.user_type == '') {
+        errors.push('User Type');
     }
 
     //if errors are not empty then remove the last comma and append with 'are required'
