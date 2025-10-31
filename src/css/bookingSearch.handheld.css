@@ -90,6 +90,29 @@
     cursor: not-allowed;
   }
 
+  .download-button {
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    background-color: #4a6f94;
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+
+  .download-button:hover {
+    background-color: #9cc7f1;
+    color: #007BFF;
+  }
+
+  .download-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+
   .error-message {
     background-color: #f8d7da;
     color: #721c24;

@@ -17,6 +17,7 @@ import { EffectFade, Autoplay } from 'swiper';
 import '../styles.css'
 import 'swiper/css/effect-fade';
 import 'swiper/css';
+import * as XLSX from 'xlsx';
 
 const BookingSearch = () => {
   const navigate = useNavigate();
@@ -50,8 +51,55 @@ const BookingSearch = () => {
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleDownloadToExcel = async () => {
+    const excelData = results.map(booking => ({
+      'Booking ID': booking.booking_id,
+      'Check In': dayjs(booking.check_in).format('YYYY-MM-DD'),
+      'Check Out': dayjs(booking.check_out).format('YYYY-MM-DD'),
+      'Total Nights': booking.number_of_nights,
+      'Number of Guests': booking.number_of_people,
+      'Room Name': booking.room_name,
+      'Room Price': booking.room_price,
+      'Guest Name': `${booking.customer_name} (${booking.customer_id})`,
+      'Guest Phone': booking.contact_number,
+      'Food Price': booking.food_price,
+      'Service Price': booking.service_price,
+      'Booked By': `${booking.source_of_booking} (${booking.source_of_booking_id})`,
+      'Commission %': booking.commission_percent,
+      'Commission': booking.commission,
+      'Total Price': booking.total_price,
+      'Remarks': booking.remarks || '',
+    }));
+    if (!excelData.length) {
+      toast.error('No bookings to download.');
+      return;
+    }
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Bookings");
+    XLSX.writeFile(workbook, "tww.xlsx");
+  }
+
+  const validateSearchFields = () => {
+    const { from_date, to_date } = searchCriteria;
+    //if either the date is present then the next is mandatory
+    if ((from_date && !to_date) || (!from_date && to_date)) {
+      toast.error('Please select both dates.');
+      return false;
+    }
+    if (to_date < from_date) {
+      toast.error('To date must be above or equal to From date.');
+      return false;
+    }
+    return true;
+  }
+
   const handleSearch = async () => {
     setLoading(true);
+    if(!validateSearchFields()) {
+      setLoading(false);
+      return;
+    }
     try {
       const bookings = await searchBookings(navigate, searchCriteria);
       setResults(bookings);
@@ -216,6 +264,15 @@ const BookingSearch = () => {
           >
             Cancel
           </button>
+          {results.length > 0 && (
+            <button
+              className="download-button"
+              onClick={handleDownloadToExcel}
+              style={{ width: '100%', marginTop: '10px' }}
+            >
+              Download as Excel
+            </button>
+          )}
         </div>
 
         <BookingList
