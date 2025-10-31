@@ -81,6 +81,10 @@
     font-size: 1em;
   }
 
+  .react-select-style {
+    width: 75%;
+  }
+
   .search-button {
     color: white;
     border: none;
@@ -94,15 +98,56 @@
     margin-top: 10px;
   }
 
-  .react-select-style {
-    width: 75%;
-  }
-
   .search-button:hover {
     background-color: #0b7dda;
   }
 
   .search-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+
+  .cancel-button {
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    background-color: #707d8a;
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+
+  .cancel-button:hover {
+    background-color: #6c757d;
+  }
+
+  .cancel-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+
+  .download-button {
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    background-color: #4a6f94;
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+
+  .download-button:hover {
+    background-color: #9cc7f1;
+    color: #007BFF;
+  }
+
+  .download-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
   }

@@ -18,6 +18,7 @@ import '../styles.css'
 import 'swiper/css/effect-fade';
 import 'swiper/css';
 import { isUserInRoles } from "../contexts/constants";
+import * as XLSX from 'xlsx';
 
 const TransactionSearch = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const TransactionSearch = () => {
   const { startDate } = useParams(); // startDate get form url (/transactions/search/:startDate) as string...
   const [searchCriteria, setSearchCriteria] = useState({
     transaction_date: startDate,
+    transaction_end_date: startDate,
   });
   const [transactionsData, setTransactionsData] = useState([]);
   const [totalDebit, setTotalDebit] = useState(0);
@@ -94,6 +96,40 @@ const TransactionSearch = () => {
     setSearchCriteria((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleDownloadExcel = () => {
+    const excelData = transactionsData.map(transaction => ({
+      'Transaction ID': transaction.acc_entry_id,
+      'Date': dayjs(transaction.acc_entry_date).format('YYYY-MM-DD'),
+      'Paid By ID': transaction.paid_by,
+      'Paid By': transaction.paid_by_customer_name,
+      'Paid By Phone': transaction.paid_by_customer_phone,
+      'Received By ID': transaction.received_by,
+      'Received By': transaction.received_by_customer_name,
+      'Received By Phone': transaction.received_by_customer_phone,
+      'Txn By ID': transaction.txn_by,
+      'Txn By': transaction.txn_by_customer_name,
+      'Txn By Phone': transaction.txn_by_customer_phone,
+      'Account Category ID': transaction.acc_category_id,
+      'Account Category': transaction.acc_category_name,
+      'Amount': transaction.acc_entry_amount,
+      'Description': transaction.acc_entry_description,
+      'Credit/Debit': transaction.acc_category_type,
+      'Mode': transaction.payment_type,
+      'Booking ID': transaction.received_for_booking_id,
+      'Guest Name': transaction.booking_customer_name,
+      'Guest Phone': transaction.booking_customer_phone,
+      'Room Name': transaction.room_name,
+    }));
+    if (!excelData.length) {
+      toast.error('No transactions to download.');
+      return;
+    }
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+    XLSX.writeFile(workbook, "transactions.xlsx");
+  };
+
   const calculateTotalDebitCredit = (transactions) => {
     //round of to two digits and comma seperated as currency
     const debit = transactions.filter(transaction => transaction.acc_category_type === 'debit').reduce((acc, transaction) => acc + transaction.acc_entry_amount, 0);
@@ -103,8 +139,23 @@ const TransactionSearch = () => {
     setCurrentPage(1);
   }
 
+  const validateSearchFields = (startDate) => {
+    const { transaction_date, transaction_end_date } = searchCriteria;
+    if (!startDate) return false;
+    //if either the date is present then the next is mandatory
+    if ((transaction_date && !transaction_end_date) || (!transaction_date && transaction_end_date)) {
+      toast.error('Please select both dates.');
+      return false;
+    }
+    if (transaction_end_date < transaction_date) {
+      toast.error('End date must be above or equal to start date.');
+      return false;
+    }
+    return true;
+  }
+
   const handleSearch = (startDate) => {
-    if(!startDate) return;
+    if (!validateSearchFields(startDate)) return;
     getTransactions(navigate, searchCriteria).then(transactions => {
       setTransactionsData(transactions);
       calculateTotalDebitCredit(transactions);
@@ -203,12 +254,23 @@ const TransactionSearch = () => {
           </div>
 
           <div className="search-field" >
-            <label htmlFor="transaction_date">Transactions Since:</label>
+            <label htmlFor="transaction_date">From Date:</label>
             <input
               type="date"
               id="transaction_date"
               name="transaction_date"
               value={searchCriteria.transaction_date}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="search-field" >
+            <label htmlFor="transaction_end_date">To Date:</label>
+            <input
+              type="date"
+              id="transaction_end_date"
+              name="transaction_end_date"
+              value={searchCriteria.transaction_end_date}
               onChange={handleInputChange}
             />
           </div>
@@ -316,6 +378,15 @@ const TransactionSearch = () => {
           >
             Cancel
           </button>
+          {transactionsData.length > 0 && (
+            <button
+              className="download-button"
+              onClick={handleDownloadExcel}
+              style={{ width: '100%', marginTop: '10px' }}
+            >
+              Download as Excel
+            </button>
+          )}
         </div>
 
         <TransactionList
