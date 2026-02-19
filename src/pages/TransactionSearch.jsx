@@ -27,6 +27,7 @@ const TransactionSearch = () => {
   const [searchCriteria, setSearchCriteria] = useState({
     transaction_date: startDate,
     transaction_end_date: startDate,
+    acc_category_type: 'debit',
   });
   const [transactionsData, setTransactionsData] = useState([]);
   const [totalDebit, setTotalDebit] = useState(0);
@@ -41,6 +42,10 @@ const TransactionSearch = () => {
   const [selectedPaidBy, setSelectedPaidBy] = useState();
   const [selectedTxnBy, setSelectedTxnBy] = useState();
   const [selectedReceivedBy, setSelectedReceivedBy] = useState();
+  const [selectedTxnType, setSelectedTxnType] = useState({
+    value: 'debit',
+    label: 'Expenses',
+  });
 
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,6 +95,12 @@ const TransactionSearch = () => {
   useEffect(() => {
     handleSearch(startDate);
   }, [startDate]);
+
+  const txnTypeOptions = [
+    { value: 'debit', label: 'Expenses' },
+    { value: 'credit', label: 'Income' },
+    { value: 'both', label: 'Both' },
+  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -186,20 +197,22 @@ const TransactionSearch = () => {
       value: 0,
       label: 'Select Booking ...',
     });
+    setSelectedTxnType({
+      value: 'debit',
+      label: 'Expenses',
+    });
     setTransactionsData([]);
     setTotalDebit(0);
     setTotalCredit(0);
   }
 
   const handleViewTransaction = (selectedTransaction) => {
-    if (selectedTransaction.acc_category_type === 'debit') {
-      navigate(`/expenses`, {
-        state: {
-          preloadedExpense: selectedTransaction,
-          from: 'searchExpense'
-        }
-      });
-    }
+    navigate(`/expenses`, {
+      state: {
+        preloadedExpense: selectedTransaction,
+        from: 'searchExpense'
+      }
+    });
   };
 
   const paginatedTransactions = transactionsData.slice(
@@ -233,6 +246,25 @@ const TransactionSearch = () => {
         </div>
 
         <div className="search-form" >
+          <div className="search-field" >
+            <label htmlFor="acc_category_type">Txn Type:</label>
+            <Select name="acc_category_type"
+              value={selectedTxnType}
+              onChange={e => {
+                setSearchCriteria(prev => ({ ...prev, acc_category_type: e.value }));
+                setSelectedTxnType({
+                  value: e.value,
+                  label: e.label,
+                });
+              }}
+              options={txnTypeOptions}
+              placeholder="Select Txn Type..."
+              isSearchable={true}
+              classNamePrefix="react-select"
+              className="react-select-style"
+            />
+          </div>
+
           <div className="search-field" >
             <label htmlFor="acc_category_id">Account Category:</label>
             <Select name="acc_category_id"
