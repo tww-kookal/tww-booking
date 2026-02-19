@@ -6,11 +6,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import TransactionList from "./TransactionList";
+import TransactionListTabular from "./TransactionListTabular";
 import { getAllAccountingCategories, getTransactionsSince, getTransactions } from '../modules/accounting.module';
 import { getAllCustomers } from '../modules/customer.module';
 import { getAllBookings } from '../modules/booking.module';
-import '../css/transactionSearch.large.css';
-import '../css/transactionSearch.handheld.css';
+import '../css/transaction/transactionSearch.large.css';
+import '../css/transaction/transactionSearch.handheld.css';
 import ScrollToTop from '../site/ScrollToTop';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectFade, Autoplay } from 'swiper';
@@ -45,6 +46,10 @@ const TransactionSearch = () => {
   const [selectedTxnType, setSelectedTxnType] = useState({
     value: 'debit',
     label: 'Expenses',
+  });
+  const [showReportAs, setShowReportAs] = useState(() => {
+    // Default to 'tabular' for large screens, 'cards' for handheld
+    return window.matchMedia('(min-width: 768px)').matches ? 'tabular' : 'cards';
   });
 
   const [loading, setLoading] = useState(false);
@@ -419,19 +424,42 @@ const TransactionSearch = () => {
               Download as Excel
             </button>
           )}
-        </div>
+          {/* Toggle Button for Tabular/Cards */}
+          {transactionsData.length > 0 && (
+            <button
+              id="showReportAs"
+              className="download-button show-report-toggle-large"
+              value={showReportAs}
+              onClick={() =>
+                setShowReportAs(showReportAs === 'tabular' ? 'cards' : 'tabular')
+              }
+            >
+              Switch to {showReportAs === 'tabular' ? 'Cards' : 'Tabular'}
+            </button>
+          )}        </div>
+        {/* Conditional rendering based on toggle */}
+        {showReportAs === 'cards' ? (
+          <TransactionList
+            loading={loading}
+            transactions={transactionsData}
+            paginatedTransactions={paginatedTransactions}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+            handlePageChange={handlePageChange}
+            handleViewTransaction={handleViewTransaction}
+            totalDebit={totalDebit}
+            totalCredit={totalCredit}
+          />
+        ) : (
+          <TransactionListTabular
+            loading={loading}
+            transactions={transactionsData}
+            handleViewTransaction={handleViewTransaction}
+            totalDebit={totalDebit}
+            totalCredit={totalCredit}
+          />
+        )}
 
-        <TransactionList
-          loading={loading}
-          transactions={transactionsData}
-          paginatedTransactions={paginatedTransactions}
-          itemsPerPage={itemsPerPage}
-          currentPage={currentPage}
-          handlePageChange={handlePageChange}
-          handleViewTransaction={handleViewTransaction}
-          totalDebit={totalDebit}
-          totalCredit={totalCredit}
-        />
       </div>
     </div>
   );

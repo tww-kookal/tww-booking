@@ -2,8 +2,8 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../css/transactionList.large.css';
-import '../css/transactionList.handheld.css';
+import '../css/transaction/transactionList.large.css';
+import '../css/transaction/transactionList.handheld.css';
 
 const TransactionList = ({
     loading,

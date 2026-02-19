@@ -22,6 +22,10 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
 
+  .show-report-toggle-large {
+    display: none !important;
+  }
+
   .search-header {
     display: flex;
     flex-direction: column;
@@ -57,9 +61,7 @@
     margin-bottom: 5px;
   }
 
-  .search-field input 
-  .search-field Select 
-  {
+  .search-field input .search-field Select {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;

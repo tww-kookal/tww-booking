@@ -9,8 +9,8 @@ import { getAllBookings } from '../modules/booking.module';
 import { getAllCustomers } from '../modules/customer.module';
 import { isUserInRoles, getUserContext } from '../contexts/constants';
 
-import '../css/transaction.large.css';
-import '../css/transaction.handheld.css';
+import '../css/transaction/transaction.large.css';
+import '../css/transaction/transaction.handheld.css';
 import ScrollToTop from '../site/ScrollToTop';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectFade, Autoplay } from 'swiper';
