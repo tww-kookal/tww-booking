@@ -1,0 +1,41 @@
+@media (max-width: 999px) {
+  .scrollable-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .booking-table {
+    min-width: 1100px;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .booking-table th,
+  .booking-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .booking-row {
+    cursor: pointer;
+  }
+
+  .booking-row.confirmed {
+    background: #e3f2fd;
+  }
+
+  .booking-row.cancelled {
+    background: #ffe0b2;
+  }
+
+  .booking-row.available {
+    background: #c8e6c9;
+  }
+
+  .booking-row a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 600;
+  }
+}

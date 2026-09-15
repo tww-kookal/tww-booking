@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from "react-router-dom";
 import dayjs from 'dayjs';
 import BookingList from "./BookingList";
+import BookingListTabular from "./BookingListTabular";
 import { getAllAttachedBookings, getAllBookings, searchBookings } from "../modules/booking.module";
 import { getAllBookingSources } from '../modules/users.module';
 
@@ -31,6 +32,9 @@ const BookingSearch = () => {
   const [users, setUsers] = useState([]);
   const [userOptions, setUserOptions] = useState([]);
   const [selectedBookingSource, setSelectedBookingSource] = useState(null);
+  const [showReportAs, setShowReportAs] = useState(() => {
+    return window.matchMedia('(min-width: 768px)').matches ? 'tabular' : 'cards';
+  });
 
   useEffect(() => {
     getAllBookingSources(navigate).then(users => {
@@ -273,18 +277,39 @@ const BookingSearch = () => {
               Download as Excel
             </button>
           )}
+          {results.length > 0 && (
+            <button
+              id="showReportAs"
+              className="download-button show-report-toggle-large"
+              value={showReportAs}
+              onClick={() =>
+                setShowReportAs(showReportAs === 'tabular' ? 'cards' : 'tabular')
+              }
+            >
+              Switch to {showReportAs === 'tabular' ? 'Cards' : 'Tabular'}
+            </button>
+          )}
         </div>
 
-        <BookingList
-          loading={loading}
-          results={results}
-          paginatedResults={paginatedResults}
-          findAttachmentsForBooking={findAttachmentsForBooking}
-          itemsPerPage={itemsPerPage}
-          currentPage={currentPage}
-          handlePageChange={handlePageChange}
-          handleViewBooking={handleViewBooking}
-        />
+        {showReportAs === 'cards' ? (
+          <BookingList
+            loading={loading}
+            results={results}
+            paginatedResults={paginatedResults}
+            findAttachmentsForBooking={findAttachmentsForBooking}
+            itemsPerPage={itemsPerPage}
+            currentPage={currentPage}
+            handlePageChange={handlePageChange}
+            handleViewBooking={handleViewBooking}
+          />
+        ) : (
+          <BookingListTabular
+            loading={loading}
+            results={results}
+            findAttachmentsForBooking={findAttachmentsForBooking}
+            handleViewBooking={handleViewBooking}
+          />
+        )}
       </div>
     </div>
   );
