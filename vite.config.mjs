@@ -4,7 +4,7 @@ import svgr from 'vite-plugin-svgr'
 
 export default defineConfig({
   plugins: [react(), svgr()],
-  base: '/tww-booking/',
+  base: '/',
   build: {
     outDir: 'dist',     // Custom output directory inside public
     emptyOutDir: true,

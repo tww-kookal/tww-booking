@@ -11,7 +11,7 @@ createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={GOOGLE_APP_CLIENT_ID}>
       <AuthProvider>
-        <BrowserRouter basename="/tww-booking/">
+        <BrowserRouter>
           <App />
         </BrowserRouter>
       </AuthProvider>
