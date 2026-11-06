@@ -393,9 +393,12 @@ export const calculateTotalPaid = (payments) => {
             return acc - amount;
         } else if (p.acc_category_name === COMMISSION_PAYOUT) {
             return acc; // Skip adding this payment
-        } else {
+        } else if (p.acc_category_type === 'credit') {
             return acc + amount;
+        } else if (p.acc_category_type === 'debit') {
+            return acc - amount;
         }
+        return acc; // Should not happen if all payments have a type
     }, 0);
 }
 
@@ -789,4 +792,3 @@ export const handleGenerateReceipt = (booking) => {
     receiptWindow.document.head.appendChild(script);
     receiptWindow.document.close();
 };
-

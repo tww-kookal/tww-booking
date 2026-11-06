@@ -494,7 +494,7 @@ const Booking = () => {
                             <div className="loading-spinner" style={{ display: isPaymentLoading ? 'block' : 'none' }}></div>
                             <div className='form-group-row'>
                                 <label style={{ width: '25%', textAlign: 'left' }}>Total</label>
-                                <label style={{ width: '25%', textAlign: 'right' }}>{booking.total_price}</label>
+                                <label style={{ width: '25%', textAlign: 'right' }}>{booking.total_price || 0}</label>
                             </div>
                             <div className='form-group-row'>
                                 <label style={{ width: '25%', fontSize: "1rem", textAlign: 'right' }}><b>Date</b></label>
