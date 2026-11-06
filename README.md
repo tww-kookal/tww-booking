@@ -78,6 +78,19 @@ All frontend actions—such as booking rooms, managing customers, processing pay
 ### 7. Deployment & Scalability
 - **Decoupled Deployment**: The frontend (on GitHub Pages) and backend (on Railway.app or other platforms) are independently deployable. As long as the API base URL is set, the frontend can connect to any backend instance, supporting scalability and maintainability.
 
+- Build the applications for each environment 
+   ```
+      npm run build -- --mode stage
+      npm run build -- --mode production
+      npm run build -- --mode development
+   ```
+
+- Deploy the app to GoDaddy - in the file explorer of GoDaddy replace the dist folder into it's corresponding public_html folder
+   ```
+      public_html/backofficestage.thewestwood.in   -- Stage
+      public_html/backoffice.thewestwood.in  -- Prod
+   ```
+
 ### 8. Security Best Practices
 - **HTTPS**: All communication is encrypted via HTTPS.
 - **Token Expiry**: The frontend gracefully handles token expiry, prompting re-authentication as needed.
